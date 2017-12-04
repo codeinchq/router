@@ -20,7 +20,7 @@
 // Project:  lib-codeinclib
 //
 namespace CodeInc\GUI\Views\HTMLTag;
-use CodeIncLib\GUI\Views\ViewException;
+use CodeInc\GUI\Views\ViewException;
 
 
 /**

@@ -6,7 +6,8 @@
   "type": "package",
   "license": "proprietary",
   "require": {
-    "php": ">=7.0"
+    "php": ">=7.0",
+    "codeinchq/lib-arrayaccess": "dev-master"
   },
   "dist": {
     "url": "https://github.com/codeinchq/lib-gui/archive/master.zip",
@@ -23,6 +24,12 @@
       "email": "joan@codeinc.co",
       "homepage": "https://www.codeinc.co",
       "role": "developer"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/codeinchq/lib-arrayaccess"
     }
   ]
 }

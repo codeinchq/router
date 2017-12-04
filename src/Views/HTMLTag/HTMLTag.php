@@ -20,6 +20,8 @@
 // Project:  codeinc.co
 //
 namespace CodeInc\GUI\Views\HTMLTag;
+use CodeInc\ArrayAccess\ArrayAccessTrait;
+use CodeInc\GUI\Views\AbstractView;
 
 
 /**
