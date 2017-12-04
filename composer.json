@@ -25,11 +25,5 @@
       "homepage": "https://www.codeinc.co",
       "role": "developer"
     }
-  ],
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/codeinchq/lib-arrayaccess"
-    }
   ]
 }
