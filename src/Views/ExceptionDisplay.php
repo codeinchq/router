@@ -36,7 +36,7 @@ class ExceptionDisplay implements ViewInterface {
 	private $exception;
 
 	/**
-	 * HTMLException constructor.
+	 * ExceptionDisplay constructor.
 	 *
 	 * @param \Exception $exception
 	 */
