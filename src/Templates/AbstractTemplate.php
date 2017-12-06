@@ -21,7 +21,7 @@
 //
 namespace CodeInc\GUI\Templates;
 use CodeInc\GUI\Templates\Interfaces\HTMLTemplateInterface;
-use CodeInc\GUI\Views\HTMLTag\HTMLTag;
+use CodeInc\GUI\Views\HTMLTag;
 use CodeInc\GUI\Views\ViewException;
 
 /**

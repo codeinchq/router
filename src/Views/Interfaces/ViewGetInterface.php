@@ -19,7 +19,8 @@
 // Time:     19:06
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Views;
+namespace CodeInc\GUI\Views\Interfaces;
+use CodeInc\GUI\Views\ViewException;
 
 
 /**

@@ -20,15 +20,16 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Views;
+use CodeInc\GUI\Views\Interfaces\ViewInterface;
 
 
 /**
- * Class HTMLException
+ * Class ExceptionDisplay
  *
  * @package CodeInc\GUI\Views
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HTMLException implements ViewInterface {
+class ExceptionDisplay implements ViewInterface {
 	/**
 	 * @var \Exception
 	 */
@@ -73,12 +74,13 @@ class HTMLException implements ViewInterface {
 	 * Renders the Exception
 	 *
 	 * @param \Exception $exception
+	 * @param string $position
 	 */
-	private function renderException(\Exception $exception, string $pos) {
+	private function renderException(\Exception $exception, string $position) {
 		?>
-		<div class="exception" data-pos="<?=htmlspecialchars($pos)?>" data-type="<?=htmlspecialchars(get_class($exception))?>">
+		<div class="exception" data-pos="<?=htmlspecialchars($position)?>" data-type="<?=htmlspecialchars(get_class($exception))?>">
 			<div class="exception-header">
-				<span class="exception-pos"><?=htmlspecialchars("[$pos]")?></span>
+				<span class="exception-pos"><?=htmlspecialchars("[$position]")?></span>
 				<span class="exception-class"><?=htmlspecialchars(get_class($exception))?></span>
 			</div>
 			<div class="exception-message">
@@ -126,10 +128,12 @@ class HTMLException implements ViewInterface {
 			}
 			div.exception.parent > div.exception div.exception-header {
 				font-weight: bold;
-				text-transform: uppercase;
 				font-size: .8em;
 				margin-bottom: 5px;
 				color: red;
+			}
+			div.exception.parent > div.exception div.exception-header span.exception-pos {
+				text-transform: uppercase;
 			}
 			div.exception.parent > div.exception div.exception-location, div.exception.parent > div.exception div.exception-trace {
 				font-size: .8em;

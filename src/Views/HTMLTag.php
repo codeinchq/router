@@ -19,9 +19,10 @@
 // Time:     15:40
 // Project:  codeinc.fr
 //
-namespace CodeInc\GUI\Views\HTMLTag;
+namespace CodeInc\GUI\Views;
 use CodeInc\ArrayAccess\ArrayAccessTrait;
 use CodeInc\GUI\Views\AbstractGetView;
+use CodeInc\GUI\Views\ViewException;
 
 
 /**
@@ -52,7 +53,7 @@ class HTMLTag extends AbstractGetView implements \ArrayAccess {
 	 *
 	 * @param string $tagName
 	 * @param array|null $attributes
-	 * @throws HTMLTagException
+	 * @throws ViewException
 	 */
 	public function __construct(string $tagName, array $attributes = null) {
 		$this->setTagName($tagName);
@@ -65,11 +66,11 @@ class HTMLTag extends AbstractGetView implements \ArrayAccess {
 	 * Sets the tag name.
 	 *
 	 * @param string $tagName
-	 * @throws HTMLTagException
+	 * @throws ViewException
 	 */
 	private function setTagName(string $tagName) {
 		if (!preg_match('/^[a-z]+$/ui', $tagName)) {
-			throw new HTMLTagException("The tag name \"$tagName\" is invalid");
+			throw new ViewException("The tag name \"$tagName\" is invalid");
 		}
 		$this->tagName = $tagName;
 	}

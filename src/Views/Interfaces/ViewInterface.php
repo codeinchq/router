@@ -15,20 +15,26 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/12/2017
-// Time:     15:48
-// Project:  lib-codeinclib
+// Date:     22/11/2017
+// Time:     17:09
+// Project:  lib-gui
 //
-namespace CodeInc\GUI\Views\HTMLTag;
+namespace CodeInc\GUI\Views\Interfaces;
 use CodeInc\GUI\Views\ViewException;
 
 
 /**
- * Class HTMLTagException
+ * Interface ViewInterface
  *
- * @package CodeInc\GUI\Views\HTMLTag
+ * @package CodeInc\GUI\Views
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HTMLTagException extends ViewException {
-
+interface ViewInterface {
+	/**
+	 * Renders the view.
+	 *
+	 * @throws ViewException
+	 * @return void
+	 */
+	public function render();
 }

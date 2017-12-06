@@ -20,6 +20,8 @@
 // Project:  lib-codeinclib
 //
 namespace CodeInc\GUI\Views;
+use CodeInc\GUI\Views\Interfaces\ViewGetInterface;
+use CodeInc\GUI\Views\Interfaces\ViewInterface;
 
 
 /**
