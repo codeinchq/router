@@ -21,7 +21,7 @@
 //
 namespace CodeInc\GUI\Views\HTMLTag;
 use CodeInc\ArrayAccess\ArrayAccessTrait;
-use CodeInc\GUI\Views\AbstractView;
+use CodeInc\GUI\Views\AbstractGetView;
 
 
 /**
@@ -30,7 +30,7 @@ use CodeInc\GUI\Views\AbstractView;
  * @package CodeInc\GUI\Views\HTMLTag
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HTMLTag extends AbstractView implements \ArrayAccess {
+class HTMLTag extends AbstractGetView implements \ArrayAccess {
 	use ArrayAccessTrait;
 
 	/**
@@ -112,15 +112,15 @@ class HTMLTag extends AbstractView implements \ArrayAccess {
 	 *
 	 * @return string
 	 */
-	public function get():string {
-		$tag = "<$this->tagName";
+	public function render():string {
+		echo "<$this->tagName";
 		foreach ($this->attributes as $name => $value) {
-			$tag .= " $name";
+			echo " $name";
 			if (!empty($value)) {
-				$tag .= "=\"".htmlspecialchars($value)."\"";
+				echo "=\"".htmlspecialchars($value)."\"";
 			}
 		}
-		return "$tag>";
+		echo ">";
 	}
 
 	/**

@@ -28,7 +28,7 @@ namespace CodeInc\GUI\Views;
  * @package CodeInc\GUI\Views
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ExceptionRender extends AbstractView {
+class ExceptionRender implements ViewInterface {
 	/**
 	 * @var \Exception
 	 */
@@ -44,12 +44,9 @@ class ExceptionRender extends AbstractView {
 	}
 
 	/**
-	 * Returns the HTML code.
-	 *
-	 * @return string
+	 * Renders the HTML code.
 	 */
-	public function get():string {
-		ob_start();
+	public function render() {
 		?>
 		<div class="exception" data-class="<?=htmlspecialchars(get_class($this->exception))?>">
 			<?
@@ -70,7 +67,6 @@ class ExceptionRender extends AbstractView {
 			?>
 		</div>
 		<?
-		return ob_get_clean();
 	}
 
 	/**

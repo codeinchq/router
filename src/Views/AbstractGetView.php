@@ -15,25 +15,38 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/11/2017
-// Time:     17:09
-// Project:  lib-gui
+// Date:     04/12/2017
+// Time:     15:53
+// Project:  lib-codeinclib
 //
 namespace CodeInc\GUI\Views;
 
 
 /**
- * Interface ViewInterface
+ * Class AbstractView
  *
  * @package CodeInc\GUI\Views
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ViewInterface {
+abstract class AbstractGetView implements ViewInterface, ViewGetInterface {
 	/**
-	 * Renders the view.
+	 * Returns the views generated code.
 	 *
 	 * @throws ViewException
-	 * @return void
 	 */
-	public function render();
+	public function get():string {
+		ob_start();
+		$this->render();
+		return ob_get_clean();
+	}
+
+	/**
+	 * Returns the view.
+	 *
+	 * @return string
+	 * @throws ViewException
+	 */
+	public function __toString():string {
+		return $this->get();
+	}
 }
