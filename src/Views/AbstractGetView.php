@@ -44,9 +44,12 @@ abstract class AbstractGetView implements ViewInterface, ViewGetInterface {
 	 * Returns the view.
 	 *
 	 * @return string
-	 * @throws ViewException
 	 */
 	public function __toString():string {
-		return $this->get();
+		try {
+			return $this->get();
+		} catch (\Exception $exception) {
+			return "Error: ".$exception->getMessage();
+		}
 	}
 }
