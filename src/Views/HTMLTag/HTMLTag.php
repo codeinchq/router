@@ -108,11 +108,9 @@ class HTMLTag extends AbstractGetView implements \ArrayAccess {
 	}
 
 	/**
-	 * Returns the tag's opening HTML source.
-	 *
-	 * @return string
+	 * Renders the tag's opening HTML source.
 	 */
-	public function render():string {
+	public function render() {
 		echo "<$this->tagName";
 		foreach ($this->attributes as $name => $value) {
 			echo " $name";
