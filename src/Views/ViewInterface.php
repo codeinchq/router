@@ -4,7 +4,7 @@
 // | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
-// | Visit https://www.codeinc.co for more information about licensing.  |
+// | Visit https://www.codeinc.fr for more information about licensing.  |
 // +---------------------------------------------------------------------+
 // | NOTICE:  All information contained herein is, and remains the       |
 // | property of Code Inc. SAS. The intellectual and technical concepts  |
