@@ -35,7 +35,7 @@ class HTMLException implements ViewInterface {
 	private $exception;
 
 	/**
-	 * ExceptionRenderComponent constructor.
+	 * HTMLException constructor.
 	 *
 	 * @param \Exception $exception
 	 */
@@ -70,7 +70,7 @@ class HTMLException implements ViewInterface {
 	}
 
 	/**
-	 * Renders hte Exception
+	 * Renders the Exception
 	 *
 	 * @param \Exception $exception
 	 */

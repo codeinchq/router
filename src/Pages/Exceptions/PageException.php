@@ -44,7 +44,7 @@ class PageException extends GUIException {
 	 * @param int $code
 	 * @param \Throwable|null $previous
 	 */
-	public function __construct(PageInterface $parentPage, string $message = "", int $code = 0, \Throwable $previous = null) {
+	public function __construct(PageInterface $parentPage, string $message = "", int $code = null, \Throwable $previous = null) {
 		$this->parentPage = $parentPage;
 		parent::__construct($message, $code, $previous);
 	}
