@@ -21,8 +21,8 @@
 //
 namespace CodeInc\GUI\Views;
 use CodeInc\ArrayAccess\ArrayAccessTrait;
-use CodeInc\GUI\Views\AbstractGetView;
-use CodeInc\GUI\Views\ViewException;
+use CodeInc\GUI\Views\Interfaces\ReturnableViewInterface;
+use CodeInc\GUI\Views\Interfaces\ViewInterface;
 
 
 /**
@@ -31,7 +31,7 @@ use CodeInc\GUI\Views\ViewException;
  * @package CodeInc\GUI\Views\HTMLTag
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HTMLTag extends AbstractGetView implements \ArrayAccess {
+class HTMLTag implements \ArrayAccess, ViewInterface, ReturnableViewInterface {
 	use ArrayAccessTrait;
 
 	/**
@@ -109,17 +109,36 @@ class HTMLTag extends AbstractGetView implements \ArrayAccess {
 	}
 
 	/**
+	 * Returns the tag's opening HTML source.
+	 *
+	 * @return string
+	 */
+	public function get():string {
+		$tag = "<$this->tagName";
+		foreach ($this->attributes as $name => $value) {
+			$tag .= " $name";
+			if (!empty($value)) {
+				$tag .= "=\"".htmlspecialchars($value)."\"";
+			}
+		}
+		return "$tag>";
+	}
+
+	/**
+	 * Alias of get()
+	 *
+	 * @see HTMLTag::get()
+	 * @return string
+	 */
+	public function __toString():string {
+		return $this->get();
+	}
+
+	/**
 	 * Renders the tag's opening HTML source.
 	 */
 	public function render() {
-		echo "<$this->tagName";
-		foreach ($this->attributes as $name => $value) {
-			echo " $name";
-			if (!empty($value)) {
-				echo "=\"".htmlspecialchars($value)."\"";
-			}
-		}
-		echo ">";
+		echo $this->get();
 	}
 
 	/**

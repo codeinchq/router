@@ -24,12 +24,12 @@ use CodeInc\GUI\Views\ViewException;
 
 
 /**
- * Interface ViewGetInterface
+ * Interface ReturnableViewInterface
  *
- * @package CodeInc\GUI\Views
+ * @package CodeInc\GUI\Views\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ViewGetInterface extends ViewInterface {
+interface ReturnableViewInterface extends ViewInterface {
 	/**
 	 * Returns the view's HTML code.
 	 *
