@@ -7,7 +7,7 @@
   "license": "proprietary",
   "require": {
     "php": ">=7.0",
-    "codeinchq/lib-arrayaccess": "^1.0"
+    "codeinchq/lib-arrayaccess": "dev-master"
   },
   "autoload": {
     "psr-4": {
@@ -22,6 +22,11 @@
       "role": "developer"
     }
   ],
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    }
+  },
   "repositories": [
     { "type": "vcs", "url": "https://github.com/codeinchq/lib-arrayaccess" }
   ]
