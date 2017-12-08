@@ -15,8 +15,8 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     06/12/2017
-// Time:     19:06
+// Date:     08/12/2017
+// Time:     14:13
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Views\Interfaces;
@@ -24,17 +24,18 @@ use CodeInc\GUI\Views\ViewException;
 
 
 /**
- * Interface ReturnableViewInterface
+ * Interface StringifiableViewInterface
  *
  * @package CodeInc\GUI\Views\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ReturnableViewInterface extends ViewInterface {
+interface StringifiableViewInterface {
 	/**
-	 * Returns the view's HTML code.
+	 * Alias of get()
 	 *
+	 * @see ViewInterface::get()
 	 * @throws ViewException
 	 * @return string
 	 */
-	public function get():string;
+	public function __toString():string;
 }

@@ -22,6 +22,7 @@
 namespace CodeInc\GUI\Views;
 use CodeInc\ArrayAccess\ArrayAccessTrait;
 use CodeInc\GUI\Views\Interfaces\ReturnableViewInterface;
+use CodeInc\GUI\Views\Interfaces\StringifiableViewInterface;
 use CodeInc\GUI\Views\Interfaces\ViewInterface;
 
 
@@ -31,7 +32,7 @@ use CodeInc\GUI\Views\Interfaces\ViewInterface;
  * @package CodeInc\GUI\Views\HTMLTag
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HTMLTag implements \ArrayAccess, ViewInterface, ReturnableViewInterface {
+class HTMLTag implements \ArrayAccess, ViewInterface, StringifiableViewInterface, ReturnableViewInterface {
 	use ArrayAccessTrait;
 
 	/**
