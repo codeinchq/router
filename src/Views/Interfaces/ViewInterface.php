@@ -20,7 +20,6 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Views\Interfaces;
-use CodeInc\GUI\Views\ViewException;
 
 
 /**
@@ -33,7 +32,7 @@ interface ViewInterface {
 	/**
 	 * Renders the view.
 	 *
-	 * @throws ViewException
+	 * @throws
 	 * @return void
 	 */
 	public function render();
