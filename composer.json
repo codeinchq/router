@@ -1,13 +1,13 @@
 {
   "name": "codeinchq/lib-gui",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Code Inc.'s GUI library",
   "homepage": "https://github.com/codeinchq/lib-gui",
   "type": "package",
   "license": "proprietary",
   "require": {
     "php": ">=7.0",
-    "codeinchq/lib-arrayaccess": "dev-master"
+    "codeinchq/lib-arrayaccess": "^1.1"
   },
   "autoload": {
     "psr-4": {
