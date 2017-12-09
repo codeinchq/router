@@ -111,6 +111,7 @@ class ExceptionDisplay implements ViewInterface {
 				font-family: Arial, sans-serif;
 				font-size: 14px;
 				list-style: decimal;
+				text-align: left;
 			}
 			div.exception.parent > div.exception-title {
 				background: red;
