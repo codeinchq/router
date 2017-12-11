@@ -16,37 +16,35 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     11/12/2017
-// Time:     15:16
+// Time:     16:50
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets;
-use CodeInc\GUI\Assets\Interfaces\WebAssetsInterface;
+namespace CodeInc\GUI\Assets\Interfaces;
+use CodeInc\GUI\Assets\Exception\PrivateAssetNotFound;
+use CodeInc\GUI\Assets\Exception\PrivateAssetsBasePathNotFound;
 
 
 /**
- * Trait WebAssetTrait
+ * Interface PrivateAssetManagerInterface
  *
- * @package CodeInc\GUI\Assets
+ * @package CodeInc\GUI\Assets\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @see WebAssetsInterface
  */
-trait WebAssetTrait {
+interface PrivateAssetsManagerInterface {
 	/**
-	 * Returns the web assets base URI.
+	 * PrivateAssetManagerInterface constructor.
 	 *
-	 * @return string
-	 * @throws
+	 * @param string $privateAssetBasePath
+	 * @throws PrivateAssetsBasePathNotFound
 	 */
-	abstract protected static function getWebAssetsURI():string;
+	public function __construct(string $privateAssetBasePath);
 
 	/**
-	 * Returns a web asset URI.
-	 *
 	 * @param string $asset
+	 * @param string|null $className
+	 * @param string|null $baseNamespace
 	 * @return string
-	 * @throws
+	 * @throws PrivateAssetNotFound
 	 */
-	public static function getAssetURI(string $asset):string {
-		return self::getWebAssetsURI().$asset;
-	}
+	public function getAssetPath(string $asset, string $className = null, string $baseNamespace = null):string;
 }
