@@ -50,7 +50,7 @@ trait PrivateAssetsTrait {
 	 * @return string
 	 * @throws PrivateAssetNotFound
 	 */
-	public static function getPrivateAssetPath(string $asset) {
+	public static function getPrivateAssetPath(string $asset):string {
 		$assetPath = self::getPrivateAssetsBaseDir()
 			.DIRECTORY_SEPARATOR
 			.self::getClassAssetsRelativePath(DIRECTORY_SEPARATOR)
