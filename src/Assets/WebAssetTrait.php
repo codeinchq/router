@@ -31,15 +31,13 @@ use CodeInc\GUI\Assets\Interfaces\WebAssetsInterface;
  * @see WebAssetsInterface
  */
 trait WebAssetTrait {
-	use AssetsTrait;
-
 	/**
 	 * Returns the web assets base URI.
 	 *
 	 * @return string
 	 * @throws
 	 */
-	abstract protected static function getWebAssetBaseURI():string;
+	abstract protected static function getWebAssetsURI():string;
 
 	/**
 	 * Returns a web asset URI.
@@ -49,6 +47,6 @@ trait WebAssetTrait {
 	 * @throws
 	 */
 	public static function getAssetURI(string $asset):string {
-		return self::getWebAssetBaseURI().self::getClassAssetsRelativePath("/")."/$asset";
+		return self::getWebAssetsURI().$asset;
 	}
 }

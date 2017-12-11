@@ -32,15 +32,13 @@ use CodeInc\GUI\Assets\Interfaces\PrivateAssetsInterface;
  * @see PrivateAssetsInterface
  */
 trait PrivateAssetsTrait {
-	use AssetsTrait;
-
 	/**
 	 * Returns the private assets base directory path.
 	 *
 	 * @return string
 	 * @throws
 	 */
-	abstract protected static function getPrivateAssetsBaseDir():string;
+	abstract protected static function getPrivateAssetsPath():string;
 
 	/**
 	 * Returns a private asset path. Throws a PrivateAssetsBasePathNotSetException if the base path is not set
@@ -51,9 +49,7 @@ trait PrivateAssetsTrait {
 	 * @throws PrivateAssetNotFound
 	 */
 	public static function getPrivateAssetPath(string $asset):string {
-		$assetPath = self::getPrivateAssetsBaseDir()
-			.DIRECTORY_SEPARATOR
-			.self::getClassAssetsRelativePath(DIRECTORY_SEPARATOR)
+		$assetPath = self::getPrivateAssetsPath()
 			.DIRECTORY_SEPARATOR
 			.$asset;
 		if (!file_exists($assetPath)) {
