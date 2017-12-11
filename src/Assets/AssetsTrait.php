@@ -30,31 +30,27 @@ namespace CodeInc\GUI\Assets;
  */
 trait AssetsTrait {
 	/**
-	 * Assets base namespace.
+	 * Returns the assets base namespace.
 	 *
-	 * @var string
+	 * @return string
+	 * @throws
 	 */
-	protected static $assetsBaseNamespace;
-
-	/**
-	 * Sets the assets base namespace.
-	 *
-	 * @param string $baseNamespace
-	 */
-	protected static function setAssetBaseNamespace(string $baseNamespace) {
-		self::$assetsBaseNamespace = $baseNamespace;
-	}
+	abstract protected static function getAssetsBaseNamespace():string;
 
 	/**
 	 * Returns the class assets relative path.
 	 *
 	 * @param string|null $pathSeparator
 	 * @return string
+	 * @throws
 	 */
 	protected static function getClassAssetsRelativePath(string $pathSeparator = null):string {
-		$relPath = self::$assetsBaseNamespace ?
-			substr(get_called_class(), strlen(self::$assetsBaseNamespace) + 1) :
-			get_call_stack();
+		if ($baseNamespace = self::getAssetsBaseNamespace()) {
+			$relPath = substr(get_called_class(), strlen($baseNamespace) + 1);
+		}
+		else {
+			$relPath = get_called_class();
+		}
 		if ($pathSeparator != "\\") {
 			$relPath = str_replace("\\", $pathSeparator, $relPath);
 		}

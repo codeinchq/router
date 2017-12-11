@@ -20,7 +20,6 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Assets;
-use CodeInc\GUI\Assets\Exception\WebAssets\WebAssetsBaseURINotSet;
 use CodeInc\GUI\Assets\Interfaces\WebAssetsInterface;
 
 
@@ -35,40 +34,19 @@ trait WebAssetTrait {
 	use AssetsTrait;
 
 	/**
-	 * Web assets base URI.
-	 *
-	 * @var string
-	 */
-	protected static $webAssetBaseURI;
-
-	/**
-	 * Sets the web assets base URI.
-	 *
-	 * @param string $baseURI
-	 */
-	protected static function setWebAssetBaseURI(string $baseURI) {
-		self::$webAssetBaseURI = $baseURI;
-	}
-
-	/**
 	 * Returns the web assets base URI.
 	 *
 	 * @return string
-	 * @throws WebAssetsBaseURINotSet
+	 * @throws
 	 */
-	protected static function getWebAssetBaseURI():string {
-		if (!self::$webAssetBaseURI) {
-			throw new WebAssetsBaseURINotSet();
-		}
-		return self::$webAssetBaseURI ?: "";
-	}
+	abstract protected static function getWebAssetBaseURI():string;
 
 	/**
 	 * Returns a web asset URI.
 	 *
 	 * @param string $asset
 	 * @return string
-	 * @throws WebAssetsBaseURINotSet
+	 * @throws
 	 */
 	public static function getAssetURI(string $asset):string {
 		return self::getWebAssetBaseURI().self::getClassAssetsRelativePath("/")."/$asset";

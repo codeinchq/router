@@ -19,8 +19,7 @@
 // Time:     15:27
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Exception\PrivateAssets;
-use CodeInc\GUI\Assets\Exception\AssetsException;
+namespace CodeInc\GUI\Assets\Exception;
 use Throwable;
 
 
@@ -30,7 +29,7 @@ use Throwable;
  * @package CodeInc\GUI\Assets\Exception\PrivateAssets
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PrivAssetNotFound extends AssetsException {
+class PrivateAssetNotFound extends AssetsException {
 	/**
 	 * PrivateAssetNotFoundException constructor.
 	 *
