@@ -19,11 +19,13 @@
 // Time:     16:21
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\PagesManager;
+namespace CodeInc\GUI\Pages;
+use CodeInc\GUI\Pages\Exceptions\PageRenderingException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundNotSetException;
 use CodeInc\GUI\Pages\Interfaces\MultiURIPageInterface;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\GUI\Pages\PagesManager\Exceptions\NotAPageException;
-use CodeInc\GUI\Pages\PagesManager\Exceptions\PageRenderingException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerNotAPageException;
 
 
 /**
@@ -45,7 +47,7 @@ class PagesManager implements \IteratorAggregate {
 
 	/**
 	 * @param string $pageClass
-	 * @throws NotAPageException
+	 * @throws PagesManagerNotAPageException
 	 */
 	public function registerNotFoundPage(string $pageClass) {
 		$this->registerPage($pageClass);
@@ -54,12 +56,12 @@ class PagesManager implements \IteratorAggregate {
 
 	/**
 	 * @param string $pageClass
-	 * @throws NotAPageException
+	 * @throws PagesManagerNotAPageException
 	 */
 	public function registerPage(string $pageClass) {
 		/** @var PageInterface $pageClass */
 		if (!is_subclass_of($pageClass, PageInterface::class)) {
-			throw new NotAPageException($pageClass);
+			throw new PagesManagerNotAPageException($pageClass);
 		}
 
 		// Registering the main URI
@@ -84,66 +86,108 @@ class PagesManager implements \IteratorAggregate {
 	}
 
 	/**
-	 * Returns the not found page's class or NULL if not defined.
+	 * Returns the not found page class.
 	 *
-	 * @return false|string
+	 * @return string
+	 * @throws PagesManagerNotFoundNotSetException
 	 */
-	public function getNotFoundPageClass() {
+	public function getNotFoundPageClass():string {
+		if (!$this->hasNotFoundPage()) {
+			throw new PagesManagerNotFoundNotSetException();
+		}
 		return $this->notFoundPageClass ?: false;
 	}
 
 	/**
+	 * Verifies if a page exists for a given URI.
+	 *
 	 * @param string $URI
-	 * @return string|false
+	 * @return bool
 	 */
-	public function getPageClassByURI(string $URI) {
-		if (array_key_exists($URI, $this->pages)) {
+	public function hasPage(string $URI):bool {
+		return array_key_exists($URI, $this->pages);
+	}
+
+	/**
+	 * Verifies if a not found page has been defined.
+	 *
+	 * @return bool
+	 */
+	public function hasNotFoundPage():bool {
+		return $this->notFoundPageClass !== null;
+	}
+
+	/**
+	 * Returns a page class for a given URI.
+	 *
+	 * @param string $URI
+	 * @param bool $allowNotFound Default: TRUE
+	 * @return string
+	 * @throws PagesManagerNotFoundException
+	 * @throws PagesManagerNotFoundNotSetException
+	 */
+	public function getPageClassByURI(string $URI, bool $allowNotFound = null):string {
+		if ($this->hasPage($URI)) { // returns the page's class
 			return $this->pages[$URI];
 		}
-		else {
-			return false;
+		elseif ($allowNotFound !== false) { // returns the not found page class (if allowed)à
+			return $this->getNotFoundPageClass();
+		}
+		else { // throws a not found exception
+			throw new PagesManagerNotFoundException($URI);
 		}
 	}
 
 	/**
+	 * Returns a page object for a given URI.
+	 *
 	 * @param string $URI
-	 * @return PageInterface|false
+	 * @param bool $allowNotFound Default: TRUE
+	 * @return PageInterface
+	 * @throws PagesManagerNotFoundException
+	 * @throws PagesManagerNotFoundNotSetException
 	 */
-	public function getPageByURI(string $URI) {
-		if (($pageClass = $this->getPageClassByURI($URI)) !== false) {
-			return new $pageClass($this);
-		}
-		return false;
+	public function getPageByURI(string $URI, bool $allowNotFound = null) {
+		$pageClass = $this->getPageClassByURI($URI, $allowNotFound);
+		return new $pageClass();
 	}
 
 	/**
-	 * @return PageInterface|false
+	 * Returns the not found page object.
+	 *
+	 * @return PageInterface
+	 * @throws PagesManagerNotFoundNotSetException
 	 */
 	public function getNotFoundPage() {
-		if (($pageClass = $this->getNotFoundPageClass()) !== false) {
-			return new $pageClass($this);
-		}
-		return false;
+		$pageClass = $this->getNotFoundPageClass();
+		return new $pageClass($this);
 	}
 
 	/**
+	 * Render a page using it's URI. If $allowNotFound is at TRUE, the page is not found and a not found page
+	 * has been defined the method will render the not found page, else a PagesManagerNotFoundException is thrown.
+	 *
 	 * @param string $URI
 	 * @param bool $allowNotFound
-	 * @return bool
+	 * @throws PagesManagerNotFoundException
+	 * @throws PagesManagerNotFoundNotSetException
 	 * @throws PageRenderingException
 	 */
-	public function renderPageByURI(string $URI, bool $allowNotFound = null):bool {
-		if (($page = $this->getPageByURI($URI)) === false) {
-			if ($allowNotFound === false || ($page = $this->getNotFoundPage()) === false) {
-				return false;
-			}
-		}
+	public function renderPageByURI(string $URI, bool $allowNotFound = null) {
+		// Obtaining the page object
+		$page = $this->getPageByURI($URI, $allowNotFound);
+
+		// Renders the page
 		try {
 			$page->render();
-			return true;
 		}
 		catch (\Exception $exception) {
-			throw new PageRenderingException($page, $URI, null, $exception);
+			if (!$exception instanceof PageRenderingException) {
+				throw new PageRenderingException($page, 0, $exception);
+			}
+			else {
+				throw $exception;
+			}
 		}
 	}
 

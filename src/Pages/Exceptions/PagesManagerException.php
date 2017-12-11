@@ -16,19 +16,19 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     04/12/2017
-// Time:     18:11
-// Project:  lib-gui
+// Time:     17:32
+// Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Assets;
+namespace CodeInc\GUI\Pages\Exceptions;
 use CodeInc\GUI\GUIException;
 
 
 /**
- * Class AssetException
+ * Class PagesManagerException
  *
- * @package CodeInc\GUI\Assets
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class AssetException extends GUIException {
+class PagesManagerException extends GUIException {
 
 }

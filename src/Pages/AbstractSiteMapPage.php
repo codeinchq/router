@@ -19,8 +19,7 @@
 // Time:     13:16
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Models;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
+namespace CodeInc\GUI\Pages;
 use CodeInc\GUI\Pages\Exceptions\PageException;
 
 
@@ -30,7 +29,7 @@ use CodeInc\GUI\Pages\Exceptions\PageException;
  * @package CodeInc\GUI\Pages\Models
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractSiteMapPage implements PageInterface {
+abstract class AbstractSiteMapPage extends AbstractPage {
 	const CHANGE_FREQ_DAILY = 'daily';
 	const CHANGE_FREQ_WEEKLY = 'weekly';
 	const CHANGE_FREQ_MONTHLY = 'monthly';

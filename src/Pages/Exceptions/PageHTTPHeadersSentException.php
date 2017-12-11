@@ -16,28 +16,30 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     04/12/2017
-// Time:     17:27
+// Time:     17:45
 // Project:  lib-codeinclib
 //
 namespace CodeInc\GUI\Pages\Exceptions;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
+use Throwable;
 
 
 /**
- * Class RenderingException
+ * Class PageHTTPHeadersSentException
  *
  * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RenderingException extends PageException {
+class PageHTTPHeadersSentException extends PageException {
 	/**
-	 * RenderingException constructor.
+	 * HTTPHeadersSentException constructor.
 	 *
 	 * @param PageInterface $parentPage
 	 * @param int $code
-	 * @param \Throwable|null $previous
+	 * @param Throwable|null $previous
 	 */
-	public function __construct(PageInterface $parentPage, int $code = null, \Throwable $previous = null) {
-		parent::__construct($parentPage,"Error while render the ".get_class($parentPage)." page", null, $previous);
+	public function __construct(PageInterface $parentPage, int $code = 0, Throwable $previous = null) {
+		parent::__construct($parentPage,"Unable to render the ".get_class($parentPage)." page, "
+			."the HTTP headers have been sent", $code, $previous);
 	}
 }

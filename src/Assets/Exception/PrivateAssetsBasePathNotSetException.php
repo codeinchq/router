@@ -15,28 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     29/11/2017
-// Time:     12:57
+// Date:     11/12/2017
+// Time:     15:22
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\Exception\AssetsException;
+namespace CodeInc\GUI\Assets\Exception;
+use Throwable;
 
 
 /**
- * Interface PrivateAssetsInterface to be used with templates, views and pages in order to access acces private
- * locally stored assets.
+ * Class PrivateAssetsBasePathNotSetException
  *
- * @package CodeInc\GUI\Assets\Interfaces
+ * @package CodeInc\GUI\Assets\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface PrivateAssetsInterface {
+class PrivateAssetsBasePathNotSetException extends AssetsException {
 	/**
-	 * Returns a private asset path.
+	 * PrivateAssetsBasePathNotSet constructor.
 	 *
-	 * @param string $asset
-	 * @return string
-	 * @throws AssetsException
+	 * @param Throwable|null $previous
 	 */
-	public static function getPrivateAssetPath(string $asset):string;
+	public function __construct(Throwable $previous = null) {
+		parent::__construct("The base path of the pivate assets is not set", 0, $previous);
+	}
 }

@@ -15,28 +15,60 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     29/11/2017
-// Time:     12:57
+// Date:     11/12/2017
+// Time:     15:16
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\Exception\AssetsException;
+namespace CodeInc\GUI\Assets;
+use CodeInc\GUI\Assets\Exception\WebAssetsBaseURINotSetException;
+use CodeInc\GUI\Assets\Interfaces\WebAssetsInterface;
 
 
 /**
- * Interface PrivateAssetsInterface to be used with templates, views and pages in order to access acces private
- * locally stored assets.
+ * Trait WebAssetTrait
  *
- * @package CodeInc\GUI\Assets\Interfaces
+ * @package CodeInc\GUI\Assets
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @see WebAssetsInterface
  */
-interface PrivateAssetsInterface {
+trait WebAssetTrait {
 	/**
-	 * Returns a private asset path.
+	 * Web assets base URI.
+	 *
+	 * @var string
+	 */
+	protected static $webAssetBaseURI;
+
+	/**
+	 * Sets the web assets base URI.
+	 *
+	 * @param string $baseURI
+	 */
+	protected static function setWebAssetBaseURI(string $baseURI) {
+		self::$webAssetBaseURI = $baseURI;
+	}
+
+	/**
+	 * Returns the web assets base URI.
+	 *
+	 * @return string
+	 * @throws WebAssetsBaseURINotSetException
+	 */
+	protected static function getWebAssetBaseURI():string {
+		if (!self::$webAssetBaseURI) {
+			throw new WebAssetsBaseURINotSetException();
+		}
+		return self::$webAssetBaseURI ?: "";
+	}
+
+	/**
+	 * Returns a web asset URI.
 	 *
 	 * @param string $asset
 	 * @return string
-	 * @throws AssetsException
+	 * @throws WebAssetsBaseURINotSetException
 	 */
-	public static function getPrivateAssetPath(string $asset):string;
+	public static function getAssetURI(string $asset):string {
+		return self::getWebAssetBaseURI().$asset;
+	}
 }
