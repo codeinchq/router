@@ -15,28 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     29/11/2017
-// Time:     12:57
+// Date:     11/12/2017
+// Time:     15:08
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\Exception\AssetsException;
+namespace CodeInc\GUI\Pages\Exceptions;
+use Throwable;
 
 
 /**
- * Interface PrivateAssetsInterface to be used with templates, views and pages in order to access acces private
- * locally stored assets.
+ * Class PagesManagerNotFoundNotSetException
  *
- * @package CodeInc\GUI\Assets\Interfaces
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface PrivateAssetsInterface {
+class PagesManagerNotFoundNotSetException extends PagesManagerException {
 	/**
-	 * Returns a private asset path.
+	 * PagesManagerNotFoundNotSetException constructor.
 	 *
-	 * @param string $asset
-	 * @return string
-	 * @throws AssetsException
+	 * @param Throwable|null $previous
 	 */
-	public static function getPrivateAssetPath(string $asset):string;
+	public function __construct(Throwable $previous = null) {
+		parent::__construct("The not found page is not set", 0, $previous);
+	}
 }

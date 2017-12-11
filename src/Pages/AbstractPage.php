@@ -15,28 +15,20 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     29/11/2017
-// Time:     12:57
+// Date:     11/12/2017
+// Time:     14:57
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\Exception\AssetsException;
+namespace CodeInc\GUI\Pages;
+use CodeInc\GUI\Pages\Interfaces\PageInterface;
 
 
 /**
- * Interface PrivateAssetsInterface to be used with templates, views and pages in order to access acces private
- * locally stored assets.
+ * Class AbstractPage
  *
- * @package CodeInc\GUI\Assets\Interfaces
+ * @package CodeInc\GUI\Pages
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface PrivateAssetsInterface {
-	/**
-	 * Returns a private asset path.
-	 *
-	 * @param string $asset
-	 * @return string
-	 * @throws AssetsException
-	 */
-	public static function getPrivateAssetPath(string $asset):string;
+abstract class AbstractPage implements PageInterface {
+
 }

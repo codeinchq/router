@@ -15,20 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/12/2017
-// Time:     17:32
-// Project:  lib-codeinclib
+// Date:     11/12/2017
+// Time:     15:23
+// Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\PagesManager\Exceptions;
-use CodeInc\GUI\GUIException;
+namespace CodeInc\GUI\Assets\Exception;
+use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class WebAssetsBaseURINotSetException
  *
- * @package CodeInc\GUI\Pages\PagesManager\Exceptions
+ * @package CodeInc\GUI\Assets\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerException extends GUIException {
-
+class WebAssetsBaseURINotSetException extends AssetsException {
+	/**
+	 * WebAssetsBaseURINotSetException constructor.
+	 *
+	 * @param Throwable|null $previous
+	 */
+	public function __construct(Throwable $previous = null) {
+		parent::__construct("The base asets base URI is not set", 0, $previous);
+	}
 }

@@ -15,31 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/12/2017
-// Time:     17:45
-// Project:  lib-codeinclib
+// Date:     28/11/2017
+// Time:     12:40
+// Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use Throwable;
+namespace CodeInc\GUI\Assets\Interfaces;
+use CodeInc\GUI\Assets\Exception\AssetsException;
+use CodeInc\GUI\Templates\Interfaces\HTMLTemplateInterface;
 
 
 /**
- * Class HTTPHeadersSentException
+ * Interface TemplateWebAssetsInterface to be used with views mostly in order for them to add the required web assets
+ * to a template.
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Assets\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HTTPHeadersSentException extends PageException {
+interface HTMLTemplateWebAssetsInterface extends WebAssetsInterface {
 	/**
-	 * HTTPHeadersSentException constructor.
-	 *
-	 * @param PageInterface $parentPage
-	 * @param int $code
-	 * @param Throwable|null $previous
+	 * @param HTMLTemplateInterface $template
+	 * @return void
+	 * @throws AssetsException
 	 */
-	public function __construct(PageInterface $parentPage, int $code = 0, Throwable $previous = null) {
-		parent::__construct($parentPage,"Unable to render the ".get_class($parentPage)." page, "
-			."the HTTP headers have been sent", $code, $previous);
-	}
+	public static function addTemplateAssets(HTMLTemplateInterface $template);
 }

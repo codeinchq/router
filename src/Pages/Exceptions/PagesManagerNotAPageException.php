@@ -15,28 +15,39 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     29/11/2017
-// Time:     12:57
-// Project:  lib-gui
+// Date:     04/12/2017
+// Time:     17:33
+// Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\Exception\AssetsException;
+namespace CodeInc\GUI\Pages\Exceptions;
 
 
 /**
- * Interface PrivateAssetsInterface to be used with templates, views and pages in order to access acces private
- * locally stored assets.
+ * Class PagesManagerNotAPageException
  *
- * @package CodeInc\GUI\Assets\Interfaces
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface PrivateAssetsInterface {
+class PagesManagerNotAPageException extends PagesManagerException {
+	private $class;
+
 	/**
-	 * Returns a private asset path.
+	 * NotAPageException constructor.
 	 *
-	 * @param string $asset
-	 * @return string
-	 * @throws AssetsException
+	 * @param string $class
+	 * @param int|null $code
+	 * @param \Throwable|null $previous
 	 */
-	public static function getPrivateAssetPath(string $asset):string;
+	public function __construct(string $class, int $code = null, \Throwable $previous = null) {
+		$this->class = $class;
+		parent::__construct("The class \"$class\" is not a page and can not be registered",
+			$code, $previous);
+}
+
+	/**
+	 * @return string
+	 */
+	public function getClass():string {
+		return $this->class;
+	}
 }

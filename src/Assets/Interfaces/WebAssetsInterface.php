@@ -20,7 +20,7 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\AssetException;
+use CodeInc\GUI\Assets\Exception\AssetsException;
 
 
 /**
@@ -35,7 +35,7 @@ interface WebAssetsInterface {
 	 *
 	 * @param string $asset
 	 * @return string
-	 * @throws AssetException
+	 * @throws AssetsException
 	 */
 	public static function getAssetURI(string $asset):string;
 }

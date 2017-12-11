@@ -16,57 +16,28 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     04/12/2017
-// Time:     17:35
+// Time:     17:27
 // Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Pages\PagesManager\Exceptions;
+namespace CodeInc\GUI\Pages\Exceptions;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
 use Throwable;
-
 
 /**
  * Class PageRenderingException
  *
- * @package CodeInc\GUI\Pages\PagesManager\Exceptions
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PageRenderingException extends PagesManagerException {
+class PageRenderingException extends PageException {
 	/**
-	 * @var PageInterface
-	 */
-	private $page;
-
-	/**
-	 * @var string
-	 */
-	private $URI;
-
-	/**
-	 * PageRenderingException constructor.
+	 * RenderingException constructor.
 	 *
-	 * @param PageInterface $page
-	 * @param string $URI
+	 * @param PageInterface $parentPage
 	 * @param int $code
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(PageInterface $page, string $URI, int $code = 0, Throwable $previous = null) {
-		$this->page = $page;
-		$this->URI = $URI;
-		parent::__construct("Erreur while rendering the page ".get_class($page)." for the URI \"$URI\"",
-			$code, $previous);
-	}
-
-	/**
-	 * @return PageInterface
-	 */
-	public function getPage() {
-		return $this->page;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getURI():string {
-		return $this->URI;
+	public function __construct(PageInterface $parentPage, int $code = null, Throwable $previous = null) {
+		parent::__construct($parentPage,"Error while render the ".get_class($parentPage)." page", null, $previous);
 	}
 }

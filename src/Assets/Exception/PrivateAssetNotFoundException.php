@@ -15,27 +15,30 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     28/11/2017
-// Time:     12:40
+// Date:     11/12/2017
+// Time:     15:27
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Interfaces;
-use CodeInc\GUI\Assets\AssetException;
-use CodeInc\GUI\Templates\Interfaces\HTMLTemplateInterface;
+namespace CodeInc\GUI\Assets\Exception;
+use Throwable;
 
 
 /**
- * Interface TemplateWebAssetsInterface to be used with views mostly in order for them to add the required web assets
- * to a template.
+ * Class PrivateAssetNotFoundException
  *
- * @package CodeInc\GUI\Assets\Interfaces
+ * @package CodeInc\GUI\Assets\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface TemplateWebAssetsInterface extends WebAssetsInterface {
+class PrivateAssetNotFoundException extends AssetsException {
 	/**
-	 * @param HTMLTemplateInterface $template
-	 * @return void
-	 * @throws AssetException
+	 * PrivateAssetNotFoundException constructor.
+	 *
+	 * @param string $asset
+	 * @param string $assetPath
+	 * @param Throwable|null $previous
 	 */
-	public static function addTemplateAssets(HTMLTemplateInterface $template);
+	public function __construct(string $asset, string $assetPath, Throwable $previous = null) {
+		parent::__construct("The private asset \"$asset\" does not exist at the location \"$assetPath\"",
+			0, $previous);
+	}
 }

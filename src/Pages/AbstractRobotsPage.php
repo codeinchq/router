@@ -19,10 +19,9 @@
 // Time:     13:13
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Models;
-use CodeInc\GUI\Pages\Exceptions\HTTPHeadersSentException;
-use CodeInc\GUI\Pages\Exceptions\RenderingException;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
+namespace CodeInc\GUI\Pages;
+use CodeInc\GUI\Pages\Exceptions\PageHTTPHeadersSentException;
+use CodeInc\GUI\Pages\Exceptions\PageRenderingException;
 
 
 /**
@@ -31,7 +30,7 @@ use CodeInc\GUI\Pages\Interfaces\PageInterface;
  * @package CodeInc\GUI\Pages\Models
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractRobotsPage implements PageInterface {
+abstract class AbstractRobotsPage extends AbstractPage {
 	/**
 	 * @var array
 	 */
@@ -85,12 +84,12 @@ abstract class AbstractRobotsPage implements PageInterface {
 	}
 
 	/**
-	 * @throws RenderingException
+	 * @throws PageRenderingException
 	 */
 	public function render() {
 		try {
 			if (headers_sent()) {
-				throw new HTTPHeadersSentException($this);
+				throw new PageHTTPHeadersSentException($this);
 			}
 			header("Content-Type: text/plain; charset=$this->charset");
 			foreach ($this->rules as $userAgent => $rules) {
@@ -104,7 +103,7 @@ abstract class AbstractRobotsPage implements PageInterface {
 			}
 		}
 		catch (\Exception $exception) {
-			throw new RenderingException($this, null, $exception);
+			throw new PageRenderingException($this, null, $exception);
 		}
 	}
 }
