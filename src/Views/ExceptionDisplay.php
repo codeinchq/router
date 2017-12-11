@@ -20,6 +20,8 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Views;
+use CodeInc\GUI\Views\Interfaces\ReturnableViewInterface;
+use CodeInc\GUI\Views\Interfaces\StringifiableViewInterface;
 use CodeInc\GUI\Views\Interfaces\ViewInterface;
 
 
@@ -29,7 +31,7 @@ use CodeInc\GUI\Views\Interfaces\ViewInterface;
  * @package CodeInc\GUI\Views
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ExceptionDisplay implements ViewInterface {
+class ExceptionDisplay implements ViewInterface, StringifiableViewInterface, ReturnableViewInterface {
 	/**
 	 * @var \Exception
 	 */
@@ -68,6 +70,32 @@ class ExceptionDisplay implements ViewInterface {
 			?>
 		</div>
 		<?
+	}
+
+	/**
+	 * Returns the view's HTML source code
+	 *
+	 * @return string
+	 */
+	public function get():string {
+		ob_start();
+		$this->render();
+		return ob_get_clean();
+	}
+
+	/**
+	 * Alias of get()
+	 *
+	 * @see ExceptionDisplay::get()
+	 * @return string
+	 */
+	public function __toString():string {
+		try {
+			return $this->get();
+		}
+		catch (\Exception $exception) {
+			return "Error: ".$exception->getMessage();
+		}
 	}
 
 	/**
