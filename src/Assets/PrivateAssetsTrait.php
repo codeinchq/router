@@ -20,9 +20,7 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Assets;
-use CodeInc\GUI\Assets\Exception\PrivateAssets\PrivAssetNotFound;
-use CodeInc\GUI\Assets\Exception\PrivateAssets\PrivAssetsBaseDirNotSet;
-use CodeInc\GUI\Assets\Exception\PrivateAssets\PrivAssetsInvalidBaseDir;
+use CodeInc\GUI\Assets\Exception\PrivateAssetNotFound;
 use CodeInc\GUI\Assets\Interfaces\PrivateAssetsInterface;
 
 
@@ -37,28 +35,12 @@ trait PrivateAssetsTrait {
 	use AssetsTrait;
 
 	/**
-	 * Private assets base direcotry path.
-	 *
-	 * @var string
-	 */
-	protected static $privateAssetsBaseDir;
-
-	/**
 	 * Returns the private assets base directory path.
 	 *
 	 * @return string
-	 * @throws PrivAssetsBaseDirNotSet
-	 * @throws PrivAssetsInvalidBaseDir
+	 * @throws
 	 */
-	protected static function getPrivateAssetsBaseDir():string {
-		if (!self::$privateAssetsBaseDir) {
-			throw new PrivAssetsBaseDirNotSet();
-		}
-		if (!is_dir(self::$privateAssetsBaseDir) || ($path = realpath(self::$privateAssetsBaseDir)) === false) {
-			throw new PrivAssetsInvalidBaseDir(self::$privateAssetsBaseDir);
-		}
-		return $path;
-	}
+	abstract protected static function getPrivateAssetsBaseDir():string;
 
 	/**
 	 * Returns a private asset path. Throws a PrivateAssetsBasePathNotSetException if the base path is not set
@@ -66,9 +48,7 @@ trait PrivateAssetsTrait {
 	 *
 	 * @param string $asset
 	 * @return string
-	 * @throws PrivAssetsBaseDirNotSet
-	 * @throws PrivAssetsInvalidBaseDir
-	 * @throws PrivAssetNotFound
+	 * @throws PrivateAssetNotFound
 	 */
 	public static function getPrivateAssetPath(string $asset) {
 		$assetPath = self::getPrivateAssetsBaseDir()
@@ -77,7 +57,7 @@ trait PrivateAssetsTrait {
 			.DIRECTORY_SEPARATOR
 			.$asset;
 		if (!file_exists($assetPath)) {
-			throw new PrivAssetNotFound($asset, $assetPath);
+			throw new PrivateAssetNotFound($asset, $assetPath);
 		}
 		return $assetPath;
 	}
