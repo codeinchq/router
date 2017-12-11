@@ -16,26 +16,30 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     11/12/2017
-// Time:     15:23
+// Time:     15:27
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Exception;
+namespace CodeInc\GUI\Assets\Exception\PrivateAssets;
+use CodeInc\GUI\Assets\Exception\AssetsException;
 use Throwable;
 
 
 /**
- * Class WebAssetsBaseURINotSetException
+ * Class PrivAssetNotFound
  *
- * @package CodeInc\GUI\Assets\Exception
+ * @package CodeInc\GUI\Assets\Exception\PrivateAssets
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class WebAssetsBaseURINotSetException extends AssetsException {
+class PrivAssetNotFound extends AssetsException {
 	/**
-	 * WebAssetsBaseURINotSetException constructor.
+	 * PrivateAssetNotFoundException constructor.
 	 *
+	 * @param string $asset
+	 * @param string $assetPath
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(Throwable $previous = null) {
-		parent::__construct("The base asets base URI is not set", 0, $previous);
+	public function __construct(string $asset, string $assetPath, Throwable $previous = null) {
+		parent::__construct("The private asset \"$asset\" does not exist at the location \"$assetPath\"",
+			0, $previous);
 	}
 }

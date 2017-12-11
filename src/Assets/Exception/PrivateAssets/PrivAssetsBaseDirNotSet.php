@@ -16,61 +16,27 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     11/12/2017
-// Time:     15:16
+// Time:     15:22
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets;
-use CodeInc\GUI\Assets\Exception\WebAssets\WebAssetsBaseURINotSet;
-use CodeInc\GUI\Assets\Interfaces\WebAssetsInterface;
+namespace CodeInc\GUI\Assets\Exception\PrivateAssets;
+use CodeInc\GUI\Assets\Exception\AssetsException;
+use Throwable;
 
 
 /**
- * Trait WebAssetTrait
+ * Class PrivAssetsBasePathNotSet
  *
- * @package CodeInc\GUI\Assets
+ * @package CodeInc\GUI\Assets\Exception\PrivateAssets
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @see WebAssetsInterface
  */
-trait WebAssetTrait {
-	use AssetsTrait;
-
+class PrivAssetsBaseDirNotSet extends AssetsException {
 	/**
-	 * Web assets base URI.
+	 * PrivateAssetsBasePathNotSet constructor.
 	 *
-	 * @var string
+	 * @param Throwable|null $previous
 	 */
-	protected static $webAssetBaseURI;
-
-	/**
-	 * Sets the web assets base URI.
-	 *
-	 * @param string $baseURI
-	 */
-	protected static function setWebAssetBaseURI(string $baseURI) {
-		self::$webAssetBaseURI = $baseURI;
-	}
-
-	/**
-	 * Returns the web assets base URI.
-	 *
-	 * @return string
-	 * @throws WebAssetsBaseURINotSet
-	 */
-	protected static function getWebAssetBaseURI():string {
-		if (!self::$webAssetBaseURI) {
-			throw new WebAssetsBaseURINotSet();
-		}
-		return self::$webAssetBaseURI ?: "";
-	}
-
-	/**
-	 * Returns a web asset URI.
-	 *
-	 * @param string $asset
-	 * @return string
-	 * @throws WebAssetsBaseURINotSet
-	 */
-	public static function getAssetURI(string $asset):string {
-		return self::getWebAssetBaseURI().self::getClassAssetsRelativePath("/")."/$asset";
+	public function __construct(Throwable $previous = null) {
+		parent::__construct("The base path of the pivate assets is not set", 0, $previous);
 	}
 }
