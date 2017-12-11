@@ -16,26 +16,48 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     11/12/2017
-// Time:     15:22
+// Time:     15:46
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Assets\Exception;
-use Throwable;
+namespace CodeInc\GUI\Assets;
 
 
 /**
- * Class PrivateAssetsBasePathNotSetException
+ * Trait AssetsTrait
  *
- * @package CodeInc\GUI\Assets\Exception
+ * @package CodeInc\GUI\Assets
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PrivateAssetsBasePathNotSetException extends AssetsException {
+trait AssetsTrait {
 	/**
-	 * PrivateAssetsBasePathNotSet constructor.
+	 * Assets base namespace.
 	 *
-	 * @param Throwable|null $previous
+	 * @var string
 	 */
-	public function __construct(Throwable $previous = null) {
-		parent::__construct("The base path of the pivate assets is not set", 0, $previous);
+	protected static $assetsBaseNamespace;
+
+	/**
+	 * Sets the assets base namespace.
+	 *
+	 * @param string $baseNamespace
+	 */
+	protected static function setAssetBaseNamespace(string $baseNamespace) {
+		self::$assetsBaseNamespace = $baseNamespace;
+	}
+
+	/**
+	 * Returns the class assets relative path.
+	 *
+	 * @param string|null $pathSeparator
+	 * @return string
+	 */
+	protected static function getClassAssetsRelativePath(string $pathSeparator = null):string {
+		$relPath = self::$assetsBaseNamespace ?
+			substr(get_called_class(), strlen(self::$assetsBaseNamespace) + 1) :
+			get_call_stack();
+		if ($pathSeparator != "\\") {
+			$relPath = str_replace("\\", $pathSeparator, $relPath);
+		}
+		return $relPath;
 	}
 }

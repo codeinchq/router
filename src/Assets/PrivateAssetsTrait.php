@@ -20,8 +20,9 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Assets;
-use CodeInc\GUI\Assets\Exception\PrivateAssetNotFoundException;
-use CodeInc\GUI\Assets\Exception\PrivateAssetsBasePathNotSetException;
+use CodeInc\GUI\Assets\Exception\PrivateAssets\PrivAssetNotFound;
+use CodeInc\GUI\Assets\Exception\PrivateAssets\PrivAssetsBaseDirNotSet;
+use CodeInc\GUI\Assets\Exception\PrivateAssets\PrivAssetsInvalidBaseDir;
 use CodeInc\GUI\Assets\Interfaces\PrivateAssetsInterface;
 
 
@@ -33,33 +34,30 @@ use CodeInc\GUI\Assets\Interfaces\PrivateAssetsInterface;
  * @see PrivateAssetsInterface
  */
 trait PrivateAssetsTrait {
+	use AssetsTrait;
+
 	/**
-	 * Private assets base path.
+	 * Private assets base direcotry path.
 	 *
 	 * @var string
 	 */
-	private static $privateAssetsBasePath;
+	protected static $privateAssetsBaseDir;
 
 	/**
-	 * Sets the private assets base path
-	 *
-	 * @param string $basePath
-	 */
-	protected static function setPrivateAssetsBasePath(string $basePath) {
-		self::$privateAssetsBasePath = $basePath;
-	}
-
-	/**
-	 * Return the private assets base path
+	 * Returns the private assets base directory path.
 	 *
 	 * @return string
-	 * @throws PrivateAssetsBasePathNotSetException
+	 * @throws PrivAssetsBaseDirNotSet
+	 * @throws PrivAssetsInvalidBaseDir
 	 */
-	protected static function getPrivateAssetsBasePath():string {
-		if (!self::$privateAssetsBasePath) {
-			throw new PrivateAssetsBasePathNotSetException();
+	protected static function getPrivateAssetsBaseDir():string {
+		if (!self::$privateAssetsBaseDir) {
+			throw new PrivAssetsBaseDirNotSet();
 		}
-		return self::$privateAssetsBasePath;
+		if (!is_dir(self::$privateAssetsBaseDir) || ($path = realpath(self::$privateAssetsBaseDir)) === false) {
+			throw new PrivAssetsInvalidBaseDir(self::$privateAssetsBaseDir);
+		}
+		return $path;
 	}
 
 	/**
@@ -68,13 +66,18 @@ trait PrivateAssetsTrait {
 	 *
 	 * @param string $asset
 	 * @return string
-	 * @throws PrivateAssetsBasePathNotSetException
-	 * @throws PrivateAssetNotFoundException
+	 * @throws PrivAssetsBaseDirNotSet
+	 * @throws PrivAssetsInvalidBaseDir
+	 * @throws PrivAssetNotFound
 	 */
 	public static function getPrivateAssetPath(string $asset) {
-		$assetPath = self::getPrivateAssetsBasePath().$asset;
+		$assetPath = self::getPrivateAssetsBaseDir()
+			.DIRECTORY_SEPARATOR
+			.self::getClassAssetsRelativePath(DIRECTORY_SEPARATOR)
+			.DIRECTORY_SEPARATOR
+			.$asset;
 		if (!file_exists($assetPath)) {
-			throw new PrivateAssetNotFoundException($asset, $assetPath);
+			throw new PrivAssetNotFound($asset, $assetPath);
 		}
 		return $assetPath;
 	}
