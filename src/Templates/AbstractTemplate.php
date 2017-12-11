@@ -15,125 +15,21 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     10/11/2017
-// Time:     14:20
+// Date:     11/12/2017
+// Time:     14:48
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Templates;
-use CodeInc\GUI\Templates\Interfaces\HTMLTemplateInterface;
-use CodeInc\GUI\Views\HTMLTag;
-use CodeInc\GUI\Views\ViewException;
+
 
 /**
- * Class AbstractTemplate
+ * Class AbstractTemplate alias of AbstractHTMLTemplate
  *
  * @package CodeInc\GUI\Templates
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @deprecated
+ * @see AbstractHTMLTemplate
  */
-abstract class AbstractTemplate implements HTMLTemplateInterface {
-	/**
-	 * Global headers
-	 *
-	 * @var array
-	 */
-	private $headers = [];
+abstract class AbstractTemplate extends AbstractHTMLTemplate {
 
-	/**
-	 * Classes added to the <html> tag.
-	 *
-	 * @var string
-	 */
-	private $HTMLClasses;
-
-	/**
-	 * Sets all the page classes (added to the <html> tag).
-	 *
-	 * @param string $class
-	 */
-	public function setHTMLClass(string $class) {
-		$this->HTMLClasses = $class;
-	}
-
-	/**
-	 * Returns all the page classes (added to the <html> tag).
-	 *
-	 * @return string
-	 */
-	public function getHTMLClass():string {
-		return $this->HTMLClasses;
-	}
-
-	/**
-	 * Returns all the page's headers
-	 *
-	 * @return array
-	 */
-	protected function getHeaders():array {
-		return $this->headers;
-	}
-
-	/**
-	 * Returns all headers as a string.
-	 *
-	 * @param string|null $glue
-	 * @return string
-	 */
-	protected function getHeadersAsString(string $glue = null):string {
-		if ($this->headers) {
-			return implode($glue ?? "\n", $this->headers);
-		}
-		return '';
-	}
-
-	/**
-	 * Adds an header to the <head>.
-	 *
-	 * @param string $header
-	 */
-	public function addHeader(string $header) {
-		$this->headers[] = $header;
-	}
-
-	/**
-	 * Adds a CSS link to the <head>.
-	 *
-	 * @param string $uri
-	 * @throws ViewException
-	 */
-	public function addCSS(string $uri) {
-		$this->addHeader((new HTMLTag('link', ['rel' => 'stylesheet', 'type' => 'text/css', 'href' => $uri]))->get());
-	}
-
-	/**
-	 * Adds inline CSS code to the <head>.
-	 *
-	 * @param string $css
-	 */
-	public function addInlineCSS(string $css) {
-		$this->addHeader('<style type="text/css">'.$css.'</style>');
-	}
-
-	/**
-	 * Adds a JS link to the <head>.
-	 *
-	 * @param string $uri
-	 * @param string|null $integrity
-	 * @param string|null $crossorigin
-	 * @throws ViewException
-	 */
-	public function addJS(string $uri, string $integrity = null, string $crossorigin = null) {
-		$tag = new HTMLTag('script', ['src' => $uri]);
-		if ($integrity) $tag['integrity'] = $integrity;
-		if ($crossorigin) $tag['crossorigin'] = $crossorigin;
-		$this->addHeader($tag->get().$tag->getClosure());
-	}
-
-	/**
-	 * Adds inline JS code to the <head>.
-	 *
-	 * @param string $js
-	 */
-	public function addInlineJs(string $js) {
-		$this->addHeader('<script>'.$js.'</script>');
-	}
 }
