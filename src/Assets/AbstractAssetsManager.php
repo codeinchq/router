@@ -16,45 +16,34 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     11/12/2017
-// Time:     15:19
+// Time:     16:55
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Assets;
-use CodeInc\GUI\Assets\Exception\PrivateAssetNotFound;
-use CodeInc\GUI\Assets\Interfaces\PrivateAssetsInterface;
 
 
 /**
- * Trait PrivateAssetsTrait
+ * Class AbstractAssetsManager
  *
  * @package CodeInc\GUI\Assets
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @see PrivateAssetsInterface
  */
-trait PrivateAssetsTrait {
+abstract class AbstractAssetsManager {
 	/**
-	 * Returns the private assets base directory path.
+	 * Returns the class relative path.
 	 *
+	 * @param string $className
+	 * @param string|null $baseNamespace
+	 * @param string|null $pathSeparator
 	 * @return string
-	 * @throws
 	 */
-	abstract protected static function getPrivateAssetsPath():string;
-
-	/**
-	 * Returns a private asset path. Throws a PrivateAssetsBasePathNotSetException if the base path is not set
-	 * and a PrivateAssetNotFoundException if the private asset does not exist.
-	 *
-	 * @param string $asset
-	 * @return string
-	 * @throws PrivateAssetNotFound
-	 */
-	public static function getPrivateAssetPath(string $asset):string {
-		$assetPath = self::getPrivateAssetsPath()
-			.DIRECTORY_SEPARATOR
-			.$asset;
-		if (!file_exists($assetPath)) {
-			throw new PrivateAssetNotFound($asset, $assetPath);
+	protected function getClassRelativePath(string $className, string $baseNamespace = null, string $pathSeparator = null):string {
+		if ($baseNamespace) {
+			$className = substr($className, strlen($baseNamespace) + 1);
 		}
-		return $assetPath;
+		if ($pathSeparator != "\\") {
+			$className = str_replace("\\", DIRECTORY_SEPARATOR, $className);
+		}
+		return $className;
 	}
 }

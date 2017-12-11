@@ -16,22 +16,18 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     11/12/2017
-// Time:     16:47
+// Time:     16:45
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Assets\Exception;
-use Throwable;
 
 
 /**
- * Class PrivateAssetNotFound
+ * Class AssetsManagerException
  *
  * @package CodeInc\GUI\Assets\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PrivateAssetNotFound extends AssetsManagerException {
-	public function __construct(string $asset, string $assetPath, Throwable $previous = null) {
-		parent::__construct("The private asset \"$asset\" does not exist at the location \"$assetPath\"",
-			0, $previous);
-	}
+class AssetsManagerException extends AssetsException {
+
 }
