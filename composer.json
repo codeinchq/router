@@ -1,9 +1,9 @@
 {
   "name": "codeinchq/lib-gui",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Code Inc.'s GUI library",
   "homepage": "https://github.com/codeinchq/lib-gui",
-  "type": "package",
+  "type": "library",
   "license": "proprietary",
   "require": {
     "php": ">=7.0",
