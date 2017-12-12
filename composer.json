@@ -1,10 +1,10 @@
 {
   "name": "codeinchq/lib-gui",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Code Inc.'s GUI library",
   "homepage": "https://github.com/codeinchq/lib-gui",
   "type": "library",
-  "license": "proprietary",
+  "license": "MIT",
   "require": {
     "php": ">=7.0",
     "codeinchq/lib-arrayaccess": "^1.1"
