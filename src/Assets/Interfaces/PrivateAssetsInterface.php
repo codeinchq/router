@@ -21,6 +21,7 @@
 //
 namespace CodeInc\GUI\Assets\Interfaces;
 use CodeInc\GUI\Assets\Exception\AssetsException;
+use CodeInc\GUI\Assets\PrivateAssetsManager;
 
 
 /**
@@ -29,6 +30,7 @@ use CodeInc\GUI\Assets\Exception\AssetsException;
  *
  * @package CodeInc\GUI\Assets\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @see PrivateAssetsManager
  */
 interface PrivateAssetsInterface {
 	/**

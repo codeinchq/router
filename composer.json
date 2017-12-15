@@ -1,13 +1,14 @@
 {
   "name": "codeinchq/lib-gui",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Code Inc.'s GUI library",
   "homepage": "https://github.com/codeinchq/lib-gui",
   "type": "library",
   "license": "MIT",
   "require": {
     "php": ">=7.0",
-    "codeinchq/lib-arrayaccess": "^1.1"
+    "codeinchq/lib-arrayaccess": "^1.1",
+    "codeinchq/lib-exceptiondisplay": "^1.0"
   },
   "autoload": {
     "psr-4": {
@@ -28,6 +29,7 @@
     }
   },
   "repositories": [
-    { "type": "vcs", "url": "https://github.com/codeinchq/lib-arrayaccess" }
+    { "type": "vcs", "url": "https://github.com/codeinchq/lib-arrayaccess" },
+    { "type": "vcs", "url": "https://github.com/codeinchq/lib-exceptiondisplay" }
   ]
 }
