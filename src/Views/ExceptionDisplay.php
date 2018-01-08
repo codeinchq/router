@@ -20,8 +20,7 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Views;
-use CodeInc\ExceptionDisplay\ExceptionRederingEngine;
-use CodeInc\ExceptionDisplay\RenderingEngines\BrowserRenderingEngine;
+use CodeInc\ErrorDisplay\RenderingEngines\ErrorBrowserRenderingEngine;
 use CodeInc\GUI\Views\Interfaces\ReturnableViewInterface;
 use CodeInc\GUI\Views\Interfaces\StringifiableViewInterface;
 use CodeInc\GUI\Views\Interfaces\ViewInterface;
@@ -36,6 +35,6 @@ use CodeInc\GUI\Views\Interfaces\ViewInterface;
  * @see BrowserRenderingEngine
  * @see ExceptionRederingEngine
  */
-class ExceptionDisplay extends BrowserRenderingEngine implements ViewInterface, StringifiableViewInterface, ReturnableViewInterface {
+class ExceptionDisplay extends ErrorBrowserRenderingEngine implements ViewInterface, StringifiableViewInterface, ReturnableViewInterface {
 
 }
