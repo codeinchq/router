@@ -22,6 +22,7 @@
 namespace CodeInc\GUI\Templates;
 use CodeInc\GUI\Templates\Interfaces\HTMLTemplateInterface;
 use CodeInc\GUI\Views\HTMLTag;
+use CodeInc\GUI\Views\ViewException;
 
 /**
  * Class AbstractHTMLTemplate
@@ -97,6 +98,7 @@ abstract class AbstractHTMLTemplate implements HTMLTemplateInterface {
 	 * Adds a CSS link to the <head>.
 	 *
 	 * @param string $uri
+	 * @throws ViewException
 	 */
 	public function addCSS(string $uri) {
 		$this->addHeader((new HTMLTag('link', ['rel' => 'stylesheet', 'type' => 'text/css', 'href' => $uri]))->get());
@@ -117,6 +119,7 @@ abstract class AbstractHTMLTemplate implements HTMLTemplateInterface {
 	 * @param string $uri
 	 * @param string|null $integrity
 	 * @param string|null $crossorigin
+	 * @throws ViewException
 	 */
 	public function addJS(string $uri, string $integrity = null, string $crossorigin = null) {
 		$tag = new HTMLTag('script', ['src' => $uri]);
