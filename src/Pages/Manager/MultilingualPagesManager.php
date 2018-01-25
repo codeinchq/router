@@ -71,14 +71,16 @@ class MultilingualPagesManager extends PagesManager {
 	}
 
 	/**
-	 * Verifies if a given language is registered for a multilingual page.
+	 * Returns the list of registered languages of a multilingual page.
 	 *
 	 * @param string $pageClass
-	 * @param string $language
-	 * @return bool
+	 * @return array
 	 */
-	public function isMultilingualPageLanguageRegistered(string $pageClass, string $language):bool {
-		return isset($this->multilingualPages[$pageClass][$language]);
+	public function getMultilingualPageLanguages(string $pageClass):array {
+		if ($this->isMultilingualPageRegistered($pageClass)) {
+			return array_keys($this->multilingualPages[$pageClass]);
+		}
+		return [];
 	}
 
 	/**
@@ -115,7 +117,7 @@ class MultilingualPagesManager extends PagesManager {
 	 * @param string $language
 	 * @return string|false
 	 */
-	public function getPageURIByLanguage(string $pageClass, string $language) {
+	public function getMultilingualPageURI(string $pageClass, string $language) {
 		if (isset($this->multilingualPages[$pageClass][$language])) {
 			return $this->multilingualPages[$pageClass][$language];
 		}
