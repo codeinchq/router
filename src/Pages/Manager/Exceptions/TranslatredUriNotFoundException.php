@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,27 +15,56 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     11/12/2017
-// Time:     15:08
+// Date:     25/01/2018
+// Time:     13:24
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 use Throwable;
 
 
 /**
- * Class PagesManagerNotFoundNotSetException
+ * Class TranslatredUriNotFoundException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerNotFoundNotSetException extends PagesManagerException {
+class TranslatredUriNotFoundException extends PagesManagerException {
 	/**
-	 * PagesManagerNotFoundNotSetException constructor.
+	 * @var string
+	 */
+	private $pageClass;
+
+	/**
+	 * @var string
+	 */
+	private $language;
+
+	/**
+	 * PagesManagerTranslatredUriNotFoundException constructor.
 	 *
+	 * @param string $pageClass
+	 * @param string $language
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(Throwable $previous = null) {
-		parent::__construct("The not found page is not set", 0, $previous);
+	public function __construct(string $pageClass, string $language, Throwable $previous = null) {
+		$this->pageClass = $pageClass;
+		$this->language = $language;
+		parent::__construct("There is not translation of the page \"$pageClass\" for the language \"$language\"",
+			0, $previous);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPageClass():string {
+		return $this->pageClass;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLanguage():string {
+		return $this->language;
 	}
 }

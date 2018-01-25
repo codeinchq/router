@@ -16,38 +16,57 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     04/12/2017
-// Time:     17:33
+// Time:     17:35
 // Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
+use CodeInc\GUI\Pages\Interfaces\PageInterface;
+use Throwable;
 
 
 /**
- * Class PagesManagerNotAPageException
+ * Class PageRenderingException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerNotAPageException extends PagesManagerException {
-	private $class;
+class PageRenderingException extends PagesManagerException {
+	/**
+	 * @var PageInterface
+	 */
+	private $page;
 
 	/**
-	 * NotAPageException constructor.
-	 *
-	 * @param string $class
-	 * @param int|null $code
-	 * @param \Throwable|null $previous
+	 * @var string
 	 */
-	public function __construct(string $class, int $code = null, \Throwable $previous = null) {
-		$this->class = $class;
-		parent::__construct("The class \"$class\" is not a page and can not be registered",
+	private $URI;
+
+	/**
+	 * PageRenderingException constructor.
+	 *
+	 * @param PageInterface $page
+	 * @param string $URI
+	 * @param int $code
+	 * @param Throwable|null $previous
+	 */
+	public function __construct(PageInterface $page, string $URI, int $code = 0, Throwable $previous = null) {
+		$this->page = $page;
+		$this->URI = $URI;
+		parent::__construct("Erreur while rendering the page ".get_class($page)." for the URI \"$URI\"",
 			$code, $previous);
-}
+	}
+
+	/**
+	 * @return PageInterface
+	 */
+	public function getPage() {
+		return $this->page;
+	}
 
 	/**
 	 * @return string
 	 */
-	public function getClass():string {
-		return $this->class;
+	public function getURI():string {
+		return $this->URI;
 	}
 }

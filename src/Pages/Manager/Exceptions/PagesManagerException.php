@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE                                               |
+// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,29 +15,20 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/01/2018
-// Time:     12:50
-// Project:  lib-gui
+// Date:     04/12/2017
+// Time:     17:32
+// Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Pages\Exceptions;
-use Throwable;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
+use CodeInc\GUI\GUIException;
 
 
 /**
- * Class PagesManagerUnknownUriException
+ * Class PagesManagerException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerUnknownUriException extends PagesManagerException {
-	/**
-	 * PagesManagerUnknownUriException constructor.
-	 *
-	 * @param int|null $code
-	 * @param Throwable|null $previous
-	 */
-	public function __construct(int $code = null, Throwable $previous = null) {
-		parent::__construct("The current page's URL can not be found in the \$_SERVER array, unable to render the current page",
-			$code ?? 0, $previous);
-	}
+class PagesManagerException extends GUIException {
+
 }

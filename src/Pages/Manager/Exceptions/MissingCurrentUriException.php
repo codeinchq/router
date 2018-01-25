@@ -16,40 +16,28 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     25/01/2018
-// Time:     13:10
+// Time:     12:50
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 use Throwable;
 
 
 /**
- * Class PagesManagerUnregistredPageException
+ * Class MissingCurrentUriException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerUnregistredPageException extends PagesManagerException {
+class MissingCurrentUriException extends PagesManagerException {
 	/**
-	 * @var string
-	 */
-	private $pageClass;
-
-	/**
-	 * PagesManagerUnregistredPageException constructor.
+	 * PagesManagerUnknownUriException constructor.
 	 *
-	 * @param string $pageClass
+	 * @param int|null $code
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $pageClass, Throwable $previous = null) {
-		$this->pageClass = $pageClass;
-		parent::__construct("The page \"$pageClass\" is not registered", 0, $previous);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getPageClass():string {
-		return $this->pageClass;
+	public function __construct(int $code = null, Throwable $previous = null) {
+		parent::__construct("The current page's URL can not be found in the \$_SERVER array, unable to render the current page",
+			$code ?? 0, $previous);
 	}
 }

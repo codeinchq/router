@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE                                               |
+// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,56 +15,41 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/01/2018
-// Time:     13:24
+// Date:     11/12/2017
+// Time:     15:00
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 use Throwable;
 
 
 /**
- * Class PagesManagerTranslatredUriNotFoundException
+ * Class PageNotFoundException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerTranslatredUriNotFoundException extends PagesManagerException {
+class PageNotFoundException extends PagesManagerException {
 	/**
 	 * @var string
 	 */
-	private $pageClass;
+	private $pageURI;
 
 	/**
-	 * @var string
-	 */
-	private $language;
-
-	/**
-	 * PagesManagerTranslatredUriNotFoundException constructor.
+	 * PagesManagerNotFoundException constructor.
 	 *
-	 * @param string $pageClass
-	 * @param string $language
+	 * @param string $pageURI
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $pageClass, string $language, Throwable $previous = null) {
-		$this->pageClass = $pageClass;
-		$this->language = $language;
-		parent::__construct("There is not translation of the page \"$pageClass\" for the language \"$language\"",
-			0, $previous);
+	public function __construct(string $pageURI, Throwable $previous = null) {
+		$this->pageURI = $pageURI;
+		parent::__construct("The page \"$pageURI\" does not exist", 0, $previous);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getPageClass():string {
-		return $this->pageClass;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getLanguage():string {
-		return $this->language;
+	public function getPageURI():string {
+		return $this->pageURI;
 	}
 }

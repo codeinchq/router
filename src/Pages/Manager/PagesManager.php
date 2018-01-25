@@ -19,22 +19,22 @@
 // Time:     16:21
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages;
+namespace CodeInc\GUI\Pages\Manager;
 use CodeInc\GUI\Pages\Exceptions\PageRenderingException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedPageException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedUriException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundNotSetException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerUnknownUriException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerUnregistredPageException;
+use CodeInc\GUI\Pages\Manager\Exceptions\DuplicatedPageException;
+use CodeInc\GUI\Pages\Manager\Exceptions\DuplicatedUriException;
+use CodeInc\GUI\Pages\Manager\Exceptions\PageNotFoundException;
+use CodeInc\GUI\Pages\Manager\Exceptions\NotFoundPageNotSetException;
+use CodeInc\GUI\Pages\Manager\Exceptions\MissingCurrentUriException;
+use CodeInc\GUI\Pages\Manager\Exceptions\UnregistredPageException;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerNotAPageException;
+use CodeInc\GUI\Pages\Manager\Exceptions\NotAPageException;
 
 
 /**
  * Class PagesManager
  *
- * @package CodeInc\GUI\Pages
+ * @package CodeInc\GUI\Pages\Manager
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class PagesManager {
@@ -65,11 +65,11 @@ class PagesManager {
 	 * Registers the not found page.
 	 *
 	 * @param string $pageClass
-	 * @throws PagesManagerNotAPageException
+	 * @throws NotAPageException
 	 */
 	public function registerNotFoundPage(string $pageClass) {
 		if (!is_subclass_of($pageClass, PageInterface::class)) {
-			throw new PagesManagerNotAPageException($pageClass);
+			throw new NotAPageException($pageClass);
 		}
 		$this->notFoundPageClass = $pageClass;
 	}
@@ -80,21 +80,21 @@ class PagesManager {
 	 * @param string $pageClass
 	 * @param string $pageURI
 	 * @param array|null $extraURIs
-	 * @throws PagesManagerDuplicatedPageException
-	 * @throws PagesManagerDuplicatedUriException
-	 * @throws PagesManagerNotAPageException
-	 * @throws PagesManagerUnregistredPageException
+	 * @throws DuplicatedPageException
+	 * @throws DuplicatedUriException
+	 * @throws NotAPageException
+	 * @throws UnregistredPageException
 	 */
 	public function registerPage(string $pageClass, string $pageURI, array $extraURIs = null) {
 		// Testing
 		if (!is_subclass_of($pageClass, PageInterface::class)) {
-			throw new PagesManagerNotAPageException($pageClass);
+			throw new NotAPageException($pageClass);
 		}
 		if ($this->isUriRegistred($pageURI)) {
-			throw new PagesManagerDuplicatedUriException($pageURI);
+			throw new DuplicatedUriException($pageURI);
 		}
 		if ($this->isPageRegistred($pageClass)) {
-			throw new PagesManagerDuplicatedPageException($pageClass);
+			throw new DuplicatedPageException($pageClass);
 		}
 
 		// Registers the page
@@ -114,15 +114,15 @@ class PagesManager {
 	 *
 	 * @param string $pageClass
 	 * @param string $pageExtraURI
-	 * @throws PagesManagerDuplicatedUriException
-	 * @throws PagesManagerUnregistredPageException
+	 * @throws DuplicatedUriException
+	 * @throws UnregistredPageException
 	 */
 	public function registerPageExtraURI(string $pageClass, string $pageExtraURI) {
 		if (!$this->isPageRegistred($pageClass)) {
-			throw new PagesManagerUnregistredPageException($pageClass);
+			throw new UnregistredPageException($pageClass);
 		}
 		if ($this->isUriRegistred($pageExtraURI)) {
-			throw new PagesManagerDuplicatedUriException($pageExtraURI);
+			throw new DuplicatedUriException($pageExtraURI);
 		}
 		$this->URIs[$pageExtraURI] = $pageClass;
 	}
@@ -152,11 +152,11 @@ class PagesManager {
 	 *
 	 * @param string $pageClass
 	 * @return string
-	 * @throws PagesManagerUnregistredPageException
+	 * @throws UnregistredPageException
 	 */
 	public function getPageUri(string $pageClass):string {
 		if (!$this->isPageRegistred($pageClass)) {
-			throw new PagesManagerUnregistredPageException($pageClass);
+			throw new UnregistredPageException($pageClass);
 		}
 		return $this->pages[$pageClass];
 	}
@@ -174,11 +174,11 @@ class PagesManager {
 	 * Returns the not found page class.
 	 *
 	 * @return string
-	 * @throws PagesManagerNotFoundNotSetException
+	 * @throws NotFoundPageNotSetException
 	 */
 	public function getNotFoundPageClass():string {
 		if (!$this->hasNotFoundPage()) {
-			throw new PagesManagerNotFoundNotSetException();
+			throw new NotFoundPageNotSetException();
 		}
 		return $this->notFoundPageClass ?: false;
 	}
@@ -198,8 +198,8 @@ class PagesManager {
 	 * @param string $URI
 	 * @param bool $allowNotFound Default: TRUE
 	 * @return string
-	 * @throws PagesManagerNotFoundException
-	 * @throws PagesManagerNotFoundNotSetException
+	 * @throws PageNotFoundException
+	 * @throws NotFoundPageNotSetException
 	 */
 	public function getPageClassByUri(string $URI, bool $allowNotFound = null):string {
 		// returns the page's class
@@ -214,7 +214,7 @@ class PagesManager {
 
 		// throws a not found exception
 		else {
-			throw new PagesManagerNotFoundException($URI);
+			throw new PageNotFoundException($URI);
 		}
 	}
 
@@ -225,8 +225,8 @@ class PagesManager {
 	 * @param string $URI
 	 * @param bool|null $allowNotFound
 	 * @throws PageRenderingException
-	 * @throws PagesManagerNotFoundException
-	 * @throws PagesManagerNotFoundNotSetException
+	 * @throws PageNotFoundException
+	 * @throws NotFoundPageNotSetException
 	 * @throws \Throwable
 	 */
 	public function renderPageByURI(string $URI, bool $allowNotFound = null) {
@@ -254,14 +254,14 @@ class PagesManager {
 	 *
 	 * @param bool|null $allowNotFound
 	 * @throws PageRenderingException
-	 * @throws PagesManagerNotFoundException
-	 * @throws PagesManagerNotFoundNotSetException
-	 * @throws PagesManagerUnknownUriException
+	 * @throws PageNotFoundException
+	 * @throws NotFoundPageNotSetException
+	 * @throws MissingCurrentUriException
 	 * @throws \Throwable
 	 */
 	public function renderCurrentPage(bool $allowNotFound = null) {
 		if (!isset($_SERVER['REQUEST_URI'])) {
-			throw new PagesManagerUnknownUriException();
+			throw new MissingCurrentUriException();
 		}
 		$this->renderPageByURI($_SERVER['REQUEST_URI'], $allowNotFound);
 	}

@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,58 +15,43 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/12/2017
-// Time:     17:35
-// Project:  lib-codeinclib
+// Date:     25/01/2018
+// Time:     13:10
+// Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
+use CodeInc\GUI\Pages\Manager\Exceptions\PagesManagerException;
 use Throwable;
 
 
 /**
- * Class PagesManagerRenderingException
+ * Class UnregistredPageException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerRenderingException extends PagesManagerException {
-	/**
-	 * @var PageInterface
-	 */
-	private $page;
-
+class UnregistredPageException extends PagesManagerException {
 	/**
 	 * @var string
 	 */
-	private $URI;
+	private $pageClass;
 
 	/**
-	 * PageRenderingException constructor.
+	 * PagesManagerUnregistredPageException constructor.
 	 *
-	 * @param PageInterface $page
-	 * @param string $URI
-	 * @param int $code
+	 * @param string $pageClass
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(PageInterface $page, string $URI, int $code = 0, Throwable $previous = null) {
-		$this->page = $page;
-		$this->URI = $URI;
-		parent::__construct("Erreur while rendering the page ".get_class($page)." for the URI \"$URI\"",
-			$code, $previous);
-	}
-
-	/**
-	 * @return PageInterface
-	 */
-	public function getPage() {
-		return $this->page;
+	public function __construct(string $pageClass, Throwable $previous = null) {
+		$this->pageClass = $pageClass;
+		parent::__construct("The page \"$pageClass\" is not registered",
+			0, $previous);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getURI():string {
-		return $this->URI;
+	public function getPageClass():string {
+		return $this->pageClass;
 	}
 }

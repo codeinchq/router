@@ -19,37 +19,38 @@
 // Time:     13:10
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 use Throwable;
 
 
 /**
- * Class PagesManagerDuplicatedURIException
+ * Class DuplicatedPageException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerDuplicatedUriException extends PagesManagerException {
+class DuplicatedPageException extends PagesManagerException {
 	/**
 	 * @var string
 	 */
-	private $pageURI;
+	private $pageClass;
 
 	/**
-	 * PagesManagerDuplicatedURIException constructor.
+	 * PagesManagerDuplicatedPageException constructor.
 	 *
-	 * @param string $pageURI
+	 * @param string $pageClass
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $pageURI, Throwable $previous = null) {
-		$this->pageURI = $pageURI;
-		parent::__construct("The URI \"$pageURI\" is already registered", 0, $previous);
+	public function __construct(string $pageClass, Throwable $previous = null) {
+		$this->pageClass = $pageClass;
+		parent::__construct("The page \"$pageClass\" is already registered",
+			0, $previous);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getPageURI():string {
-		return $this->pageURI;
+	public function getPageClass():string {
+		return $this->pageClass;
 	}
 }

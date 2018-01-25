@@ -16,19 +16,38 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     04/12/2017
-// Time:     17:32
+// Time:     17:33
 // Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Pages\Exceptions;
-use CodeInc\GUI\GUIException;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 
 
 /**
- * Class PagesManagerException
+ * Class NotAPageException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerException extends GUIException {
+class NotAPageException extends PagesManagerException {
+	private $pageClass;
 
+	/**
+	 * NotAPageException constructor.
+	 *
+	 * @param string $pagaClass
+	 * @param int|null $code
+	 * @param \Throwable|null $previous
+	 */
+	public function __construct(string $pagaClass, int $code = null, \Throwable $previous = null) {
+		$this->pageClass = $pagaClass;
+		parent::__construct("The class \"$pagaClass\" is not a page and can not be registered",
+			$code, $previous);
+}
+
+	/**
+	 * @return string
+	 */
+	public function getPageClass():string {
+		return $this->pageClass;
+	}
 }

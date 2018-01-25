@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE                                               |
+// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,41 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/01/2018
-// Time:     13:10
+// Date:     11/12/2017
+// Time:     15:08
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 use Throwable;
 
 
 /**
- * Class PagesManagerDuplicatedPageException
+ * Class NotFoundPageNotSetException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerDuplicatedPageException extends PagesManagerException {
+class NotFoundPageNotSetException extends PagesManagerException {
 	/**
-	 * @var string
-	 */
-	private $pageClass;
-
-	/**
-	 * PagesManagerDuplicatedPageException constructor.
+	 * PagesManagerNotFoundNotSetException constructor.
 	 *
-	 * @param string $pageClass
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $pageClass, Throwable $previous = null) {
-		$this->pageClass = $pageClass;
-		parent::__construct("The page \"$pageClass\" is already registered", 0, $previous);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getPageClass():string {
-		return $this->pageClass;
+	public function __construct(Throwable $previous = null) {
+		parent::__construct("The not found page is not set", 0, $previous);
 	}
 }

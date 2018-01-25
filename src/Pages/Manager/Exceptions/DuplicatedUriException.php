@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,28 +15,42 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     11/12/2017
-// Time:     15:00
+// Date:     25/01/2018
+// Time:     13:10
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Exceptions;
+namespace CodeInc\GUI\Pages\Manager\Exceptions;
 use Throwable;
 
 
 /**
- * Class PagesManagerNotFoundException
+ * Class DuplicatedUriException
  *
- * @package CodeInc\GUI\Pages\Exceptions
+ * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerNotFoundException extends PagesManagerException {
+class DuplicatedUriException extends PagesManagerException {
 	/**
-	 * PagesManagerNotFoundException constructor.
+	 * @var string
+	 */
+	private $pageURI;
+
+	/**
+	 * PagesManagerDuplicatedURIException constructor.
 	 *
-	 * @param string $URI
+	 * @param string $pageURI
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $URI, Throwable $previous = null) {
-		parent::__construct("The page \"$URI\" does not exist", 0, $previous);
+	public function __construct(string $pageURI, Throwable $previous = null) {
+		$this->pageURI = $pageURI;
+		parent::__construct("The URI \"$pageURI\" is already registered",
+			0, $previous);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPageURI():string {
+		return $this->pageURI;
 	}
 }

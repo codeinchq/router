@@ -19,19 +19,19 @@
 // Time:     13:33
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedUriException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerTranslatredUriNotFoundException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerUnregistredPageException;
+namespace CodeInc\GUI\Pages\Manager;
+use CodeInc\GUI\Pages\Manager\Exceptions\DuplicatedUriException;
+use CodeInc\GUI\Pages\Manager\Exceptions\TranslatredUriNotFoundException;
+use CodeInc\GUI\Pages\Manager\Exceptions\UnregistredPageException;
 
 
 /**
  * Class PagesMultilingualManager
  *
- * @package CodeInc\GUI\Pages
+ * @package CodeInc\GUI\Pages\Manager
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesMultilingualManager extends PagesManager {
+class MultilingualPagesManager extends PagesManager {
 
 	/**
 	 * List of translated pages.
@@ -48,8 +48,8 @@ class PagesMultilingualManager extends PagesManager {
 	 * @param string $pageClass
 	 * @param string $language
 	 * @param string $translatedURI
-	 * @throws PagesManagerDuplicatedUriException
-	 * @throws PagesManagerUnregistredPageException
+	 * @throws DuplicatedUriException
+	 * @throws UnregistredPageException
 	 */
 	public function registerPageTranslatedUri(string $pageClass, string $language, string $translatedURI) {
 		$this->registerPageExtraURI($pageClass, $translatedURI);
@@ -62,11 +62,11 @@ class PagesMultilingualManager extends PagesManager {
 	 * @param string $pageClass
 	 * @param string $language
 	 * @return string
-	 * @throws PagesManagerTranslatredUriNotFoundException
+	 * @throws TranslatredUriNotFoundException
 	 */
 	public function getPageTranslatedUri(string $pageClass, string $language):string {
 		if (!isset($this->translatedURIs[$pageClass][$language])) {
-			throw new PagesManagerTranslatredUriNotFoundException($pageClass, $language);
+			throw new TranslatredUriNotFoundException($pageClass, $language);
 		}
 		return $this->translatedURIs[$pageClass][$language];
 	}
