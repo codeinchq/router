@@ -20,9 +20,6 @@
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Pages\Manager;
-use CodeInc\GUI\Pages\Manager\Exceptions\DuplicatedUriException;
-use CodeInc\GUI\Pages\Manager\Exceptions\TranslatredUriNotFoundException;
-use CodeInc\GUI\Pages\Manager\Exceptions\UnregistredPageException;
 
 
 /**
@@ -34,40 +31,94 @@ use CodeInc\GUI\Pages\Manager\Exceptions\UnregistredPageException;
 class MultilingualPagesManager extends PagesManager {
 
 	/**
-	 * List of translated pages.
+	 * List of translated pages (keys are page classes, values are a sub array of languages matching URIs).
 	 *
-	 * @see PagesManager::registerPageTranslatedUri()
-	 * @see PagesManager::getPageTranslatedUri()
+	 * @see MultilingualPagesManager::registerMultilingualPageURI()
+	 * @see MultilingualPagesManager::getPageTranslatedURI()
 	 * @var array
 	 */
-	protected $translatedURIs = [];
+	protected $multilingualPages = [];
 
 	/**
-	 * Registers a page translation.
+	 * List of multilingual URIs with their corresponding language.
 	 *
+	 * @var array
+	 */
+	protected $multilingualURIs = [];
+
+	/**
 	 * @param string $pageClass
 	 * @param string $language
-	 * @param string $translatedURI
-	 * @throws DuplicatedUriException
-	 * @throws UnregistredPageException
+	 * @param string $pageURI
+	 * @throws PagesManagerException
 	 */
-	public function registerPageTranslatedUri(string $pageClass, string $language, string $translatedURI) {
-		$this->registerPageExtraURI($pageClass, $translatedURI);
-		$this->translatedURIs[$pageClass][$language] = $translatedURI;
+	public function registerMultilingualPage(string $pageClass, string $language, string $pageURI) {
+		$this->registerPage($pageClass, $pageURI);
+		if (!isset($this->multilingualPages[$pageClass][$language])) {
+			$this->multilingualPages[$pageClass][$language] = $pageURI;
+		}
+		$this->multilingualURIs[$pageURI] = $language;
 	}
 
 	/**
-	 * Retruns the translated URI of a page for a given language.
+	 * Verifies if a page is registered and is a multilingual page.
+	 *
+	 * @param string $pageClass
+	 * @return bool
+	 */
+	public function isMultilingualPageRegistered(string $pageClass):bool {
+		return isset($this->multilingualPages[$pageClass]);
+	}
+
+	/**
+	 * Verifies if a given language is registered for a multilingual page.
 	 *
 	 * @param string $pageClass
 	 * @param string $language
-	 * @return string
-	 * @throws TranslatredUriNotFoundException
+	 * @return bool
 	 */
-	public function getPageTranslatedUri(string $pageClass, string $language):string {
-		if (!isset($this->translatedURIs[$pageClass][$language])) {
-			throw new TranslatredUriNotFoundException($pageClass, $language);
+	public function isMultilingualPageLanguageRegistered(string $pageClass, string $language):bool {
+		return isset($this->multilingualPages[$pageClass][$language]);
+	}
+
+	/**
+	 * Returns the language of a multilingual page using it's URI or FALSE if the URI does not belong
+	 * to a multilingual page or is not registered.
+	 *
+	 * @param string $pageURI
+	 * @return false|string
+	 */
+	public function getPageLanguageByURI(string $pageURI) {
+		if (isset($this->multilingualURIs[$pageURI])) {
+			return $this->multilingualPages[$pageURI];
 		}
-		return $this->translatedURIs[$pageClass][$language];
+		return false;
+	}
+
+	/**
+	 * Returns the language of the current multilingual page using it's URI or FALSE if the URI does not belong
+	 * to a multilingual page or is not registered.
+	 *
+	 * @return false|string
+	 */
+	public function getCurrentPageLanguage() {
+		if (isset($_SERVER['REQUEST_URI'])) {
+			return $this->getPageClassByURI($_SERVER['REQUEST_URI']);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns a multilingual page URI for a given language.
+	 *
+	 * @param string $pageClass
+	 * @param string $language
+	 * @return string|false
+	 */
+	public function getPageURIByLanguage(string $pageClass, string $language) {
+		if (isset($this->multilingualPages[$pageClass][][$language])) {
+			return $this->multilingualPages[$pageClass][][$language];
+		}
+		return false;
 	}
 }

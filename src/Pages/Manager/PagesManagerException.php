@@ -15,41 +15,20 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     11/12/2017
-// Time:     15:00
-// Project:  lib-gui
+// Date:     04/12/2017
+// Time:     17:32
+// Project:  lib-codeinclib
 //
-namespace CodeInc\GUI\Pages\Manager\Exceptions;
-use Throwable;
+namespace CodeInc\GUI\Pages\Manager;
+use CodeInc\GUI\GUIException;
 
 
 /**
- * Class PageNotFoundException
+ * Class PagesManagerException
  *
  * @package CodeInc\GUI\Pages\Manager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PageNotFoundException extends PagesManagerException {
-	/**
-	 * @var string
-	 */
-	private $pageURI;
+class PagesManagerException extends GUIException {
 
-	/**
-	 * PagesManagerNotFoundException constructor.
-	 *
-	 * @param string $pageURI
-	 * @param Throwable|null $previous
-	 */
-	public function __construct(string $pageURI, Throwable $previous = null) {
-		$this->pageURI = $pageURI;
-		parent::__construct("The page \"$pageURI\" does not exist", 0, $previous);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getPageURI():string {
-		return $this->pageURI;
-	}
 }
