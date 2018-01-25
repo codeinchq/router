@@ -22,10 +22,9 @@
 namespace CodeInc\GUI\Pages;
 use CodeInc\GUI\Pages\Exceptions\PageRenderingException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedPageException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedURIException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedUriException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundNotSetException;
-use CodeInc\GUI\Pages\Exceptions\PagesManagerTranslatredUriNotFoundException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerUnknownUriException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerUnregistredPageException;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
@@ -46,30 +45,21 @@ class PagesManager {
 	 *
 	 * @var array
 	 */
-	private $URIs = [];
+	protected $URIs = [];
 
 	/**
 	 * List of pages classes (key) matching pages URIs (values)
 	 *
 	 * @var array
 	 */
-	private $pages = [];
-
-	/**
-	 * List of translated pages.
-	 *
-	 * @see PagesManager::registerPageTranslatedUri()
-	 * @see PagesManager::getPageTranslatedUri()
-	 * @var array
-	 */
-	private $translatedURIs = [];
+	protected $pages = [];
 
 	/**
 	 * Not found page class.
 	 *
 	 * @var string|null
 	 */
-	private $notFoundPageClass;
+	protected $notFoundPageClass;
 
 	/**
 	 * Registers the not found page.
@@ -91,7 +81,7 @@ class PagesManager {
 	 * @param string $pageURI
 	 * @param array|null $extraURIs
 	 * @throws PagesManagerDuplicatedPageException
-	 * @throws PagesManagerDuplicatedURIException
+	 * @throws PagesManagerDuplicatedUriException
 	 * @throws PagesManagerNotAPageException
 	 * @throws PagesManagerUnregistredPageException
 	 */
@@ -101,7 +91,7 @@ class PagesManager {
 			throw new PagesManagerNotAPageException($pageClass);
 		}
 		if ($this->isUriRegistred($pageURI)) {
-			throw new PagesManagerDuplicatedURIException($pageURI);
+			throw new PagesManagerDuplicatedUriException($pageURI);
 		}
 		if ($this->isPageRegistred($pageClass)) {
 			throw new PagesManagerDuplicatedPageException($pageClass);
@@ -124,7 +114,7 @@ class PagesManager {
 	 *
 	 * @param string $pageClass
 	 * @param string $pageExtraURI
-	 * @throws PagesManagerDuplicatedURIException
+	 * @throws PagesManagerDuplicatedUriException
 	 * @throws PagesManagerUnregistredPageException
 	 */
 	public function registerPageExtraURI(string $pageClass, string $pageExtraURI) {
@@ -132,7 +122,7 @@ class PagesManager {
 			throw new PagesManagerUnregistredPageException($pageClass);
 		}
 		if ($this->isUriRegistred($pageExtraURI)) {
-			throw new PagesManagerDuplicatedURIException($pageExtraURI);
+			throw new PagesManagerDuplicatedUriException($pageExtraURI);
 		}
 		$this->URIs[$pageExtraURI] = $pageClass;
 	}
@@ -155,36 +145,6 @@ class PagesManager {
 	 */
 	public function isUriRegistred(string $URI):bool {
 		return array_key_exists($URI, $this->URIs);
-	}
-
-	/**
-	 * Registers a page translation.
-	 *
-	 * @param string $pageClass
-	 * @param string $language
-	 * @param string $translatedURI
-	 * @throws PagesManagerUnregistredPageException
-	 */
-	public function registerPageTranslatedUri(string $pageClass, string $language, string $translatedURI) {
-		if (!$this->isPageRegistred($pageClass)) {
-			throw new PagesManagerUnregistredPageException($pageClass);
-		}
-		$this->translatedURIs[$pageClass][$language] = $translatedURI;
-	}
-
-	/**
-	 * Retruns the translated URI of a page for a given language.
-	 *
-	 * @param string $pageClass
-	 * @param string $language
-	 * @return string
-	 * @throws PagesManagerTranslatredUriNotFoundException
-	 */
-	public function getPageTranslatedUri(string $pageClass, string $language):string {
-		if (!array_key_exists($pageClass, $this->translatedURIs) ||!array_key_exists($language, $this->translatedURIs[$pageClass])) {
-			throw new PagesManagerTranslatredUriNotFoundException($pageClass, $language);
-		}
-		return $this->translatedURIs[$pageClass][$language];
 	}
 
 	/**

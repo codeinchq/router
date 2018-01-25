@@ -29,7 +29,7 @@ use Throwable;
  * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManagerDuplicatedURIException extends PagesManagerException {
+class PagesManagerDuplicatedUriException extends PagesManagerException {
 	/**
 	 * @var string
 	 */
