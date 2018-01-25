@@ -185,6 +185,11 @@ class PagesManager {
 			throw new PagesManagerException("The current page's URL can not be found in the \$_SERVER array, "
 				."unable to render the current page");
 		}
-		$this->renderPageByURI($_SERVER['REQUEST_URI'], $allowNotFound);
+		if (($pos = strpos($_SERVER['REQUEST_URI'], '?')) !== false) {
+			$this->renderPageByURI(substr($_SERVER['REQUEST_URI'], 0, $pos), $allowNotFound);
+		}
+		else {
+			$this->renderPageByURI($_SERVER['REQUEST_URI'], $allowNotFound);
+		}
 	}
 }
