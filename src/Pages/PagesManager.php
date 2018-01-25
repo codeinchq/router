@@ -120,6 +120,8 @@ class PagesManager {
 	}
 
 	/**
+	 * Regiters a page extra URI.
+	 *
 	 * @param string $pageClass
 	 * @param string $pageExtraURI
 	 * @throws PagesManagerDuplicatedURIException
