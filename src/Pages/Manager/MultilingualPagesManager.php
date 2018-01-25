@@ -116,8 +116,8 @@ class MultilingualPagesManager extends PagesManager {
 	 * @return string|false
 	 */
 	public function getPageURIByLanguage(string $pageClass, string $language) {
-		if (isset($this->multilingualPages[$pageClass][][$language])) {
-			return $this->multilingualPages[$pageClass][][$language];
+		if (isset($this->multilingualPages[$pageClass][$language])) {
+			return $this->multilingualPages[$pageClass][$language];
 		}
 		return false;
 	}
