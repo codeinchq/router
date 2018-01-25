@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,31 +15,32 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/11/2017
-// Time:     17:09
+// Date:     25/01/2018
+// Time:     14:58
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Pages\Interfaces;
 
 
 /**
- * Interface PageInterface
+ * Interface PageMultilingualInterface
  *
  * @package CodeInc\GUI\Pages\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface PageInterface {
+interface PageMultilingualInterface {
 	/**
-	 * Renders the view.
+	 * Returns the page's URI for a given language.
 	 *
-	 * @return void
-	 */
-	public function render();
-
-	/**
-	 * Returns the page URI.
-	 *
+	 * @param string $language
 	 * @return string
 	 */
-	public static function getURI():string;
+	public static function getLanguageURI(string $language):string;
+
+	/**
+	 * Returns the list of supported language in an array.
+	 *
+	 * @return array
+	 */
+	public static function getSupportedLanguages():array;
 }

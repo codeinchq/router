@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,31 +15,24 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/11/2017
-// Time:     17:09
+// Date:     25/01/2018
+// Time:     14:57
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\Pages\Interfaces;
 
 
 /**
- * Interface PageInterface
+ * Interface PageMultipleURIInterface
  *
  * @package CodeInc\GUI\Pages\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface PageInterface {
+interface PageMultipleURIInterface extends PageInterface {
 	/**
-	 * Renders the view.
+	 * Returns the extra URIs of the current page.
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function render();
-
-	/**
-	 * Returns the page URI.
-	 *
-	 * @return string
-	 */
-	public static function getURI():string;
+	public static function getExtraURIs():array;
 }
