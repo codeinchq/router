@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,19 +15,41 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/11/2017
-// Time:     11:11
+// Date:     25/01/2018
+// Time:     13:10
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Pages\Interfaces;
+namespace CodeInc\GUI\Pages\Exceptions;
+use Throwable;
 
 
 /**
- * Interface MultiLingualPageInterface
+ * Class PagesManagerUnregistredPageException
  *
- * @package CodeInc\GUI\Pages\Interfaces
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MultiLingualPageInterface {
-	public static function getLangURI(string $language):string;
+class PagesManagerUnregistredPageException extends PagesManagerException {
+	/**
+	 * @var string
+	 */
+	private $pageClass;
+
+	/**
+	 * PagesManagerUnregistredPageException constructor.
+	 *
+	 * @param string $pageClass
+	 * @param Throwable|null $previous
+	 */
+	public function __construct(string $pageClass, Throwable $previous = null) {
+		$this->pageClass = $pageClass;
+		parent::__construct("The page \"$pageClass\" is not registered", 0, $previous);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPageClass():string {
+		return $this->pageClass;
+	}
 }

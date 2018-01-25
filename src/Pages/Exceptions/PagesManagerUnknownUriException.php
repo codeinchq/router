@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,27 +15,29 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     06/12/2017
-// Time:     18:54
+// Date:     25/01/2018
+// Time:     12:50
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Views;
-use CodeInc\ErrorDisplay\RenderingEngines\ErrorBrowserRenderingEngine;
-use CodeInc\GUI\Views\Interfaces\ReturnableViewInterface;
-use CodeInc\GUI\Views\Interfaces\StringifiableViewInterface;
-use CodeInc\GUI\Views\Interfaces\ViewInterface;
+namespace CodeInc\GUI\Pages\Exceptions;
+use Throwable;
 
 
 /**
- * Class ExceptionDisplay
+ * Class PagesManagerUnknownUriException
  *
- * @package CodeInc\GUI\Views
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @deprecated
- * @see BrowserRenderingEngine
- * @see ExceptionRederingEngine
  */
-class ExceptionDisplay extends ErrorBrowserRenderingEngine
-	implements ViewInterface, StringifiableViewInterface, ReturnableViewInterface {
-
+class PagesManagerUnknownUriException extends PagesManagerException {
+	/**
+	 * PagesManagerUnknownUriException constructor.
+	 *
+	 * @param int|null $code
+	 * @param Throwable|null $previous
+	 */
+	public function __construct(int $code = null, Throwable $previous = null) {
+		parent::__construct("The current page's URL can not be found in the \$_SERVER array, unable to render the current page",
+			$code ?? 0, $previous);
+	}
 }

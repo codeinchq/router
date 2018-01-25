@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
+// | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,27 +15,41 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     06/12/2017
-// Time:     18:54
+// Date:     25/01/2018
+// Time:     13:10
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\Views;
-use CodeInc\ErrorDisplay\RenderingEngines\ErrorBrowserRenderingEngine;
-use CodeInc\GUI\Views\Interfaces\ReturnableViewInterface;
-use CodeInc\GUI\Views\Interfaces\StringifiableViewInterface;
-use CodeInc\GUI\Views\Interfaces\ViewInterface;
+namespace CodeInc\GUI\Pages\Exceptions;
+use Throwable;
 
 
 /**
- * Class ExceptionDisplay
+ * Class PagesManagerDuplicatedURIException
  *
- * @package CodeInc\GUI\Views
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @deprecated
- * @see BrowserRenderingEngine
- * @see ExceptionRederingEngine
  */
-class ExceptionDisplay extends ErrorBrowserRenderingEngine
-	implements ViewInterface, StringifiableViewInterface, ReturnableViewInterface {
+class PagesManagerDuplicatedURIException extends PagesManagerException {
+	/**
+	 * @var string
+	 */
+	private $pageURI;
 
+	/**
+	 * PagesManagerDuplicatedURIException constructor.
+	 *
+	 * @param string $pageURI
+	 * @param Throwable|null $previous
+	 */
+	public function __construct(string $pageURI, Throwable $previous = null) {
+		$this->pageURI = $pageURI;
+		parent::__construct("The URI \"$pageURI\" is already registered", 0, $previous);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPageURI():string {
+		return $this->pageURI;
+	}
 }

@@ -35,11 +35,4 @@ interface PageInterface {
 	 * @return void
 	 */
 	public function render();
-
-	/**
-	 * Returns the page's URI.
-	 *
-	 * @return string
-	 */
-	public static function getURI():string;
 }

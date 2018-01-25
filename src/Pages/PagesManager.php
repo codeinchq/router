@@ -21,9 +21,13 @@
 //
 namespace CodeInc\GUI\Pages;
 use CodeInc\GUI\Pages\Exceptions\PageRenderingException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedPageException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerDuplicatedURIException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundException;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerNotFoundNotSetException;
-use CodeInc\GUI\Pages\Interfaces\MultiURIPageInterface;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerTranslatredUriNotFoundException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerUnknownUriException;
+use CodeInc\GUI\Pages\Exceptions\PagesManagerUnregistredPageException;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
 use CodeInc\GUI\Pages\Exceptions\PagesManagerNotAPageException;
 
@@ -34,46 +38,165 @@ use CodeInc\GUI\Pages\Exceptions\PagesManagerNotAPageException;
  * @package CodeInc\GUI\Pages
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PagesManager implements \IteratorAggregate {
+class PagesManager {
+	const DEFAULT_404_URI = "error404.html";
+
 	/**
+	 * List of pages URIs (keys) matching pages classes (values)
+	 *
+	 * @var array
+	 */
+	private $URIs = [];
+
+	/**
+	 * List of pages classes (key) matching pages URIs (values)
+	 *
 	 * @var array
 	 */
 	private $pages = [];
 
 	/**
+	 * List of translated pages.
+	 *
+	 * @see PagesManager::registerPageTranslatedUri()
+	 * @see PagesManager::getPageTranslatedUri()
+	 * @var array
+	 */
+	private $translatedURIs = [];
+
+	/**
+	 * Not found page class.
+	 *
 	 * @var string|null
 	 */
 	private $notFoundPageClass;
 
 	/**
+	 * Registers the not found page.
+	 *
 	 * @param string $pageClass
 	 * @throws PagesManagerNotAPageException
 	 */
 	public function registerNotFoundPage(string $pageClass) {
-		$this->registerPage($pageClass);
+		if (!is_subclass_of($pageClass, PageInterface::class)) {
+			throw new PagesManagerNotAPageException($pageClass);
+		}
 		$this->notFoundPageClass = $pageClass;
 	}
 
 	/**
+	 * Registers a page.
+	 *
 	 * @param string $pageClass
+	 * @param string $pageURI
+	 * @param array|null $extraURIs
+	 * @throws PagesManagerDuplicatedPageException
+	 * @throws PagesManagerDuplicatedURIException
 	 * @throws PagesManagerNotAPageException
+	 * @throws PagesManagerUnregistredPageException
 	 */
-	public function registerPage(string $pageClass) {
-		/** @var PageInterface $pageClass */
+	public function registerPage(string $pageClass, string $pageURI, array $extraURIs = null) {
+		// Testing
 		if (!is_subclass_of($pageClass, PageInterface::class)) {
 			throw new PagesManagerNotAPageException($pageClass);
 		}
+		if ($this->isUriRegistred($pageURI)) {
+			throw new PagesManagerDuplicatedURIException($pageURI);
+		}
+		if ($this->isPageRegistred($pageClass)) {
+			throw new PagesManagerDuplicatedPageException($pageClass);
+		}
 
-		// Registering the main URI
-		$this->pages[$pageClass::getURI()] = $pageClass;
+		// Registers the page
+		$this->URIs[$pageURI] = $pageClass;
+		$this->pages[$pageClass] = $pageURI;
 
 		// Registering additionnal URIs
-		if (is_subclass_of($pageClass, MultiURIPageInterface::class)) {
-			/** @var MultiURIPageInterface $pageClass */
-			foreach ($pageClass::getAdditionnalURIs() as $additionnalURI) {
-				$this->pages[$additionnalURI] = $pageClass;
+		if ($extraURIs) {
+			foreach ($extraURIs as $extraURI) {
+				$this->registerPageExtraURI($pageClass, $extraURI);
 			}
 		}
+	}
+
+	/**
+	 * @param string $pageClass
+	 * @param string $pageExtraURI
+	 * @throws PagesManagerDuplicatedURIException
+	 * @throws PagesManagerUnregistredPageException
+	 */
+	public function registerPageExtraURI(string $pageClass, string $pageExtraURI) {
+		if (!$this->isPageRegistred($pageClass)) {
+			throw new PagesManagerUnregistredPageException($pageClass);
+		}
+		if ($this->isUriRegistred($pageExtraURI)) {
+			throw new PagesManagerDuplicatedURIException($pageExtraURI);
+		}
+		$this->URIs[$pageExtraURI] = $pageClass;
+	}
+
+	/**
+	 * Verifies if a page is registered
+	 *
+	 * @param string $pageClass
+	 * @return bool
+	 */
+	public function isPageRegistred(string $pageClass):bool {
+		return array_key_exists($pageClass, $this->pages);
+	}
+
+	/**
+	 * Verifies if a URI is registered
+	 *
+	 * @param string $URI
+	 * @return bool
+	 */
+	public function isUriRegistred(string $URI):bool {
+		return array_key_exists($URI, $this->URIs);
+	}
+
+	/**
+	 * Registers a page translation.
+	 *
+	 * @param string $pageClass
+	 * @param string $language
+	 * @param string $translatedURI
+	 * @throws PagesManagerUnregistredPageException
+	 */
+	public function registerPageTranslatedUri(string $pageClass, string $language, string $translatedURI) {
+		if (!$this->isPageRegistred($pageClass)) {
+			throw new PagesManagerUnregistredPageException($pageClass);
+		}
+		$this->translatedURIs[$pageClass][$language] = $translatedURI;
+	}
+
+	/**
+	 * Retruns the translated URI of a page for a given language.
+	 *
+	 * @param string $pageClass
+	 * @param string $language
+	 * @return string
+	 * @throws PagesManagerTranslatredUriNotFoundException
+	 */
+	public function getPageTranslatedUri(string $pageClass, string $language):string {
+		if (!array_key_exists($pageClass, $this->translatedURIs) ||!array_key_exists($language, $this->translatedURIs[$pageClass])) {
+			throw new PagesManagerTranslatredUriNotFoundException($pageClass, $language);
+		}
+		return $this->translatedURIs[$pageClass][$language];
+	}
+
+	/**
+	 * Returns a page URI.
+	 *
+	 * @param string $pageClass
+	 * @return string
+	 * @throws PagesManagerUnregistredPageException
+	 */
+	public function getPageUri(string $pageClass):string {
+		if (!$this->isPageRegistred($pageClass)) {
+			throw new PagesManagerUnregistredPageException($pageClass);
+		}
+		return $this->pages[$pageClass];
 	}
 
 	/**
@@ -82,7 +205,7 @@ class PagesManager implements \IteratorAggregate {
 	 * @return array
 	 */
 	public function getRegisteredPages():array {
-		return $this->pages;
+		return $this->URIs;
 	}
 
 	/**
@@ -96,16 +219,6 @@ class PagesManager implements \IteratorAggregate {
 			throw new PagesManagerNotFoundNotSetException();
 		}
 		return $this->notFoundPageClass ?: false;
-	}
-
-	/**
-	 * Verifies if a page exists for a given URI.
-	 *
-	 * @param string $URI
-	 * @return bool
-	 */
-	public function hasPage(string $URI):bool {
-		return array_key_exists($URI, $this->pages);
 	}
 
 	/**
@@ -126,41 +239,21 @@ class PagesManager implements \IteratorAggregate {
 	 * @throws PagesManagerNotFoundException
 	 * @throws PagesManagerNotFoundNotSetException
 	 */
-	public function getPageClassByURI(string $URI, bool $allowNotFound = null):string {
-		if ($this->hasPage($URI)) { // returns the page's class
-			return $this->pages[$URI];
+	public function getPageClassByUri(string $URI, bool $allowNotFound = null):string {
+		// returns the page's class
+		if ($this->isUriRegistred($URI)) {
+			return $this->URIs[$URI];
 		}
-		elseif ($allowNotFound !== false) { // returns the not found page class (if allowed)à
+
+		// returns the not found page class (if allowed)à
+		elseif ($allowNotFound !== false) {
 			return $this->getNotFoundPageClass();
 		}
-		else { // throws a not found exception
+
+		// throws a not found exception
+		else {
 			throw new PagesManagerNotFoundException($URI);
 		}
-	}
-
-	/**
-	 * Returns a page object for a given URI.
-	 *
-	 * @param string $URI
-	 * @param bool $allowNotFound Default: TRUE
-	 * @return PageInterface
-	 * @throws PagesManagerNotFoundException
-	 * @throws PagesManagerNotFoundNotSetException
-	 */
-	public function getPageByURI(string $URI, bool $allowNotFound = null) {
-		$pageClass = $this->getPageClassByURI($URI, $allowNotFound);
-		return new $pageClass();
-	}
-
-	/**
-	 * Returns the not found page object.
-	 *
-	 * @return PageInterface
-	 * @throws PagesManagerNotFoundNotSetException
-	 */
-	public function getNotFoundPage() {
-		$pageClass = $this->getNotFoundPageClass();
-		return new $pageClass($this);
 	}
 
 	/**
@@ -168,20 +261,23 @@ class PagesManager implements \IteratorAggregate {
 	 * has been defined the method will render the not found page, else a PagesManagerNotFoundException is thrown.
 	 *
 	 * @param string $URI
-	 * @param bool $allowNotFound
+	 * @param bool|null $allowNotFound
+	 * @throws PageRenderingException
 	 * @throws PagesManagerNotFoundException
 	 * @throws PagesManagerNotFoundNotSetException
-	 * @throws PageRenderingException
+	 * @throws \Throwable
 	 */
 	public function renderPageByURI(string $URI, bool $allowNotFound = null) {
-		// Obtaining the page object
-		$page = $this->getPageByURI($URI, $allowNotFound);
+		// Obtaining the page class
+		$pageClass = $this->getPageClassByUri($URI, $allowNotFound);
 
 		// Renders the page
 		try {
+			/** @var PageInterface $page */
+			$page = new $pageClass();
 			$page->render();
 		}
-		catch (\Exception $exception) {
+		catch (\Throwable $exception) {
 			if (!$exception instanceof PageRenderingException) {
 				throw new PageRenderingException($page, 0, $exception);
 			}
@@ -192,9 +288,19 @@ class PagesManager implements \IteratorAggregate {
 	}
 
 	/**
-	 * @return \ArrayIterator
+	 * Renders the current page using $_SERVER['REQUEST_URI'] a the current URI.
+	 *
+	 * @param bool|null $allowNotFound
+	 * @throws PageRenderingException
+	 * @throws PagesManagerNotFoundException
+	 * @throws PagesManagerNotFoundNotSetException
+	 * @throws PagesManagerUnknownUriException
+	 * @throws \Throwable
 	 */
-	public function getIterator():\ArrayIterator {
-		return new \ArrayIterator($this->pages);
+	public function renderCurrentPage(bool $allowNotFound = null) {
+		if (!isset($_SERVER['REQUEST_URI'])) {
+			throw new PagesManagerUnknownUriException();
+		}
+		$this->renderPageByURI($_SERVER['REQUEST_URI'], $allowNotFound);
 	}
 }
