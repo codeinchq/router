@@ -21,6 +21,8 @@
 //
 namespace CodeInc\GUI\Pages\Manager;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
+use CodeInc\GUI\Pages\Interfaces\PageMultilingualInterface;
+use CodeInc\GUI\Pages\Interfaces\PageMultipleURIInterface;
 
 
 /**
@@ -70,59 +72,51 @@ class PagesManager {
 	/**
 	 * Registers a page.
 	 *
-	 * @param string $pageURI
 	 * @param string $pageClass
 	 * @throws PagesManagerException
 	 */
-	public function registerPage(string $pageClass, string $pageURI) {
+	public function registerPage(string $pageClass) {
 		// Testing
-		if (!is_subclass_of($pageClass, PageInterface::class)) {
-			throw new PagesManagerException("The class \"$pageClass\" is not a page and "
-				."can not be registered.");
-		}
-		if ($this->isPageURIRegistred($pageURI)) {
-			throw new PagesManagerException("The URI \"$pageURI\" is already in used by the page "
-				."\"".$this->getPageClassByURI($pageURI)."\" and can not be used by the page \"$pageClass\".");
+		if (array_key_exists($pageClass, $this->pageClasses)) {
+			throw new PagesManagerException("The page \"$pageClass\" is already registered");
 		}
 
-		// Registers the page
+		// Registering the page
+		$pageURI = $this->getPageURI($pageClass);
+		$this->pageClasses[$pageClass] = $pageURI;
 		$this->pageURIs[$pageURI] = $pageClass;
-		if (!$this->isPageRegistred($pageClass)) {
-			$this->pageClasses[$pageClass] = $pageURI;
+
+		// Adding extra URIs
+		if (is_subclass_of($pageClass, PageMultipleURIInterface::class)) {
+			/** @var PageMultipleURIInterface $pageClass */
+			foreach ($pageClass::getExtraURIs() as $extraURI) {
+				$this->pageURIs[$extraURI] = $pageClass;
+			}
 		}
-	}
 
-	/**
-	 * Verifies if a page is registered
-	 *
-	 * @param string $pageClass
-	 * @return bool
-	 */
-	public function isPageRegistred(string $pageClass):bool {
-		return array_key_exists($pageClass, $this->pageClasses);
-	}
-
-	/**
-	 * Verifies if a page URI is registered.
-	 *
-	 * @param string $pageURI
-	 * @return bool
-	 */
-	public function isPageURIRegistred(string $pageURI):bool {
-		return array_key_exists($pageURI, $this->pageURIs);
+		// Adding multilingual pages URLs
+		if (is_subclass_of($pageClass, PageMultilingualInterface::class)) {
+			/** @var PageMultilingualInterface $pageClass */
+			foreach ($pageClass::getSupportedLanguages() as $language) {
+				$this->pageURIs[$pageClass::getLanguageURI($language)] = $pageClass;
+			}
+		}
 	}
 
 	/**
 	 * Returns a page URI.
 	 *
 	 * @param string $pageClass
-	 * @return string|false
+	 * @return string
+	 * @throws PagesManagerException
 	 */
-	public function getPageURI(string $pageClass):string {
-		if ($this->isPageRegistred($pageClass)) {
-			return $this->pageClasses[$pageClass];
+	protected function getPageURI(string $pageClass):string {
+		if (!is_subclass_of($pageClass, PageInterface::class)) {
+			throw new PagesManagerException("The class \"$pageClass\" is not a page and "
+				."can not be registered.");
 		}
-		return false;
+		/** @var PageInterface $pageClass */
+		return $pageClass::getURI();
 	}
 
 	/**
@@ -135,15 +129,6 @@ class PagesManager {
 	}
 
 	/**
-	 * Verifies if a not found page has been defined.
-	 *
-	 * @return bool
-	 */
-	public function hasNotFoundPage():bool {
-		return $this->notFoundPageClass !== null;
-	}
-
-	/**
 	 * Returns a page class for a given URI or FALSE if the page does not exist.
 	 *
 	 * @param string $pageURI
@@ -152,7 +137,7 @@ class PagesManager {
 	 */
 	public function getPageClassByURI(string $pageURI, bool $allowNotFound = null) {
 		// returns the page's class
-		if ($this->isPageURIRegistred($pageURI)) {
+		if (array_key_exists($pageURI, $this->pageURIs)) {
 			return $this->pageURIs[$pageURI];
 		}
 
