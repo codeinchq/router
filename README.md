@@ -21,8 +21,8 @@ final class HomePage extends AbstractPage {
 }
 
 final class SamplePage extends AbstractPage {
-	public function process():ResponseInterface {
-		$resp = new Html5Response($this);
+    public function process():ResponseInterface {
+        $resp = new Html5Response($this);
         $resp->setPageTitle("Sample page");
         $resp->setHtmlBody("<p>This is a sample page!</p>");
         return $resp;
