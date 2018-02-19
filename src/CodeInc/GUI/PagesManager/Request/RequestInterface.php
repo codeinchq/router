@@ -37,25 +37,32 @@ interface RequestInterface {
 	public function getPagesManager():PagesManagerInterface;
 
 	/**
-	 * Returns the get variables manager.
+	 * Returns the HTTP headers iterator.
 	 *
-	 * @return RequestQuery
+	 * @return HttpHeaders
 	 */
-	public function getGet():RequestQuery;
+	public function httpHeaders():HttpHeaders;
 
 	/**
-	 * Returs the post variables manager.
+	 * Returns the get variables iterator.
 	 *
 	 * @return RequestQuery
 	 */
-	public function getPost():RequestQuery;
+	public function get():RequestQuery;
 
 	/**
-	 * Returns the cookies manager.
+	 * Returs the post variables iterator.
 	 *
 	 * @return RequestQuery
 	 */
-	public function getCookies():RequestQuery;
+	public function post():RequestQuery;
+
+	/**
+	 * Returns the cookies iterator.
+	 *
+	 * @return RequestQuery
+	 */
+	public function cookies():RequestQuery;
 
 	/**
 	 * Returns the request URL.
@@ -112,27 +119,4 @@ interface RequestInterface {
 	 * @return null|string
 	 */
 	public function getContent():?string;
-
-	/**
-	 * Verifies if a header is set.
-	 *
-	 * @param string $header
-	 * @return bool
-	 */
-	public function hasHeader(string $header):bool;
-
-	/**
-	 * Returns a header value of null if not set.
-	 *
-	 * @param string $header
-	 * @return null|string
-	 */
-	public function getHeader(string $header):?string;
-
-	/**
-	 * Returns all headers in an assoc array.
-	 *
-	 * @return array
-	 */
-	public function getAllHeaders():array;
 }

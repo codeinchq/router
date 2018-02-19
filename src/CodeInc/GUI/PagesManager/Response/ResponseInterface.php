@@ -43,14 +43,14 @@ interface ResponseInterface {
 	 *
 	 * @return Cookies
 	 */
-	public function getCookies():Cookies;
+	public function cookies():Cookies;
 
 	/**
 	 * Returns the HTTP headers manager.
 	 *
-	 * @return ResponseHttpHeaders
+	 * @return HttpHeaders
 	 */
-	public function getHttpHeaders():ResponseHttpHeaders;
+	public function httpHeaders():HttpHeaders;
 
 	/**
 	 * Sends the response.

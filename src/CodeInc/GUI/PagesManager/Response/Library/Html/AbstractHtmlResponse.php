@@ -118,7 +118,7 @@ abstract class AbstractHtmlResponse extends AbstractResponse {
 	public function setHtmlCharset(string $htmlCharset, bool $setHttpHeader = null):void {
 		$this->htmlCharset = $htmlCharset;
 		if ($setHttpHeader !== false) {
-			$this->getHttpHeaders()->addHeader("Content-Type", "text/html; charset=$htmlCharset");
+			$this->httpHeaders()->addHeader("Content-Type", "text/html; charset=$htmlCharset");
 		}
 	}
 

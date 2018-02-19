@@ -39,6 +39,11 @@ class Request implements RequestInterface {
 	private $pagesManager;
 
 	/**
+	 * @var HttpHeaders
+	 */
+	private $httpHeaders;
+
+	/**
 	 * @var RequestQuery
 	 */
 	private $get;
@@ -98,7 +103,8 @@ class Request implements RequestInterface {
 		$this->url = $url ?: Url::fromCurrentUrl();
 		$this->pagesManager = $pagesManager;
 
-		// GPC
+		// submodules
+		$this->httpHeaders = HttpHeaders::factoryFromGlobals();
 		$this->get = RequestQuery::fromGet($this);
 		$this->post = RequestQuery::fromPost($this);
 		$this->cookies = RequestQuery::fromCookie($this);
@@ -109,15 +115,6 @@ class Request implements RequestInterface {
 		$this->remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
 		$this->remotePort = $_SERVER['REMOTE_PORT'] ?? null;
 		$this->content = file_get_contents('php://input');
-
-		// headers
-		$this->headers = [];
-		foreach ($_SERVER as $name => $value) {
-			if (substr($name, 0, 5) == 'HTTP_') {
-				$this->headers[str_replace(' ', '-',
-					ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-			}
-		}
 	}
 
 	/**
@@ -130,9 +127,17 @@ class Request implements RequestInterface {
 
 	/**
 	 * @inheritdoc
+	 * @return HttpHeaders
+	 */
+	public function httpHeaders():HttpHeaders {
+		return $this->httpHeaders;
+	}
+
+	/**
+	 * @inheritdoc
 	 * @return RequestQuery
 	 */
-	public function getGet():RequestQuery {
+	public function get():RequestQuery {
 		return $this->get;
 	}
 
@@ -140,7 +145,7 @@ class Request implements RequestInterface {
 	 * @inheritdoc
 	 * @return RequestQuery
 	 */
-	public function getPost():RequestQuery {
+	public function post():RequestQuery {
 		return $this->post;
 	}
 
@@ -148,7 +153,7 @@ class Request implements RequestInterface {
 	 * @inheritdoc
 	 * @return RequestQuery
 	 */
-	public function getCookies():RequestQuery {
+	public function cookies():RequestQuery {
 		return $this->cookies;
 	}
 

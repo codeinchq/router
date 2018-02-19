@@ -16,33 +16,20 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     19/02/2018
-// Time:     20:38
+// Time:     21:21
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
-use CodeInc\GUI\PagesManager\Exceptions\HttpHeadersSentException;
+namespace CodeInc\GUI\PagesManager\Request;
 
 
 /**
- * Class ResponseHeaders
+ * Class HttpHeaders
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\GUI\PagesManager\Request
  * @author Joan Fabrégat <joan@codeinc.fr>
  * @todo finir la doc
  */
-class ResponseHttpHeaders implements \Iterator, \ArrayAccess {
-	/**
-	 * Parent response.
-	 *
-	 * @var ResponseInterface
-	 */
-	private $response;
-
-	/**
-	 * @var int
-	 */
-	private $httpResponseCode = 200;
-
+class HttpHeaders implements \Iterator, \ArrayAccess {
 	/**
 	 * @var array
 	 */
@@ -59,34 +46,26 @@ class ResponseHttpHeaders implements \Iterator, \ArrayAccess {
 	private $iteratorIndex;
 
 	/**
-	 * ResponseHttpHeaders constructor.
+	 * HttpHeaders constructor.
+	 */
+	public function __construct(array $headers = null) {
+		$this->headers = $headers ?: [];
+	}
+
+	/**
+	 * Configures the headers using $_SERVER data.
 	 *
-	 * @param ResponseInterface $response
+	 * @return HttpHeaders
 	 */
-	public function __construct(ResponseInterface $response) {
-		$this->response = $response;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getHttpResponseCode():int {
-		return $this->httpResponseCode;
-	}
-
-	/**
-	 * @param int $httpResponseCode
-	 */
-	public function setHttpResponseCode(int $httpResponseCode):void {
-		$this->httpResponseCode = $httpResponseCode;
-	}
-
-	/**
-	 * @param string $header
-	 * @param string $value
-	 */
-	public function addHeader(string $header, string $value):void {
-		$this->headers[$header] = $value;
+	public static function factoryFromGlobals():HttpHeaders {
+		$headers = new HttpHeaders();
+		foreach ($_SERVER as $name => $value) {
+			if (substr($name, 0, 5) == 'HTTP_') {
+				$headers->headers[str_replace(' ', '-',
+					ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+			}
+		}
+		return $headers;
 	}
 
 	/**
@@ -106,13 +85,6 @@ class ResponseHttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
-	 * @param string $header
-	 */
-	public function removeHeader(string $header):void {
-		unset($this->headers[$header]);
-	}
-
-	/**
 	 * @return array
 	 */
 	public function getHeaders():array {
@@ -120,25 +92,10 @@ class ResponseHttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
-	 * Sends all the headers.
-	 *
-	 * @throws HttpHeadersSentException
-	 */
-	public function send():void {
-		if (headers_sent()) {
-			throw new HttpHeadersSentException($this->response);
-		}
-		http_response_code($this->httpResponseCode);
-		foreach ($this->headers as $header => $value) {
-			header("$header: $value", true);
-		}
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function offsetSet($offset, $value):void {
-		$this->addHeader((string)$offset, (string)$value);
+		return;
 	}
 
 	/**
@@ -161,7 +118,7 @@ class ResponseHttpHeaders implements \Iterator, \ArrayAccess {
 	 * @inheritdoc
 	 */
 	public function offsetUnset($offset):void {
-		$this->removeHeader((string)$offset);
+		return;
 	}
 
 	/**

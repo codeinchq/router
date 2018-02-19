@@ -24,7 +24,7 @@ use CodeInc\GUI\Pages\Interfaces\PageInterface;
 use CodeInc\GUI\PagesManager\Response\Exceptions\ReponseSentException;
 use CodeInc\GUI\PagesManager\Response\Exceptions\ResponseException;
 use CodeInc\GUI\PagesManager\Response\Cookies;
-use CodeInc\GUI\PagesManager\Response\ResponseHttpHeaders;
+use CodeInc\GUI\PagesManager\Response\HttpHeaders;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
 
 
@@ -41,7 +41,7 @@ abstract class AbstractResponse implements ResponseInterface {
 	private $page;
 
 	/**
-	 * @var ResponseHttpHeaders
+	 * @var HttpHeaders
 	 */
 	private $httpHeaders;
 
@@ -59,13 +59,13 @@ abstract class AbstractResponse implements ResponseInterface {
 	 * AbstractResponse constructor.
 	 *
 	 * @param PageInterface $page
-	 * @param ResponseHttpHeaders|null $httpHeaders
+	 * @param HttpHeaders|null $httpHeaders
 	 * @param Cookies|null $cookies
 	 */
-	public function __construct(PageInterface $page, ResponseHttpHeaders $httpHeaders = null,
+	public function __construct(PageInterface $page, HttpHeaders $httpHeaders = null,
 		Cookies $cookies = null) {
 		$this->page = $page;
-		$this->httpHeaders = $httpHeaders ?: new ResponseHttpHeaders($this);
+		$this->httpHeaders = $httpHeaders ?: new HttpHeaders($this);
 		$this->cookies = $cookies ?: new Cookies($this);
 	}
 
@@ -81,14 +81,14 @@ abstract class AbstractResponse implements ResponseInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function getHttpHeaders():ResponseHttpHeaders {
+	public function httpHeaders():HttpHeaders {
 		return $this->httpHeaders;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function getCookies():Cookies {
+	public function cookies():Cookies {
 		return $this->cookies;
 	}
 
@@ -108,8 +108,8 @@ abstract class AbstractResponse implements ResponseInterface {
 			if ($this->isSent()) {
 				throw new ReponseSentException($this);
 			}
-			$this->getHttpHeaders()->send();
-			$this->getCookies()->send();
+			$this->httpHeaders()->send();
+			$this->cookies()->send();
 			$this->sendContent();
 			$this->sent = true;
 		}
