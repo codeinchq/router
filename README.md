@@ -33,5 +33,5 @@ $pageManager->processRequest();
 ```
 
 # License 
-This library is published under the MIT license (see the [`LICENSE` file](https://github.com/codeinchq/lib-gui/blob/master/LICENSE)).
+This library is published under the MIT license (see the [`LICENSE`](https://github.com/codeinchq/lib-gui/blob/master/LICENSE) file).
 
