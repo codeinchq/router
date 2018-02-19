@@ -5,12 +5,12 @@ PHP 7 library to manage and render the graphic user interface.
 ## Usage
 ```php
 <?php
-use CodeInc\GUI\PagesManager\PagesManager;
-use CodeInc\GUI\Pages\AbstractPage;
-use CodeInc\GUI\PagesManager\Response\ResponseInterface;
-use CodeInc\GUI\PagesManager\Response\Library\Html\SimpleHtmlResponse;
-use CodeInc\GUI\PagesManager\Response\Library\Redirect\RedirectResponse;
 use CodeInc\Url\Url;
+use CodeInc\Router\Pages\AbstractPage;
+use CodeInc\Router\Responses\ResponseInterface;
+use CodeInc\Router\Responses\HTML\SimpleHtmlResponse;
+use CodeInc\Router\Responses\Redirect\RedirectResponse;
+use CodeInc\Router\Router;
 
 final class HomePage extends AbstractPage {
 	public function process():ResponseInterface {
@@ -36,11 +36,14 @@ final class SamplePage extends AbstractPage {
     }
 }
 
-$pageManager = new PagesManager();
-$pageManager->registerPage("/", HomePage::class);
-$pageManager->registerPage("/sample.html", SamplePage::class);
-$pageManager->processRequest();
+$router = new Router();
+$router->mapRoute("/", HomePage::class);
+$router->mapRoute("/sample.html", SamplePage::class);
+$router->processRequest();
 ```
+
+Mapping:
+router -> lookup current route -> calls the corresponding page -> send back a response -> response is processed and sent to the web browser
 
 # License 
 This library is published under the MIT license (see the [`LICENSE`](https://github.com/codeinchq/lib-gui/blob/master/LICENSE) file).

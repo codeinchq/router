@@ -1,8 +1,8 @@
 {
-  "name": "codeinchq/lib-gui",
+  "name": "codeinchq/lib-router",
   "version": "1.1.0",
-  "description": "Code Inc.'s GUI library",
-  "homepage": "https://github.com/codeinchq/lib-gui",
+  "description": "Code Inc.'s router library",
+  "homepage": "https://github.com/codeinchq/lib-router",
   "type": "library",
   "license": "MIT",
   "require": {
