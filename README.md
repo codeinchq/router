@@ -1,6 +1,6 @@
-# Code Inc.'s GUI library
+# Code Inc. router library
 
-PHP 7 library to manage and render the graphic user interface.
+PHP 7 library to manage routes and send responses to the client.
 
 ## Usage
 ```php
