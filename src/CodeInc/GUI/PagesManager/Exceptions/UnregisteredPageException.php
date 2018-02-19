@@ -15,45 +15,43 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:37
+// Date:     19/02/2018
+// Time:     20:01
 // Project:  lib-gui
 //
 namespace CodeInc\GUI\PagesManager\Exceptions;
 use CodeInc\GUI\PagesManager\PagesManagerInterface;
-use CodeInc\GUI\PagesManager\Request\RequestInterface;
 use Throwable;
 
 
 /**
- * Class PagesManagerNotFoundException
+ * Class UnregisteredPageException
  *
  * @package CodeInc\GUI\PagesManager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PageNotFoundException extends PagesManagerException {
+class UnregisteredPageException extends PagesManagerException {
 	/**
-	 * @var RequestInterface
+	 * @var string
 	 */
-	private $request;
+	private $pageClass;
 
 	/**
-	 * PagesManagerNotFoundException constructor.
+	 * UnregisteredPageException constructor.
 	 *
-	 * @param RequestInterface $request
-	 * @param PagesManagerInterface|null $service
+	 * @param string $pageClass
+	 * @param PagesManagerInterface $pagesManager
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(RequestInterface $request, PagesManagerInterface $service, ?Throwable $previous = null) {
-		$this->request = $request;
-		parent::__construct("No page is registered for the URL \"{$request->getUrl()}\"",
-			$service, $previous);
+	public function __construct(string $pageClass, PagesManagerInterface $pagesManager, ?Throwable $previous = null) {
+		$this->pageClass = $pageClass;
+		parent::__construct("The page \"$pageClass\" is not registered", $pagesManager, $previous);
 	}
 
 	/**
-	 * @return RequestInterface
+	 * @return string
 	 */
-	public function getRequest():RequestInterface {
-		return $this->request;
+	public function getPageClass():string {
+		return $this->pageClass;
 	}
 }

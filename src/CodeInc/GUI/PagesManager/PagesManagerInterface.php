@@ -36,10 +36,11 @@ interface PagesManagerInterface {
 	/**
 	 * Registers a page.
 	 *
+	 * @param string $path
 	 * @param string $pageClass
 	 * @throws PagesManagerException
 	 */
-	public function registerPage(string $pageClass):void;
+	public function registerPage(string $path, string $pageClass):void;
 
 	/**
 	 * @param string $pageClass

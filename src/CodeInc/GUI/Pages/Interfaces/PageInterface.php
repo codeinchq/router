@@ -49,13 +49,6 @@ interface PageInterface {
 	public function process():ResponseInterface;
 
 	/**
-	 * Returns the page path.
-	 *
-	 * @return string
-	 */
-	public static function getPath():string;
-
-	/**
 	 * Returns the parent request
 	 *
 	 * @return RequestInterface

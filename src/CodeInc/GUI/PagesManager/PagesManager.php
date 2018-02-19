@@ -28,6 +28,7 @@ use CodeInc\GUI\PagesManager\Exceptions\NotAPageException;
 use CodeInc\GUI\PagesManager\Exceptions\PageProcessingException;
 use CodeInc\GUI\PagesManager\Exceptions\PageNotFoundException;
 use CodeInc\GUI\PagesManager\Exceptions\ReponseSentException;
+use CodeInc\GUI\PagesManager\Exceptions\UnregisteredPageException;
 use CodeInc\GUI\PagesManager\Request\Request;
 use CodeInc\GUI\PagesManager\Request\RequestInterface;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
@@ -84,7 +85,7 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 	 * @inheritdoc
 	 * @throws ExistingPageException
 	 */
-	public function registerPage(string $pageClass):void {
+	public function registerPage(string $path, string $pageClass):void {
 		// Testing
 		$this->validatePage($pageClass);
 		if (in_array($pageClass, $this->pagePaths)) {
@@ -93,7 +94,7 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 
 		// Registering the page
 		/** @var $pageClass PageInterface */
-		$this->pagePaths[$pageClass::getPath()] = $pageClass;
+		$this->pagePaths[$path] = $pageClass;
 
 		// Adding multilingual pages URLs
 		if (is_subclass_of($pageClass, PageMultilingualInterface::class)) {
@@ -108,15 +109,18 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 	 * @inheritdoc
 	 */
 	public function getPageUrl(string $pageClass, ?array $queryParameters = null):Url {
-		/** @var $pageClass PageInterface */
-		$this->validatePage($pageClass);
+		if (($pagePath = array_search($pageClass, $this->pagePaths)) === false) {
+			throw new UnregisteredPageException($pageClass, $this);
+		}
+
 		$url = new Url();
 		$url->useCurrentHost();
 		$url->useCurrentScheme();
-		$url->setPath($pageClass::getPath());
+		$url->setPath($pagePath);
 		if ($queryParameters) {
 			$url->addQueryParameters($queryParameters);
 		}
+
 		return $url;
 	}
 
@@ -146,7 +150,6 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 
 		// processing the page
 		try {
-			$this->validatePage($pageClass);
 			/** @var PageInterface $page */
 			$page = new $pageClass($this, $request);
 			$response = $page->process();
