@@ -33,7 +33,7 @@ abstract class AbstractResponse implements ResponseInterface {
 	/**
 	 * @var array
 	 */
-	private $headers = [];
+	private $httpHeaders = [];
 
 	/**
 	 * @var ResponseCookie[]
@@ -89,49 +89,49 @@ abstract class AbstractResponse implements ResponseInterface {
 	}
 
 	/**
-	 * Verifies if a header is set.
+	 * Verifies if a HTTP header is set.
 	 *
 	 * @param string $header
 	 * @return bool
 	 */
-	public function hasHeader(string $header):bool {
-		return isset($this->headers[$header]);
+	public function hasHttpHeader(string $header):bool {
+		return isset($this->httpHeaders[$header]);
 	}
 
 	/**
-	 * Returns a header value of null if not set.
+	 * Returns a HTTP header value of null if not set.
 	 *
 	 * @param string $header
 	 * @return null|string
 	 */
-	public function getHeader(string $header):?string {
-		return $this->headers[$header] ?? null;
+	public function getHttpHeader(string $header):?string {
+		return $this->httpHeaders[$header] ?? null;
 	}
 
 	/**
-	 * Sets a header.
+	 * Sets a HTTP header.
 	 *
 	 * @param string $header
 	 * @param string $value
 	 */
-	public function setHeader(string $header, string $value):void {
-		$this->headers[$header] = $value;
+	public function setHttpHeader(string $header, string $value):void {
+		$this->httpHeaders[$header] = $value;
 	}
 
 	/**
-	 * Removes a header.
+	 * Removes a HTTP header.
 	 *
 	 * @param string $header
 	 */
-	public function removeHeader(string $header):void {
-		unset($this->headers[$header]);
+	public function removeHttpHeader(string $header):void {
+		unset($this->httpHeaders[$header]);
 	}
 
 	/**
-	 * Removes all headers.
+	 * Removes all HTTP headers.
 	 */
-	public function removeAllHeaders():void {
-		$this->headers = [];
+	public function removeHttpHeaders():void {
+		$this->httpHeaders = [];
 	}
 
 	/**
@@ -139,8 +139,8 @@ abstract class AbstractResponse implements ResponseInterface {
 	 *
 	 * @return array
 	 */
-	public function getHeaders():array {
-		return $this->headers;
+	public function getHttpHeaders():array {
+		return $this->httpHeaders;
 	}
 
 	/**

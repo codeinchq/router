@@ -43,19 +43,12 @@ interface ResponseInterface {
 	public function getHttpStatusCode():int;
 
 	/**
-	 * Returns the page's content.
-	 *
-	 * @return null|string
-	 */
-	public function getContent():?string;
-
-	/**
 	 * Verifies if a header is set.
 	 *
 	 * @param string $header
 	 * @return bool
 	 */
-	public function hasHeader(string $header):bool;
+	public function hasHttpHeader(string $header):bool;
 
 	/**
 	 * Returns a header value of null if not set.
@@ -63,7 +56,7 @@ interface ResponseInterface {
 	 * @param string $header
 	 * @return null|string
 	 */
-	public function getHeader(string $header):?string;
+	public function getHttpHeader(string $header):?string;
 
 	/**
 	 * Sets a header.
@@ -71,26 +64,26 @@ interface ResponseInterface {
 	 * @param string $header
 	 * @param string $value
 	 */
-	public function setHeader(string $header, string $value):void;
+	public function setHttpHeader(string $header, string $value):void;
 
 	/**
 	 * Removes a header.
 	 *
 	 * @param string $header
 	 */
-	public function removeHeader(string $header):void;
+	public function removeHttpHeader(string $header):void;
 
 	/**
 	 * Removes all headers.
 	 */
-	public function removeAllHeaders():void;
+	public function removeHttpHeaders():void;
 
 	/**
 	 * Returns all headers in an assoc array.
 	 *
 	 * @return array
 	 */
-	public function getHeaders():array;
+	public function getHttpHeaders():array;
 
 	/**
 	 * Creates a new cookie.
@@ -150,4 +143,11 @@ interface ResponseInterface {
 	 * @return array
 	 */
 	public function getDeletedCookies():array;
+
+	/**
+	 * Returns the page's content.
+	 *
+	 * @return null|string
+	 */
+	public function getContent():?string;
 }

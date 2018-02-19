@@ -187,7 +187,7 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 
 		// sending headers
 		http_response_code($response->getHttpStatusCode());
-		foreach ($response->getHeaders() as $header => $value) {
+		foreach ($response->getHttpHeaders() as $header => $value) {
 			header("$header: $value", true);
 		}
 

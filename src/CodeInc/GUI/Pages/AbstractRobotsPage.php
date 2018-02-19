@@ -91,7 +91,7 @@ abstract class AbstractRobotsPage extends AbstractPage {
 	public function process():ResponseInterface {
 		try {
 			$response = new Response($this);
-			$response->setHeader("Content-Type", "charset=$this->charset");
+			$response->setHttpHeader("Content-Type", "charset=$this->charset");
 			foreach ($this->rules as $userAgent => $rules) {
 				$response->addContent("User-agent: $userAgent\n");
 				foreach ($rules as $type => $value) {

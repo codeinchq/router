@@ -45,7 +45,7 @@ class RedirectResponse extends AbstractResponse {
 	public function __construct(PageInterface $page, Url $redirectUrl) {
 		parent::__construct($page);
 		$this->setHttpStatusCode(302);
-		$this->getHeaders()->setHeader("Location", $redirectUrl->getUrl());
+		$this->getHttpHeaders()->setHeader("Location", $redirectUrl->getUrl());
 	}
 
 	/**

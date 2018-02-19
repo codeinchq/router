@@ -9,29 +9,23 @@ use CodeInc\GUI\PagesManager\PagesManager;
 use CodeInc\GUI\Pages\AbstractPage;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
 use CodeInc\GUI\PagesManager\Response\Response;
-use CodeInc\GUI\Templates\HTML\BlankHtml5Template;
+use CodeInc\GUI\PagesManager\Response\Html5Response;
 
 final class HomePage extends AbstractPage {
 	public function process():ResponseInterface {
-		ob_start();
-		$tpl = new BlankHtml5Template($this);
-		$tpl->setTitle("Home page");
-		$tpl->renderHeader();
-		?>
-		<p>
-		    The is the home page !
-		</p>
-		<?
-		$tpl->renderFooter();
-		return new Response($this, ob_get_clean());
+		$resp = new Html5Response($this);
+		$resp->setPageTitle("Home page");
+		$resp->setHtmlBody("<p>The is the home page!</p>");
+		return $resp;
     }
 }
 
 final class SamplePage extends AbstractPage {
 	public function process():ResponseInterface {
-		$resp = new Response($this);
-		$resp->setContent("This is a sample page!");
-		return $resp;
+		$resp = new Html5Response($this);
+        $resp->setPageTitle("Sample page");
+        $resp->setHtmlBody("<p>This is a sample page!</p>");
+        return $resp;
     }
 }
 
