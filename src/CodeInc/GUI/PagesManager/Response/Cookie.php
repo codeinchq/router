@@ -23,12 +23,12 @@ namespace CodeInc\GUI\PagesManager\Response;
 
 
 /**
- * Class ResponseCookie
+ * Class Cookie
  *
  * @package CodeInc\GUI\PagesManager\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponseCookie {
+class Cookie {
 	/**
 	 * @var string
 	 */
@@ -63,6 +63,11 @@ class ResponseCookie {
 	 * @var bool|null
 	 */
 	private $httpOnly;
+
+	/**
+	 * @var bool
+	 */
+	private $deleted = false;
 
 	/**
 	 * Cookie constructor.
@@ -164,5 +169,19 @@ class ResponseCookie {
 	 */
 	public function setHttpOnly(?bool $httpOnly):void {
 		$this->httpOnly = $httpOnly;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isDeleted():bool {
+		return $this->deleted;
+	}
+
+	/**
+	 * @param bool $deleted
+	 */
+	public function setDeleted(bool $deleted):void {
+		$this->deleted = $deleted;
 	}
 }

@@ -15,52 +15,55 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:41
+// Date:     12/02/2018
+// Time:     13:25
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
+namespace CodeInc\GUI\PagesManager\Response\Library;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\GUI\PagesManager\Response\Cookies;
 
 
 /**
- * Interface ResponseInterface
+ * Class Response
  *
  * @package CodeInc\GUI\PagesManager\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ResponseInterface {
+class SimpleContentResponse extends AbstractResponse {
 	/**
-	 * Returns the parent page.
-	 *
-	 * @return PageInterface
+	 * @var string|null
 	 */
-	public function getPage():PageInterface;
+	private $content;
 
 	/**
-	 * Returns the cookies manager.
+	 * Response constructor.
 	 *
-	 * @return Cookies
+	 * @param PageInterface $page
+	 * @param null|string $content
 	 */
-	public function getCookies():Cookies;
+	public function __construct(PageInterface $page, ?string $content = null) {
+		parent::__construct($page);
+		$this->setContent($content);
+	}
 
 	/**
-	 * Returns the HTTP headers manager.
-	 *
-	 * @return ResponseHttpHeaders
+	 * @inheritdoc
 	 */
-	public function getHttpHeaders():ResponseHttpHeaders;
+	public function sendContent():void {
+		echo $this->content;
+	}
 
 	/**
-	 * Sends the response.
+	 * @inheritdoc
 	 */
-	public function send():void;
+	public function setContent(?string $content):void {
+		$this->content = $content;
+	}
 
 	/**
-	 * Verifies if the response is sent.
-	 *
-	 * @return bool
+	 * @inheritdoc
 	 */
-	public function isSent():bool;
+	public function addContent(string $content):void {
+		$this->content .= $content;
+	}
 }

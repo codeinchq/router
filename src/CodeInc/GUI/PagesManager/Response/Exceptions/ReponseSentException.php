@@ -15,55 +15,30 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     12/02/2018
-// Time:     13:25
+// Date:     19/02/2018
+// Time:     18:38
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
+namespace CodeInc\GUI\PagesManager\Response\Exceptions;
+use CodeInc\GUI\PagesManager\Response\ResponseInterface;
+use Throwable;
 
 
 /**
- * Class Response
+ * Class ReponseSentException
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\GUI\PagesManager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Response extends AbstractResponse {
+class ReponseSentException extends ResponseException {
 	/**
-	 * @var string|null
-	 */
-	private $content;
-
-	/**
-	 * Response constructor.
+	 * ReponseSentException constructor.
 	 *
-	 * @param PageInterface $page
-	 * @param null|string $content
+	 * @param ResponseInterface $response
+	 * @param null|Throwable $previous
 	 */
-	public function __construct(PageInterface $page, ?string $content = null) {
-		parent::__construct($page);
-		$this->setContent($content);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function getContent():?string {
-		return $this->content;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function setContent(?string $content):void {
-		$this->content = $content;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function addContent(string $content):void {
-		$this->content .= $content;
+	public function __construct(ResponseInterface $response, ?Throwable $previous = null) {
+		parent::__construct("A response has already been sent to the web browser",
+			$response, $previous);
 	}
 }

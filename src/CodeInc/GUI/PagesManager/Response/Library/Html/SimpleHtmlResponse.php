@@ -15,52 +15,69 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:41
+// Date:     19/02/2018
+// Time:     21:00
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\GUI\PagesManager\Response\Cookies;
+namespace CodeInc\GUI\PagesManager\Response\Library\Html;
 
 
 /**
- * Interface ResponseInterface
+ * Class SimpleHtmlResponse
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\GUI\PagesManager\Response\Library\Html
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ResponseInterface {
+class SimpleHtmlResponse extends AbstractHtmlResponse {
 	/**
-	 * Returns the parent page.
-	 *
-	 * @return PageInterface
+	 * @var string
 	 */
-	public function getPage():PageInterface;
+	protected $htmlBody;
 
 	/**
-	 * Returns the cookies manager.
+	 * Returns the HTML <body> content.
 	 *
-	 * @return Cookies
+	 * @return string
 	 */
-	public function getCookies():Cookies;
+	public function getHtmlBody():string {
+		return $this->htmlBody;
+	}
 
 	/**
-	 * Returns the HTTP headers manager.
+	 * Sets the HTML <body> content.
 	 *
-	 * @return ResponseHttpHeaders
+	 * @param string $htmlBody
 	 */
-	public function getHttpHeaders():ResponseHttpHeaders;
+	public function setHtmlBody(string $htmlBody):void {
+		$this->htmlBody = $htmlBody;
+	}
 
 	/**
-	 * Sends the response.
+	 * Adds content to the HTML <body>.
+	 *
+	 * @param string $html
 	 */
-	public function send():void;
+	public function addHtmlBody(string $html):void {
+		$this->htmlBody .= $html;
+	}
 
 	/**
-	 * Verifies if the response is sent.
-	 *
-	 * @return bool
+	 * Sends the content.
 	 */
-	public function isSent():bool;
+	public function sendContent():void {
+		?>
+		<!DOCTYPE html>
+		<html lang="<?=htmlspecialchars($this->getHtmlLanguage())?>">
+			<head>
+				<meta charset="<?=htmlspecialchars($this->getHtmlCharset())?>">
+				<title><?=htmlspecialchars($this->getHtmlTitle())?></title>
+				<?=$this->getHtmlHeaders()->getHeadersAsString()?>
+			</head>
+
+			<body>
+				<?=$this->getHtmlBody()?>
+			</body>
+		</html>
+		<?
+	}
 }

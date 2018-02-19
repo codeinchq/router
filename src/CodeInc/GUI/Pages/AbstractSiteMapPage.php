@@ -21,7 +21,7 @@
 //
 namespace CodeInc\GUI\Pages;
 use CodeInc\GUI\Pages\Exceptions\PageException;
-use CodeInc\GUI\PagesManager\Response\Response;
+use CodeInc\GUI\PagesManager\Response\Library\SimpleContentResponse;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
 
 
@@ -77,7 +77,7 @@ abstract class AbstractSiteMapPage extends AbstractPage {
 	 * @return ResponseInterface
 	 */
 	public function process():ResponseInterface {
-		$response = new Response($this);
+		$response = new SimpleContentResponse($this);
 		$response->setHttpHeader("Content-Type", "application/xml; charset=$this->charset");
 		$response->addContent('<?xml version="1.0" encoding="UTF-8"?>'."\n"
 			.'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n");

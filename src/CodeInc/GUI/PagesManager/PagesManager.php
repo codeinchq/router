@@ -23,11 +23,11 @@ namespace CodeInc\GUI\PagesManager;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
 use CodeInc\GUI\Pages\Interfaces\PageMultilingualInterface;
 use CodeInc\GUI\PagesManager\Exceptions\ExistingPageException;
-use CodeInc\GUI\PagesManager\Exceptions\HeaderSentException;
+use CodeInc\GUI\PagesManager\Exceptions\HttpHeadersSentException;
 use CodeInc\GUI\PagesManager\Exceptions\NotAPageException;
 use CodeInc\GUI\PagesManager\Exceptions\PageProcessingException;
 use CodeInc\GUI\PagesManager\Exceptions\PageNotFoundException;
-use CodeInc\GUI\PagesManager\Exceptions\ReponseSentException;
+use CodeInc\GUI\PagesManager\Response\Exceptions\ReponseSentException;
 use CodeInc\GUI\PagesManager\Exceptions\UnregisteredPageException;
 use CodeInc\GUI\PagesManager\Request\Request;
 use CodeInc\GUI\PagesManager\Request\RequestInterface;
@@ -177,13 +177,13 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 	 * @inheritdoc
 	 * @param RequestInterface $request
 	 * @param ResponseInterface $response
-	 * @throws HeaderSentException
+	 * @throws HttpHeadersSentException
 	 * @throws ReponseSentException
 	 */
 	public function sendResponse(RequestInterface $request, ResponseInterface $response):void {
 		// checking
-		if ($this->isResponseSent()) throw new ReponseSentException($response, $this);
-		if (headers_sent()) throw new HeaderSentException($response, $this);
+		if ($this->isResponseSent()) throw new ReponseSentException($response);
+		if (headers_sent()) throw new HttpHeadersSentException($response);
 
 		// sending headers
 		http_response_code($response->getHttpStatusCode());
@@ -192,16 +192,7 @@ class PagesManager implements PagesManagerInterface, NotFoundInterface {
 		}
 
 		// sending cookies
-		foreach ($response->getCookies() as $cookie) {
-			if (!$response->isCookieDeleted($cookie->getName())) {
-				setcookie($cookie->getName(), $cookie->getValue(),
-					($cookie->getExpire() ? $cookie->getExpire()->getTimestamp() : null),
-					$cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-			}
-		}
-		foreach ($response->getDeletedCookies() as $cookieName) {
-			setcookie($cookieName, null, -1);
-		}
+
 
 		// sending content
 		if (($content = $response->getContent()) !== null) {

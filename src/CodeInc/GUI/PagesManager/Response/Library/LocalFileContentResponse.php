@@ -15,47 +15,32 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     15:39
+// Date:     19/02/2018
+// Time:     20:22
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Exceptions;
-use CodeInc\GUI\PagesManager\PagesManagerInterface;
-use CodeInc\GUI\PagesManager\Response\ResponseInterface;
-use Throwable;
+namespace CodeInc\GUI\PagesManager\Response\Library;
+use CodeInc\GUI\Pages\Interfaces\PageInterface;
 
 
 /**
- * Class ResponseException
+ * Class BinaryResponse
  *
- * @package CodeInc\GUI\PagesManager\Response\Exceptions
+ * @package CodeInc\GUI\PagesManager\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @todo
  */
-class ResponseException extends PagesManagerException {
-	/**
-	 * @var ResponseInterface
-	 */
-	private $response;
-
-	/**
-	 * ResponseException constructor.
-	 *
-	 * @param string $message
-	 * @param ResponseInterface $response
-	 * @param PagesManagerInterface $pagesManager
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ResponseInterface $response, PagesManagerInterface $pagesManager,
-		?Throwable $previous = null) {
-
-		$this->response = $response;
-		parent::__construct($message, $pagesManager, $previous);
-	}
-
-	/**
-	 * @return ResponseInterface
-	 */
-	public function getResponse():ResponseInterface {
-		return $this->response;
-	}
+class LocalFileContentResponse extends AbstractResponse {
+//	private $filePath;
+//
+//
+//	public function __construct(PageInterface $page, string $filePath, string $filename = null, bool $sendAsAttachment = null, string $mimeType = null) {
+//		parent::__construct($page);
+//		$this->filePath = $filePath;
+//		$this->getHttpHeaders()->addHeader('Content-Disposition: '.($sendAsAttachment ? 'attachment' : 'inline').'; filename="'.($filePath).'""')
+//	}
+//
+//	protected function sendContent():void {
+//		readfile()
+//	}
 }

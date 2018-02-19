@@ -16,31 +16,28 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     19/02/2018
-// Time:     18:40
+// Time:     21:08
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Exceptions;
-use CodeInc\GUI\PagesManager\PagesManagerInterface;
+namespace CodeInc\GUI\PagesManager\Response\Exceptions;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
 use Throwable;
 
 
 /**
- * Class HeaderSentException
+ * Class ResponseSendingException
  *
- * @package CodeInc\GUI\PagesManager\ResponseSender
+ * @package CodeInc\GUI\PagesManager\Response\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HeaderSentException extends ResponseException {
+class ResponseSendingException extends ResponseException {
 	/**
-	 * HeaderSentException constructor.
+	 * ResponseSendingException constructor.
 	 *
 	 * @param ResponseInterface $response
-	 * @param PagesManagerInterface $pagesManager
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(ResponseInterface $response, PagesManagerInterface $pagesManager, ?Throwable $previous = null) {
-		parent::__construct("Unable to send the response, the HTTP headers have been sent",
-			$response, $pagesManager, $previous);
+	public function __construct(ResponseInterface $response, ?Throwable $previous = null) {
+		parent::__construct("Error while sending the respsonse", $response, $previous);
 	}
 }

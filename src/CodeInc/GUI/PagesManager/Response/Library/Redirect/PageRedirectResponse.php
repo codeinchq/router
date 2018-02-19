@@ -15,43 +15,30 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     11:45
+// Date:     19/02/2018
+// Time:     21:13
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
+namespace CodeInc\GUI\PagesManager\Response\Library\Redirect;
 use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\Url\Url;
 
 
 /**
- * Class RedirectResponse
+ * Class PageRedirectResponse
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\GUI\PagesManager\Response\Library\Redirect
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RedirectResponse extends AbstractResponse {
+class PageRedirectResponse extends RedirectResponse {
 	/**
-	 * @var Url
-	 */
-	public $redirectUrl;
-
-	/**
-	 * RedirectResponse constructor.
+	 * PageRedirectResponse constructor.
 	 *
 	 * @param PageInterface $page
-	 * @param Url $redirectUrl
+	 * @param string $pageClass
+	 * @param array|null $queryParams
+	 * @throws \CodeInc\GUI\PagesManager\Exceptions\PagesManagerException
 	 */
-	public function __construct(PageInterface $page, Url $redirectUrl) {
-		parent::__construct($page);
-		$this->setHttpStatusCode(302);
-		$this->getHttpHeaders()->setHeader("Location", $redirectUrl->getUrl());
-	}
-
-	/**
-	 * @return null|string
-	 */
-	public function getContent():?string {
-		return null;
+	public function __construct(PageInterface $page, string $pageClass, ?array $queryParams = null) {
+		parent::__construct($page, $page->getPagesManager()->getPageUrl($pageClass, $queryParams));
 	}
 }

@@ -15,52 +15,44 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:41
+// Date:     13/02/2018
+// Time:     15:39
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\GUI\PagesManager\Response\Cookies;
+namespace CodeInc\GUI\PagesManager\Response\Exceptions;
+use CodeInc\GUI\PagesManager\Exceptions\PagesManagerException;
+use CodeInc\GUI\PagesManager\Response\ResponseInterface;
+use Throwable;
 
 
 /**
- * Interface ResponseInterface
+ * Class ResponseException
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\GUI\PagesManager\Response\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ResponseInterface {
+class ResponseException extends PagesManagerException {
 	/**
-	 * Returns the parent page.
-	 *
-	 * @return PageInterface
+	 * @var ResponseInterface
 	 */
-	public function getPage():PageInterface;
+	private $response;
 
 	/**
-	 * Returns the cookies manager.
+	 * ResponseException constructor.
 	 *
-	 * @return Cookies
+	 * @param string $message
+	 * @param ResponseInterface $response
+	 * @param null|Throwable $previous
 	 */
-	public function getCookies():Cookies;
+	public function __construct(string $message, ResponseInterface $response, ?Throwable $previous = null) {
+		$this->response = $response;
+		parent::__construct($message, $response->getPage()->getPagesManager(), $previous);
+	}
 
 	/**
-	 * Returns the HTTP headers manager.
-	 *
-	 * @return ResponseHttpHeaders
+	 * @return ResponseInterface
 	 */
-	public function getHttpHeaders():ResponseHttpHeaders;
-
-	/**
-	 * Sends the response.
-	 */
-	public function send():void;
-
-	/**
-	 * Verifies if the response is sent.
-	 *
-	 * @return bool
-	 */
-	public function isSent():bool;
+	public function getResponse():ResponseInterface {
+		return $this->response;
+	}
 }

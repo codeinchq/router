@@ -21,7 +21,7 @@
 //
 namespace CodeInc\GUI\Pages;
 use CodeInc\GUI\Pages\Exceptions\PageRenderingException;
-use CodeInc\GUI\PagesManager\Response\Response;
+use CodeInc\GUI\PagesManager\Response\Library\SimpleContentResponse;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
 
 
@@ -90,7 +90,7 @@ abstract class AbstractRobotsPage extends AbstractPage {
 	 */
 	public function process():ResponseInterface {
 		try {
-			$response = new Response($this);
+			$response = new SimpleContentResponse($this);
 			$response->setHttpHeader("Content-Type", "charset=$this->charset");
 			foreach ($this->rules as $userAgent => $rules) {
 				$response->addContent("User-agent: $userAgent\n");

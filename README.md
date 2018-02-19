@@ -8,13 +8,12 @@ PHP 7 library to manage and render the graphic user interface.
 use CodeInc\GUI\PagesManager\PagesManager;
 use CodeInc\GUI\Pages\AbstractPage;
 use CodeInc\GUI\PagesManager\Response\ResponseInterface;
-use CodeInc\GUI\PagesManager\Response\Response;
-use CodeInc\GUI\PagesManager\Response\Html5Response;
+use CodeInc\GUI\PagesManager\Response\Library\Html\SimpleHtmlResponse;
 
 final class HomePage extends AbstractPage {
 	public function process():ResponseInterface {
-		$resp = new Html5Response($this);
-		$resp->setPageTitle("Home page");
+		$resp = new SimpleHtmlResponse($this);
+		$resp->setHtmlTitle("Home page");
 		$resp->setHtmlBody("<p>The is the home page!</p>");
 		return $resp;
     }
@@ -22,8 +21,8 @@ final class HomePage extends AbstractPage {
 
 final class SamplePage extends AbstractPage {
     public function process():ResponseInterface {
-        $resp = new Html5Response($this);
-        $resp->setPageTitle("Sample page");
+        $resp = new SimpleHtmlResponse($this);
+        $resp->setHtmlTitle("Sample page");
         $resp->setHtmlBody("<p>This is a sample page!</p>");
         return $resp;
     }

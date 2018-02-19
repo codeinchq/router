@@ -15,52 +15,31 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:41
+// Date:     19/02/2018
+// Time:     18:40
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Response;
-use CodeInc\GUI\Pages\Interfaces\PageInterface;
-use CodeInc\GUI\PagesManager\Response\Cookies;
+namespace CodeInc\GUI\PagesManager\Exceptions;
+use CodeInc\GUI\PagesManager\Response\Exceptions\ResponseException;
+use CodeInc\GUI\PagesManager\Response\ResponseInterface;
+use Throwable;
 
 
 /**
- * Interface ResponseInterface
+ * Class HttpHeadersSentException
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\GUI\PagesManager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ResponseInterface {
+class HttpHeadersSentException extends ResponseException {
 	/**
-	 * Returns the parent page.
+	 * HeaderSentException constructor.
 	 *
-	 * @return PageInterface
+	 * @param ResponseInterface $response
+	 * @param null|Throwable $previous
 	 */
-	public function getPage():PageInterface;
-
-	/**
-	 * Returns the cookies manager.
-	 *
-	 * @return Cookies
-	 */
-	public function getCookies():Cookies;
-
-	/**
-	 * Returns the HTTP headers manager.
-	 *
-	 * @return ResponseHttpHeaders
-	 */
-	public function getHttpHeaders():ResponseHttpHeaders;
-
-	/**
-	 * Sends the response.
-	 */
-	public function send():void;
-
-	/**
-	 * Verifies if the response is sent.
-	 *
-	 * @return bool
-	 */
-	public function isSent():bool;
+	public function __construct(ResponseInterface $response, ?Throwable $previous = null) {
+		parent::__construct("Unable to send the response, the HTTP headers have been sent",
+			$response, $previous);
+	}
 }

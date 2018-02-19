@@ -15,32 +15,46 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     18:38
+// Date:     16/02/2018
+// Time:     11:45
 // Project:  lib-gui
 //
-namespace CodeInc\GUI\PagesManager\Exceptions;
-use CodeInc\GUI\PagesManager\PagesManagerInterface;
-use CodeInc\GUI\PagesManager\Response\ResponseInterface;
-use Throwable;
+namespace CodeInc\GUI\PagesManager\Response\Library\Redirect;
+use CodeInc\GUI\Pages\Interfaces\PageInterface;
+use CodeInc\GUI\PagesManager\Response\Library\AbstractResponse;
+use CodeInc\Url\Url;
 
 
 /**
- * Class ReponseSentException
+ * Class RedirectResponse
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\PagesManager\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ReponseSentException extends ResponseException {
+class RedirectResponse extends AbstractResponse {
 	/**
-	 * ReponseSentException constructor.
-	 *
-	 * @param ResponseInterface $response
-	 * @param PagesManagerInterface $pagesManager
-	 * @param null|Throwable $previous
+	 * @var Url
 	 */
-	public function __construct(ResponseInterface $response, PagesManagerInterface $pagesManager, ?Throwable $previous = null) {
-		parent::__construct("A response has already been sent to the web browser",
-			$response, $pagesManager, $previous);
+	public $redirectUrl;
+
+	/**
+	 * RedirectResponse constructor.
+	 *
+	 * @param PageInterface $page
+	 * @param Url $redirectUrl
+	 */
+	public function __construct(PageInterface $page, Url $redirectUrl) {
+		parent::__construct($page);
+		$this->getHttpHeaders()->setHttpResponseCode(302);
+		$this->getHttpHeaders()->addHeader("Location", $redirectUrl->getUrl());
+	}
+
+	/**
+	 * No content to send.
+	 *
+	 * @inheritdoc
+	 */
+	protected function sendContent():void {
+		return;
 	}
 }
