@@ -15,43 +15,25 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     13:39
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\Assets\Providers;
 
 
 /**
- * Class PagesManagerException
+ * Interface ProviderInterface
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Assets\Providers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+interface AssetsProviderInterface {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * Returns an asset URL or null if the asset does not exist.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param string $asset
+	 * @return string|null
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
-	}
+	public function getUrl(string $asset):?string;
 }

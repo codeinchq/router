@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE                                               |
+// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,43 +15,29 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     04/12/2017
+// Time:     17:27
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\GUI\Pages\Exceptions;
+use CodeInc\GUI\Pages\PageInterface;
 use Throwable;
 
-
 /**
- * Class PagesManagerException
+ * Class PageRenderingException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Pages\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class PageRenderingException extends PageException {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * RenderingException constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param PageInterface $page
+	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function __construct(PageInterface $page, Throwable $previous = null) {
+		parent::__construct("Error while render the ".get_class($page)." page",
+			$page, $previous);
 	}
 }

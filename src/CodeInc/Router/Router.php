@@ -20,17 +20,13 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router;
-use CodeInc\Router\Pages\Interfaces\PageInterface;
-use CodeInc\Router\Pages\Interfaces\PageMultilingualInterface;
-use CodeInc\Router\Exceptions\ExistingPageException;
-use CodeInc\Router\Exceptions\NotAPageException;
-use CodeInc\Router\Exceptions\PageProcessingException;
-use CodeInc\Router\Exceptions\PageNotFoundException;
-use CodeInc\Router\Exceptions\UnmappedPageException;
+use CodeInc\Router\Exceptions\ExistingRouteException;
+use CodeInc\Router\Exceptions\RouterException;
+use CodeInc\Router\Interfaces\RoutableInterface;
+use CodeInc\Router\Interfaces\RoutedClassInterface;
+use CodeInc\Router\Interfaces\RoutedObjectInterface;
 use CodeInc\Router\Request\Request;
-use CodeInc\Router\Request\RequestInterface;
-use CodeInc\Router\Responses\ResponseInterface;
-use CodeInc\Url\Url;
+use CodeInc\Router\Response\ResponseInterface;
 
 
 /**
@@ -48,60 +44,111 @@ class Router implements RouterInterface {
 	private $routes = [];
 
 	/**
-	 * Not found page class.
+	 * Not found route.
 	 *
 	 * @var string|null
 	 */
-	private $notFoundPage;
+	private $notFoundRoute;
 
 	/**
 	 * @inheritdoc
 	 */
-	public function mapNotFoundRoute(string $pageClass):void {
-		if (!$this->isPage($pageClass)) {
-			throw new NotAPageException($pageClass, $this);
+	public function mapNotFoundRoute(string $route):void {
+		if (!$this->hasRoute($route)) {
+			throw new RouterException("The route \"$route\" does not exist and can not "
+				."be used as the not found route", $this);
 		}
-		$this->notFoundPage = $pageClass;
+		$this->notFoundRoute = $route;
 	}
 
 	/**
-	 * Verifies if a class is a page.
-	 *
-	 * @param string $pageClass
+	 * @inheritdoc
+	 * @return array
+	 */
+	public function getRoutes():array {
+		return array_keys($this->routes);
+	}
+
+	/**
+	 * @param RouterInterface $router
+	 * @throws ExistingRouteException
+	 */
+	public function mapRouter(RouterInterface $router):void {
+		foreach ($router->getRoutes() as $route) {
+			$this->addRoute($route, $router);
+		}
+	}
+
+	/**
+	 * @param RoutedObjectInterface $object
+	 * @throws ExistingRouteException
+	 */
+	public function mapRoutedObject(RoutedObjectInterface $object):void {
+		$this->addRoute($object->getRoute(), $object);
+	}
+
+	/**
+	 * @param string $route
+	 * @param RoutableInterface $object
+	 * @throws ExistingRouteException
+	 */
+	public function mapObject(string $route, RoutableInterface $object):void {
+		$this->addRoute($route, $object);
+	}
+
+	/**
+	 * @param string $class
+	 * @throws ExistingRouteException
+	 * @throws RouterException
+	 */
+	public function mapRoutedClass(string $class):void {
+		if (!is_subclass_of($class, RoutedClassInterface::class)) {
+			throw new RouterException("The class \"$class\" does not implement "
+				."\"".RoutedClassInterface::class."\"", $this);
+		}
+		/** @var RoutedClassInterface $class */
+		$this->addRoute($class::getRoute(), $class);
+	}
+
+	/**
+	 * @param string $route
+	 * @param string $class
+	 * @throws ExistingRouteException
+	 * @throws RouterException
+	 */
+	public function mapClass(string $route, string $class):void {
+		if (!is_subclass_of($class, RoutableInterface::class)) {
+			throw new RouterException("The class \"$class\" does not implement "
+				."\"".RoutableInterface::class."\"", $this);
+		}
+		$this->addRoute($route, $class);
+	}
+
+	/**
+	 * @param string $route
+	 * @param callable $callable
+	 * @throws ExistingRouteException
+	 */
+	public function mapCallable(string $route, callable $callable) {
+		$this->addRoute($route, $callable);
+	}
+
+	/**
+	 * @param string $route
+	 * @param object|string|callable $target
+	 * @throws ExistingRouteException
+	 */
+	private function addRoute(string $route, $target):void {
+		if (isset($this->routes[$route])) {
+			throw new ExistingRouteException($route, $this);
+		}
+		$this->routes[$route] = $target;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @param string $route
 	 * @return bool
-	 */
-	protected function isPage(string $pageClass):bool {
-		return is_subclass_of($pageClass, PageInterface::class);
-	}
-
-	/**
-	 * @inheritdoc
-	 * @throws ExistingPageException
-	 */
-	public function mapRoute(string $route, string $pageClass):void {
-		// Testing
-		if (!$this->isPage($pageClass)) {
-			throw new NotAPageException($pageClass, $this);
-		}
-		if (in_array($pageClass, $this->routes)) {
-			throw new ExistingPageException($pageClass, $this);
-		}
-
-		// Registering the page
-		/** @var $pageClass PageInterface */
-		$this->routes[$route] = $pageClass;
-
-		// Adding multilingual pages URLs
-		if (is_subclass_of($pageClass, PageMultilingualInterface::class)) {
-			/** @var PageMultilingualInterface $pageClass */
-			foreach ($pageClass::getSupportedLanguages() as $language) {
-				$this->routes[$pageClass::getLanguagePath($language)] = $pageClass;
-			}
-		}
-	}
-
-	/**
-	 * @inheritdoc
 	 */
 	public function hasRoute(string $route):bool {
 		return array_key_exists($route, $this->routes);
@@ -109,80 +156,53 @@ class Router implements RouterInterface {
 
 	/**
 	 * @inheritdoc
+	 * @param string $route
+	 * @return ResponseInterface
+	 * @throws RouterException
 	 */
-	public function buildPageUrl(string $pageClass, ?array $queryParameters = null):Url {
-		if (($pagePath = array_search($pageClass, $this->routes)) === false) {
-			throw new UnmappedPageException($pageClass, $this);
+	public function processRoute(string $route) {
+		// checking the route
+		if (!$this->hasRoute($route)) {
+			if (!$this->notFoundRoute) {
+				throw new RouterException("The route \"$route\" does not exist");
+			}
+			$route = $this->notFoundRoute;
 		}
 
-		$url = new Url();
-		$url->useCurrentHost();
-		$url->useCurrentScheme();
-		$url->setPath($pagePath);
-		if ($queryParameters) {
-			$url->addQueryParameters($queryParameters);
+		// preparing
+		$request = new Request($this);
+		$target = $this->routes[$route];
+
+		// is an object
+		if ($target instanceof RoutableInterface) {
+			return $target->process($request);
+		}
+		
+		// is a router
+		elseif ($target instanceof RouterInterface) {
+			return $target->processRoute($route);
+		}
+		
+		// is callable
+		elseif (is_callable($target)) {
+			$response = $target($request);
+			if ($response instanceof ResponseInterface) {
+				throw new RouterException("The response of the callable for the route \"$route\" is not "
+					."a vaid response (all responses must implement \"".ResponseInterface::class."\")",
+					$this);
+			}
+			return $response;
 		}
 
-		return $url;
-	}
-
-	/**
-	 * Returns a new request.
-	 *
-	 * @return RequestInterface
-	 */
-	protected function requestFactory():RequestInterface {
-		return new Request($this);
-	}
-
-	/**
-	 * Returns a new page.
-	 *
-	 * @param string $pageClass
-	 * @param RequestInterface $request
-	 * @return PageInterface
-	 */
-	protected function pageFactory(string $pageClass, RequestInterface $request):PageInterface {
-		return new $pageClass($this, $request);
-	}
-
-	/**
-	 * Sends a response.
-	 *
-	 * @param ResponseInterface $response
-	 */
-	protected function sendResponse(ResponseInterface $response):void {
-		if (!$response->isSent()) {
-			$response->send();
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 * @throws PageNotFoundException
-	 */
-	public function processRequest(RequestInterface $request = null):void {
-		$request = $request ?: $this->requestFactory();
-		$route = $request->getUrl()->getPath();
-
-		// reading the page class
-		if (isset($this->routes[$route])) {
-			$pageClass = $this->routes[$route];
-		}
-		elseif ($this->notFoundPage) {
-			$pageClass = $this->notFoundPage;
-		}
+		// is a class
 		else {
-			throw new PageNotFoundException($route, $this);
+			/** @var RoutableInterface $object */
+			$object = new $target($this);
+			return $object->process($request);
 		}
+	}
 
-		// processing the page
-		try {
-			$page = $this->pageFactory($pageClass, $request);
-			$this->sendResponse($page->process());
-		}
-		catch (\Throwable $exception) {
-			throw new PageProcessingException($pageClass, $this, $exception);
-		}
+	private function processObject(RoutableInterface $object, Request $request) {
+
 	}
 }

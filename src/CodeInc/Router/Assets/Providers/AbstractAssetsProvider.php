@@ -15,43 +15,61 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     13:46
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+declare(strict_types=1);
+namespace CodeInc\Router\Assets\Providers;
 
 
 /**
- * Class PagesManagerException
+ * Class AbstractProvider
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Assets\Providers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+abstract class AbstractAssetsProvider implements AssetsProviderInterface {
 	/**
-	 * @var RouterInterface|null
+	 * Version number.
+	 *
+	 * @var string|null
 	 */
-	private $router;
+	private $versionNumber;
 
 	/**
-	 * RouterException constructor.
+	 * AbstractProvider constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param null|string $versionNumber
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(?string $versionNumber = null) {
+		$this->setVersionNumber($versionNumber);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @param null|string $versionNumber
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function setVersionNumber(?string $versionNumber):void {
+		$this->versionNumber = $versionNumber;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getVersionNumber():?string {
+		return $this->versionNumber;
+	}
+
+	/**
+	 * Adds the version number to the url if set
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	protected function addVersionNumber(string $url):string {
+		if ($this->versionNumber) {
+			return (strchr($url, "?") ? "&" : "?")."v$this->versionNumber";
+		}
+		return $url;
 	}
 }

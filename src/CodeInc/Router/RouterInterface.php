@@ -20,9 +20,6 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\RouterException;
-use CodeInc\Router\Request\RequestInterface;
-use CodeInc\Url\Url;
 
 
 /**
@@ -41,17 +38,17 @@ interface RouterInterface {
 	public function hasRoute(string $route):bool;
 
 	/**
-	 * Processes a route.
+	 * Returns the list of available routes.
 	 *
-	 * @param RequestInterface|null $request
+	 * @return array
 	 */
-	public function processRequest(?RequestInterface $request = null):void;
+	public function getRoutes():array;
 
 	/**
-	 * @param string $pageClass
-	 * @param array|null $queryParameters
-	 * @return Url
-	 * @throws RouterException
+	 * Processes a route.
+	 *
+	 * @throws
+	 * @param string $route
 	 */
-	public function buildPageUrl(string $pageClass, ?array $queryParameters = null):Url;
+	public function processRoute(string $route):void;
 }

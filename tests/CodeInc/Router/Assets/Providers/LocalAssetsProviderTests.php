@@ -15,43 +15,24 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     13:55
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
-
+declare(strict_types=1);
+namespace Tests\CodeInc\Router\Assets\Providers;
+use CodeInc\Router\Assets\Providers\LocalAssetsProvider;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Class PagesManagerException
+ * Class LocalAssetsProviderTests
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
-	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
+class LocalAssetsProviderTests extends TestCase {
+	public function testDirectoryListing() {
+		$localAssets = new LocalAssetsProvider();
+		$localAssets->mapDirectory(__DIR__."/../../../../../");
 
-	/**
-	 * RouterException constructor.
-	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
 	}
 }

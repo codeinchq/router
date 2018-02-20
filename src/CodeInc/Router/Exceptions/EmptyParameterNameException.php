@@ -15,43 +15,29 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     19/02/2018
+// Time:     12:03
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+use CodeInc\Router\Request\Request;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class EmptyParameterNameException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\PagesManager\Request\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class EmptyParameterNameException extends RequestException {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * EmptyParameterNameException constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param Request|null $request
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function __construct(?Request $request = null, ?Throwable $previous = null) {
+		parent::__construct("The request query parameter can not be empty", $request, $previous);
 	}
 }

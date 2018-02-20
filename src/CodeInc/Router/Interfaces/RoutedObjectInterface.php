@@ -15,43 +15,24 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     14:19
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\Interfaces;
 
 
 /**
- * Class PagesManagerException
+ * Interface RoutedObjectInterface
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+interface RoutedObjectInterface extends RoutableInterface {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * Returns the route toward the current object.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @return string
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
-	}
+	public function getRoute():string;
 }

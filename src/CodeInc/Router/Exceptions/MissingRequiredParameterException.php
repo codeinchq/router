@@ -15,43 +15,64 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     16/02/2018
+// Time:     10:57
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+use CodeInc\Router\Request\Request;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class RequestQueryMissingRequiredParameterException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\PagesManager\Request\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class MissingRequiredParameterException extends RequestException {
 	/**
-	 * @var RouterInterface|null
+	 * @var string
 	 */
-	private $router;
+	private $paramName;
 
 	/**
-	 * RouterException constructor.
+	 * @var string
+	 */
+	private $gpcArray;
+
+	/**
+	 * MissingRequiredParameterException constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param string $paramName
+	 * @param string $GPCArray
+	 * @param Request|null $request
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $paramName, string $GPCArray, ?Request $request = null,
+		?Throwable $previous = null) {
+
+		$this->paramName = $paramName;
+		$this->gpcArray = $GPCArray;
+
+		parent::__construct(
+			"The required parameter \"$paramName\" from the GPC array \"$GPCArray\" is missing",
+			$request,
+			$previous
+		);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return string
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getParamName():string {
+		return $this->paramName;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getGpcArray():string {
+		return $this->gpcArray;
 	}
 }

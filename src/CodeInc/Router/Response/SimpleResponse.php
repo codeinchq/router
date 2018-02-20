@@ -15,43 +15,56 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     12/02/2018
+// Time:     13:25
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\Response;
+use CodeInc\GUI\Pages\PageInterface;
 
 
 /**
- * Class PagesManagerException
+ * Class SimpleResponse
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Responses
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class SimpleResponse extends AbstractResponse {
 	/**
-	 * @var RouterInterface|null
+	 * @var string|null
 	 */
-	private $router;
+	private $content;
 
 	/**
-	 * RouterException constructor.
+	 * Response constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param PageInterface $page
+	 * @param null|string $content
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(PageInterface $page, ?string $content = null) {
+		parent::__construct($page);
+		$this->setContent($content);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @inheritdoc
+	 * @return string
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getContent():string {
+		return $this->content;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function setContent(?string $content):void {
+		$this->content = $content;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function addContent(string $content):void {
+		$this->content .= $content;
 	}
 }

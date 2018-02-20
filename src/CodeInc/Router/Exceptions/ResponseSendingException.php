@@ -15,43 +15,33 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     19/02/2018
+// Time:     21:08
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Response\ResponseInterface;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class ResponseSendingException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\PagesManager\Response\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class ResponseSendingException extends ResponseException {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * ResponseSendingException constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param ResponseInterface $response
+	 * @param RouterInterface $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function __construct(ResponseInterface $response, RouterInterface $router,
+		?Throwable $previous = null) {
+		parent::__construct("Error while sending the respsonse",
+			$response, $router, $previous);
 	}
 }

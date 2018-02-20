@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE                                               |
+// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,43 +15,45 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     28/11/2017
+// Time:     16:35
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\GUI\Pages\Exceptions;
+use CodeInc\GUI\Pages\PageInterface;
+use CodeInc\Router\Exceptions\RouterException;
 
 
 /**
- * Class PagesManagerException
+ * Class PageException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Pages
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class PageException extends RouterException {
 	/**
-	 * @var RouterInterface|null
+	 * @var PageInterface
 	 */
-	private $router;
+	private $page;
 
 	/**
-	 * RouterException constructor.
+	 * PageException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param PageInterface $page
+	 * @param \Throwable|null $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $message, PageInterface $page, \Throwable $previous = null) {
+		$this->page = $page;
+		parent::__construct($message, $page->getRouter(), $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * Retruns the parent page.
+	 *
+	 * @return PageInterface|null
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getPage() {
+		return $this->page;
 	}
 }

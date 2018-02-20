@@ -20,7 +20,7 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Pages\Interfaces\PageInterface;
+use CodeInc\GUI\Pages\PageInterface;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 

@@ -15,43 +15,26 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     13:38
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Assets;
+use CodeInc\GUI\Pages\AbstractPage;
+use CodeInc\Router\Response\ResponseInterface;
 use CodeInc\Router\RouterInterface;
-use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class WebAssetsProxyProxy
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Assets
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
-	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
+class WebAssetsProxy implements RouterInterface {
+	private $basePath;
 
-	/**
-	 * RouterException constructor.
-	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
+	public function process():ResponseInterface {
 
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
 	}
 }

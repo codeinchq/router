@@ -15,43 +15,31 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     14:46
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\GUI\Templates;
 
 
 /**
- * Class PagesManagerException
+ * Interface TemplateInterface
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Templates
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+interface TemplateInterface {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * Returns the template header HTML code
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @return string
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
+	public function getHeader():string;
 
 	/**
-	 * @return RouterInterface|null
+	 * Returns the template footer HTML code
+	 *
+	 * @return string
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
-	}
+	public function getFooter():string;
 }

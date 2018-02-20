@@ -15,43 +15,31 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     19/02/2018
+// Time:     20:22
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\Response;
 
 
 /**
- * Class PagesManagerException
+ * Class BinaryResponse
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\PagesManager\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @todo
  */
-class RouterException extends \Exception {
-	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
-	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
-	}
+class LocalFileResponse extends AbstractResponse {
+//	private $filePath;
+//
+//
+//	public function __construct(PageInterface $page, string $filePath, string $filename = null, bool $sendAsAttachment = null, string $mimeType = null) {
+//		parent::__construct($page);
+//		$this->filePath = $filePath;
+//		$this->getHttpHeaders()->addHeader('Content-Disposition: '.($sendAsAttachment ? 'attachment' : 'inline').'; filename="'.($filePath).'""')
+//	}
+//
+//	protected function sendContent():void {
+//		readfile()
+//	}
 }

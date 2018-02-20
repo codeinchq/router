@@ -1,7 +1,7 @@
 <?php
 //
 // +---------------------------------------------------------------------+
-// | CODE INC. SOURCE CODE                                               |
+// | CODE INC. SOURCE CODE - CONFIDENTIAL                                |
 // +---------------------------------------------------------------------+
 // | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
@@ -15,43 +15,42 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     22/11/2017
+// Time:     17:09
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\GUI\Pages;
+use CodeInc\Router\Interfaces\RoutableInterface;
+use CodeInc\Router\Request\Request;
 use CodeInc\Router\RouterInterface;
-use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Interface PageInterface
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Pages\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+interface PageInterface extends RoutableInterface {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * PageInterface constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param RouterInterface $router
+	 * @param Request $request
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
-	}
+	public function __construct(RouterInterface $router, Request $request);
 
 	/**
-	 * @return RouterInterface|null
+	 * Returns the parent request
+	 *
+	 * @return Request
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
-	}
+	public function getRequest():Request;
+
+	/**
+	 * Returns the page router.
+	 *
+	 * @return RouterInterface
+	 */
+	public function getRouter():RouterInterface;
 }

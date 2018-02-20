@@ -15,43 +15,43 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     14:00
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router\Assets\Providers;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class ProviderException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Assets\Providers
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @todo changer l'héritage
  */
-class RouterException extends \Exception {
+class ProviderException extends \Exception {
 	/**
-	 * @var RouterInterface|null
+	 * @var AssetsProviderInterface
 	 */
-	private $router;
+	private $assetsProvider;
 
 	/**
-	 * RouterException constructor.
+	 * ProviderException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param AssetsProviderInterface $assetsProvider
+	 * @param Throwable|null $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $message, AssetsProviderInterface $assetsProvider, Throwable $previous = null) {
+		$this->assetsProvider = $assetsProvider;
+		parent::__construct($message, 0, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return AssetsProviderInterface
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getAssetsProvider():AssetsProviderInterface {
+		return $this->assetsProvider;
 	}
 }

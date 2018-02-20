@@ -15,43 +15,56 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     19/02/2018
+// Time:     19:13
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\GUI\Pages;
+use CodeInc\Router\Request\Request;
 use CodeInc\Router\RouterInterface;
-use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class AbstractPage
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Pages
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+abstract class AbstractPage implements PageInterface {
 	/**
-	 * @var RouterInterface|null
+	 * @var Request
+	 */
+	private $request;
+
+	/**
+	 * @var RouterInterface
 	 */
 	private $router;
 
 	/**
-	 * RouterException constructor.
+	 * AbstractPage constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param RouterInterface $router
+	 * @param Request $request
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
+	public function __construct(RouterInterface $router, Request $request) {
 		$this->router = $router;
-		parent::__construct($message, null, $previous);
+		$this->request = $request;
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @inheritdoc
+	 * @return Request
 	 */
-	public function getRouter():?RouterInterface {
+	public function getRequest():Request {
+		return $this->request;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return RouterInterface
+	 */
+	public function getRouter():RouterInterface {
 		return $this->router;
 	}
 }

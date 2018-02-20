@@ -20,8 +20,6 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Request;
-use CodeInc\Router\Request\Components\HttpHeaders;
-use CodeInc\Router\Request\Components\RequestQuery;
 use CodeInc\Router\RouterInterface;
 use CodeInc\Url\Url;
 
@@ -32,7 +30,7 @@ use CodeInc\Url\Url;
  * @package CodeInc\GUI\PagesManager\Request
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Request implements RequestInterface {
+class Request {
 	public const METHOD_GET = 'GET', METHOD_POST = 'POST', METHOD_UNKNOW = null;
 
 	/**
@@ -59,11 +57,6 @@ class Request implements RequestInterface {
 	 * @var RequestQuery
 	 */
 	private $cookies;
-
-	/**
-	 * @var array
-	 */
-	private $headers;
 
 	/**
 	 * @var Url
@@ -128,39 +121,44 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the HTTP headers iterator.
+	 *
 	 * @return HttpHeaders
 	 */
-	public function httpHeaders():HttpHeaders {
+	public function getHttpHeaders():HttpHeaders {
 		return $this->httpHeaders;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the get variables iterator.
+	 *
 	 * @return RequestQuery
 	 */
-	public function get():RequestQuery {
+	public function getGetQuery():RequestQuery {
 		return $this->get;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returs the post variables iterator.
+	 *
 	 * @return RequestQuery
 	 */
-	public function post():RequestQuery {
+	public function getPostQuery():RequestQuery {
 		return $this->post;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the cookies iterator.
+	 *
 	 * @return RequestQuery
 	 */
-	public function cookies():RequestQuery {
+	public function getCookies():RequestQuery {
 		return $this->cookies;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the request URL.
+	 *
 	 * @return Url
 	 */
 	public function getUrl():Url {
@@ -168,7 +166,8 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the method type ('GET' or 'POST').
+	 *
 	 * @return null|string
 	 */
 	public function getMethod():?string {
@@ -176,7 +175,8 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Verifies if the method is POST.
+	 *
 	 * @return bool
 	 */
 	public function isMethodPost():bool {
@@ -184,7 +184,8 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Verifies if the method is GET.
+	 *
 	 * @return bool
 	 */
 	public function isMethodGet():bool {
@@ -192,7 +193,8 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the remote IP address.
+	 *
 	 * @return null|string
 	 */
 	public function getRemoteAddr():?string {
@@ -200,7 +202,8 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the remote port waiting for the response.
+	 *
 	 * @return int|null
 	 */
 	public function getRemotePort():?int {
@@ -208,7 +211,8 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Verifies if the request went trough a secure connection.
+	 *
 	 * @return bool
 	 */
 	public function isSecure():bool {
@@ -216,36 +220,11 @@ class Request implements RequestInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the request content or null if the request has no content.
+	 *
 	 * @return null|string
 	 */
 	public function getContent():?string {
 		return $this->content;
-	}
-
-	/**
-	 * @inheritdoc
-	 * @param string $header
-	 * @return bool
-	 */
-	public function hasHeader(string $header):bool {
-		return isset($this->headers[$header]);
-	}
-
-	/**
-	 * @inheritdoc
-	 * @param string $header
-	 * @return null|string
-	 */
-	public function getHeader(string $header):?string {
-		return $this->headers[$header] ?? null;
-	}
-
-	/**
-	 * @inheritdoc
-	 * @return array
-	 */
-	public function getHeaders():array {
-		return $this->headers;
 	}
 }

@@ -15,43 +15,50 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     15:21
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\GUI\Templates\HTML;
 
 
 /**
- * Class PagesManagerException
+ * Class SimpleHtml5Template
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Templates\HTML
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class SimpleHtml5Template extends AbstractHtmlTemplate {
 	/**
-	 * @var RouterInterface|null
+	 * @inheritdoc
+	 * @return string
 	 */
-	private $router;
+	public function getHeader():string {
+		ob_start();
+		?>
+		<!DOCTYPE html>
+		<html lang="<?=htmlspecialchars($this->getLanguage())?>">
+			<head>
+				<meta charset="<?=htmlspecialchars($this->getCharset())?>">
+				<title><?=htmlspecialchars($this->getTitle())?></title>
+				<?=$this->getHeaders()->getAsString()?>
+			</head>
 
-	/**
-	 * RouterException constructor.
-	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+			<body>
+		<?
+		return ob_get_clean();
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @inheritdoc
+	 * @return string
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getFooter():string {
+		ob_start();
+		?>
+			</body>
+		</html>
+		<?
+		return ob_get_clean();
 	}
 }

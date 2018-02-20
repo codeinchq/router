@@ -15,43 +15,43 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     15:32
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\GUI\Views;
+use CodeInc\GUI\GuiException;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class ViewException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Views
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class ViewException extends GuiException {
 	/**
-	 * @var RouterInterface|null
+	 * @var ViewInterface|null
 	 */
-	private $router;
+	private $view;
 
 	/**
-	 * RouterException constructor.
+	 * ViewException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param ViewInterface|null $view
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $message, ?ViewInterface $view =null, ?Throwable $previous = null) {
+		$this->view = $view;
+		parent::__construct($message, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return ViewInterface|null
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getView():?ViewInterface {
+		return $this->view;
 	}
 }

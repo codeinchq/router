@@ -15,43 +15,43 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     15:31
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\GUI\Templates;
+use CodeInc\GUI\GuiException;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class TemplateException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\Templates
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class TemplateException extends GuiException {
 	/**
-	 * @var RouterInterface|null
+	 * @var TemplateInterface|null
 	 */
-	private $router;
+	private $template;
 
 	/**
-	 * RouterException constructor.
+	 * TemplateException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param TemplateInterface|null $template
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $message, ?TemplateInterface $template = null, ?Throwable $previous = null) {
+		$this->template = $template;
+		parent::__construct($message, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return TemplateInterface|null
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getTemplate():?TemplateInterface {
+		return $this->template;
 	}
 }

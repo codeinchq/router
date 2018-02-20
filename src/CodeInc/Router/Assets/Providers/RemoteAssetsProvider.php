@@ -15,43 +15,41 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     20/02/2018
+// Time:     13:45
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
-
+declare(strict_types=1);
+namespace CodeInc\Router\Assets\Providers;
 
 /**
- * Class PagesManagerException
+ * Class RemoteAssetsProvider
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Assets\Providers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class RemoteAssetsProvider extends AbstractAssetsProvider {
 	/**
-	 * @var RouterInterface|null
+	 * @var string
 	 */
-	private $router;
+	private $baseUrl;
 
 	/**
-	 * RouterException constructor.
+	 * RemoteAssetsProvider constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param string $baseUrl
+	 * @param null|string $versionNumber
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $baseUrl, ?string $versionNumber = null) {
+		$this->baseUrl = $baseUrl;
+		parent::__construct($versionNumber);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @param string $asset
+	 * @return string
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getUrl(string $asset):string {
+		return $this->addVersionNumber($this->baseUrl.$asset);
 	}
 }

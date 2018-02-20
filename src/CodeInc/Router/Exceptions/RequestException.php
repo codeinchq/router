@@ -16,42 +16,42 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     13/02/2018
-// Time:     13:06
+// Time:     13:13
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+use CodeInc\Router\Request\Request;
 use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class RequestException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\GUI\PagesManager\Request\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class RequestException extends RouterException {
 	/**
-	 * @var RouterInterface|null
+	 * @var Request|null
 	 */
-	private $router;
+	private $request;
 
 	/**
-	 * RouterException constructor.
+	 * RequestException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param Request|null $request
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, null, $previous);
+	public function __construct(string $message, ?Request $request = null, ?Throwable $previous = null) {
+		$this->request = $request;
+		parent::__construct($message, $request ? $request->getRouter() : null, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return Request|null
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getRequest():?Request {
+		return $this->request;
 	}
 }
