@@ -15,64 +15,47 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:57
+// Date:     13/02/2018
+// Time:     13:13
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Request\Exceptions;
+use CodeInc\Router\Exceptions\RouterException;
 use CodeInc\Router\Request\Request;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class RequestQueryMissingRequiredParameterException
+ * Class RequestException
  *
- * @package CodeInc\GUI\PagesManager\Request\Exceptions
+ * @package CodeInc\Router\Request\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MissingRequiredParameterException extends RequestException {
+class RequestException extends RouterException {
 	/**
-	 * @var string
+	 * @var Request|null
 	 */
-	private $paramName;
+	private $request;
 
 	/**
-	 * @var string
-	 */
-	private $gpcArray;
-
-	/**
-	 * MissingRequiredParameterException constructor.
+	 * RequestException constructor.
 	 *
-	 * @param string $paramName
-	 * @param string $GPCArray
+	 * @param string $message
 	 * @param Request|null $request
+	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $paramName, string $GPCArray, ?Request $request = null,
+	public function __construct(string $message, ?Request $request = null, ?RouterInterface $router = null,
 		?Throwable $previous = null) {
-
-		$this->paramName = $paramName;
-		$this->gpcArray = $GPCArray;
-
-		parent::__construct(
-			"The required parameter \"$paramName\" from the GPC array \"$GPCArray\" is missing",
-			$request,
-			$previous
-		);
+		$this->request = $request;
+		parent::__construct($message, $router, $previous);
 	}
 
 	/**
-	 * @return string
+	 * @return Request|null
 	 */
-	public function getParamName():string {
-		return $this->paramName;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getGpcArray():string {
-		return $this->gpcArray;
+	public function getRequest():?Request {
+		return $this->request;
 	}
 }

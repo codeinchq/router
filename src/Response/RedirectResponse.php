@@ -20,17 +20,19 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Response;
-use CodeInc\Router\Response\ResponseInterface;
+use CodeInc\Router\Response\Exceptions\ResponseSendingException;
+use CodeInc\Router\Response\Exceptions\ResponseSentException;
 use CodeInc\Url\Url;
 
 
 /**
  * Class RedirectResponse
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\Router\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RedirectResponse implements ResponseInterface {
+class RedirectResponse extends AbstractResponse {
+	// default HTTP response code value
 	public const DEFAULT_HTTP_RESPONSE_CODE = 302;
 
 	/**
@@ -39,9 +41,9 @@ class RedirectResponse implements ResponseInterface {
 	public $redirectUrl;
 
 	/**
-	 * @var int
+	 * @var bool
 	 */
-	private $httpResponseCode;
+	private $sent = false;
 
 	/**
 	 * RedirectResponse constructor.
@@ -50,25 +52,14 @@ class RedirectResponse implements ResponseInterface {
 	 * @param int|null $httpResponseCode
 	 */
 	public function __construct(Url $redirectUrl, int $httpResponseCode = null) {
+		parent::__construct();
 		$this->redirectUrl = $redirectUrl;
-		$this->httpResponseCode = $httpResponseCode ?? self::DEFAULT_HTTP_RESPONSE_CODE;
+		$this->getHttpHeaders()->setResponseCode($httpResponseCode ?? self::DEFAULT_HTTP_RESPONSE_CODE);
 	}
 
 	/**
-	 * @param int $httpResponseCode
-	 */
-	public function setHttpResponseCode(int $httpResponseCode):void {
-		$this->httpResponseCode = $httpResponseCode;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getHttpResponseCode():int {
-		return $this->httpResponseCode;
-	}
-
-	/**
+	 * Returns the redirect URL.
+	 *
 	 * @return Url
 	 */
 	public function getRedirectUrl():Url {
@@ -76,11 +67,31 @@ class RedirectResponse implements ResponseInterface {
 	}
 
 	/**
-	 * Sends the response
+	 * @inheritdoc
+	 * @return bool
+	 */
+	public function isSent():bool {
+		return $this->sent;
+	}
+
+	/**
+	 * Sends the response.
+	 *
+	 * @throws ResponseSendingException
+	 * @throws ResponseSentException
 	 */
 	public function send():void {
-		http_response_code($this->getHttpResponseCode());
-		header('Location: '.$this->getRedirectUrl()->getUrl(), true);
-		exit;
+		if ($this->isSent()) {
+			throw new ResponseSentException($this);
+		}
+		try {
+			$this->getHttpHeaders()->addHeader("Location", $this->getRedirectUrl()->getUrl());
+			$this->getHttpHeaders()->send();
+			$this->getCookies()->send();
+			$this->sent = true;
+		}
+		catch (\Throwable $exception) {
+			throw new ResponseSendingException($this, $exception);
+		}
 	}
 }

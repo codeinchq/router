@@ -15,44 +15,30 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:37
+// Date:     19/02/2018
+// Time:     18:40
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router\Response\Exceptions;
+use CodeInc\Router\Response\ResponseInterface;
 use Throwable;
 
 
 /**
- * Class PagesManagerNotFoundException
+ * Class HttpHeadersSentException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Response\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PageNotFoundException extends RouterException {
+class HttpHeadersSentException extends ResponseException {
 	/**
-	 * @var string
-	 */
-	private $route;
-
-	/**
-	 * PageNotFoundException constructor.
+	 * HttpHeadersSentException constructor.
 	 *
-	 * @param string $route
-	 * @param RouterInterface $service
+	 * @param ResponseInterface $response
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $route, RouterInterface $service, ?Throwable $previous = null) {
-		$this->route = $route;
-		parent::__construct("No page is registered for the route \"$route\"",
-			$service, $previous);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getRoute():string {
-		return $this->route;
+	public function __construct(ResponseInterface $response, Throwable $previous = null) {
+		parent::__construct("Unable to send the response, the HTTP headers have been sent",
+			$response, $previous);
 	}
 }

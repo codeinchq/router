@@ -15,32 +15,44 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     18:40
+// Date:     13/02/2018
+// Time:     15:39
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Response\Exceptions;
+use CodeInc\Router\Exceptions\RouterException;
 use CodeInc\Router\Response\ResponseInterface;
-use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class HttpHeadersSentException
+ * Class ResponseException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Response\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HttpHeadersSentException extends ResponseException {
+class ResponseException extends RouterException {
 	/**
-	 * HttpHeadersSentException constructor.
+	 * @var ResponseInterface
+	 */
+	private $response;
+
+	/**
+	 * ResponseException constructor.
 	 *
+	 * @param string $message
 	 * @param ResponseInterface $response
-	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(ResponseInterface $response, ?RouterInterface $router = null, ?Throwable $previous = null) {
-		parent::__construct("Unable to send the response, the HTTP headers have been sent",
-			$response, $router, $previous);
+	public function __construct(string $message, ResponseInterface $response, Throwable $previous = null) {
+		$this->response = $response;
+		parent::__construct($message, null, $previous);
+	}
+
+	/**
+	 * @return ResponseInterface
+	 */
+	public function getResponse():ResponseInterface {
+		return $this->response;
 	}
 }

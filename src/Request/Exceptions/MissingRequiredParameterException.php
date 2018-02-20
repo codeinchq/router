@@ -15,29 +15,65 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     12:03
+// Date:     16/02/2018
+// Time:     10:57
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Request\Exceptions;
 use CodeInc\Router\Request\Request;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class EmptyParameterNameException
+ * Class MissingRequiredParameterException
  *
- * @package CodeInc\GUI\PagesManager\Request\Exceptions
+ * @package CodeInc\Router\Request\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class EmptyParameterNameException extends RequestException {
+class MissingRequiredParameterException extends RequestException {
 	/**
-	 * EmptyParameterNameException constructor.
+	 * @var string
+	 */
+	private $paramName;
+
+	/**
+	 * @var string
+	 */
+	private $gpcArray;
+
+	/**
+	 * MissingRequiredParameterException constructor.
 	 *
+	 * @param string $paramName
+	 * @param string $GPCArray
 	 * @param Request|null $request
+	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(?Request $request = null, ?Throwable $previous = null) {
-		parent::__construct("The request query parameter can not be empty", $request, $previous);
+	public function __construct(string $paramName, string $GPCArray, ?Request $request = null,
+		?RouterInterface $router = null, ?Throwable $previous = null) {
+
+		$this->paramName = $paramName;
+		$this->gpcArray = $GPCArray;
+
+		parent::__construct(
+			"The required parameter \"$paramName\" from the GPC array \"$GPCArray\" is missing",
+			$request, $router, $previous
+		);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getParamName():string {
+		return $this->paramName;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getGpcArray():string {
+		return $this->gpcArray;
 	}
 }

@@ -16,23 +16,44 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     20/02/2018
-// Time:     14:19
+// Time:     20:01
 // Project:  lib-router
 //
-namespace CodeInc\Router\Interfaces;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Request\Request;
+use CodeInc\Router\RouterInterface;
+use Throwable;
 
 
 /**
- * Interface RoutedObjectInterface
+ * Class RouteNotFoundException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RoutedObjectInterface extends RoutableInterface {
+class RouteNotFoundException extends RouterException {
 	/**
-	 * Returns the route toward the current object.
-	 *
-	 * @return string
+	 * @var Request
 	 */
-	public function getRoute():string;
+	private $request;
+
+	/**
+	 * RouteNotFoundException constructor.
+	 *
+	 * @param Request $request
+	 * @param RouterInterface|null $router
+	 * @param Throwable|null $previous
+	 */
+	public function __construct(Request $request, RouterInterface $router = null, Throwable $previous = null) {
+		$this->request = $request;
+		parent::__construct("Not route found to process the request \"{$request->getUrl()}\"",
+			$router, $previous);
+	}
+
+	/**
+	 * @return Request
+	 */
+	public function getRequest():Request {
+		return $this->request;
+	}
 }

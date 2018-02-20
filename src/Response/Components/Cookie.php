@@ -19,13 +19,13 @@
 // Time:     13:33
 // Project:  lib-router
 //
-namespace CodeInc\Router\Response;
+namespace CodeInc\Router\Response\Components;
 
 
 /**
  * Class Cookie
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\Router\Response\Components
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class Cookie {

@@ -20,7 +20,9 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Response;
-use CodeInc\GUI\Pages\PageInterface;
+use CodeInc\Router\Response\Exceptions\ResponseException;
+use CodeInc\Router\Response\Exceptions\ResponseSendingException;
+use CodeInc\Router\Response\Exceptions\ResponseSentException;
 
 
 /**
@@ -29,25 +31,25 @@ use CodeInc\GUI\Pages\PageInterface;
  * @package CodeInc\Router\Responses
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class SimpleResponse extends AbstractResponse {
+class Response extends AbstractResponse {
 	/**
 	 * @var string|null
 	 */
 	private $content;
 
 	/**
-	 * Response constructor.
+	 * SimpleResponse constructor.
 	 *
-	 * @param PageInterface $page
-	 * @param null|string $content
+	 * @param string|null $content
 	 */
-	public function __construct(PageInterface $page, ?string $content = null) {
-		parent::__construct($page);
+	public function __construct(string $content = null) {
+		parent::__construct();
 		$this->setContent($content);
 	}
 
 	/**
-	 * @inheritdoc
+	 * Return the response content.
+	 *
 	 * @return string
 	 */
 	public function getContent():string {
@@ -55,16 +57,38 @@ class SimpleResponse extends AbstractResponse {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Sets the response content.
+	 *
+	 * @param null|string $content
 	 */
 	public function setContent(?string $content):void {
 		$this->content = $content;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Adds to the response content.
+	 *
+	 * @param string $content
 	 */
 	public function addContent(string $content):void {
 		$this->content .= $content;
+	}
+
+	/**
+	 * @throws ResponseException
+	 */
+	public function send():void {
+		if ($this->sent) {
+			throw new ResponseSentException($this);
+		}
+		try {
+			$this->getHttpHeaders()->send();
+			$this->getCookies()->send();
+			echo $this->content;
+			$this->sent = true;
+		}
+		catch (\Throwable $exception) {
+			throw new ResponseSendingException($this, $exception);
+		}
 	}
 }

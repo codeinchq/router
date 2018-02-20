@@ -19,15 +19,14 @@
 // Time:     21:21
 // Project:  lib-router
 //
-namespace CodeInc\Router\Request;
+namespace CodeInc\Router\Request\Components;
 
 
 /**
  * Class HttpHeaders
  *
- * @package CodeInc\GUI\PagesManager\Request
+ * @package CodeInc\Router\Request\Components
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @todo finir la doc
  */
 class HttpHeaders implements \Iterator, \ArrayAccess {
 	/**
@@ -47,6 +46,8 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 
 	/**
 	 * HttpHeaders constructor.
+	 *
+	 * @param array|null $headers
 	 */
 	public function __construct(array $headers = null) {
 		$this->headers = $headers ?: [];
@@ -69,6 +70,8 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Verifies if a header is set.
+	 *
 	 * @param string $header
 	 * @return bool
 	 */
@@ -77,6 +80,8 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Returns a header value of null if not set.
+	 *
 	 * @param string $header
 	 * @return null|string
 	 */
@@ -85,9 +90,11 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Returns all headers.
+	 *
 	 * @return array
 	 */
-	public function getHeaders():array {
+	public function getAll():array {
 		return $this->headers;
 	}
 

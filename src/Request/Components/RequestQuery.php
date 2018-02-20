@@ -19,15 +19,16 @@
 // Time:     13:02
 // Project:  lib-router
 //
-namespace CodeInc\Router\Request;
-use CodeInc\Router\Exceptions\EmptyParameterNameException;
-use CodeInc\Router\Exceptions\MissingRequiredParameterException;
+namespace CodeInc\Router\Request\Components;
+use CodeInc\Router\Request\Exceptions\EmptyParameterNameException;
+use CodeInc\Router\Request\Exceptions\MissingRequiredParameterException;
+use CodeInc\Router\Request\Request;
 
 
 /**
  * Class RequestQuery
  *
- * @package CodeInc\GUI\Services\PagesManager\Request
+ * @package CodeInc\Router\Request\Components
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class RequestQuery implements \ArrayAccess, \Iterator {

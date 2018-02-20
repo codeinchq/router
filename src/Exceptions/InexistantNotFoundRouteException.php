@@ -15,8 +15,8 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     18:36
+// Date:     16/02/2018
+// Time:     10:37
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
@@ -25,33 +25,34 @@ use Throwable;
 
 
 /**
- * Class ExistingPageException
+ * Class RouteNotFoundException
  *
- * @package CodeInc\GUI\Router\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ExistingPageException extends RouterException {
+class InexistantNotFoundRouteException extends RouterException {
 	/**
 	 * @var string
 	 */
-	private $pageClass;
+	private $route;
 
 	/**
-	 * ExistingPageException constructor.
+	 * PageNotFoundException constructor.
 	 *
-	 * @param string $pageClass
+	 * @param string $route
 	 * @param RouterInterface $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $pageClass, RouterInterface $router, ?Throwable $previous = null) {
-		$this->pageClass = $pageClass;
-		parent::__construct("The page \"$pageClass\" is already registered", $router, $previous);
+	public function __construct(string $route, RouterInterface $router, ?Throwable $previous = null) {
+		$this->route = $route;
+		parent::__construct("The not found route \"$route\" does not exist",
+			$router, $previous);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getPageClass():string {
-		return $this->pageClass;
+	public function getRoute():string {
+		return $this->route;
 	}
 }

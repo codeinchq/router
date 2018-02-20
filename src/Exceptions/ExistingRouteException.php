@@ -27,7 +27,7 @@ use Throwable;
 /**
  * Class ExistingRouteException
  *
- * @package CodeInc\GUI\Router\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class ExistingRouteException extends RouterException {
@@ -45,7 +45,8 @@ class ExistingRouteException extends RouterException {
 	 */
 	public function __construct(string $route, RouterInterface $router, ?Throwable $previous = null) {
 		$this->route = $route;
-		parent::__construct("The route \"$route\" is already registered", $router, $previous);
+		parent::__construct("The route \"$route\" already exists",
+			$router, $previous);
 	}
 
 	/**

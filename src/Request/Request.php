@@ -20,23 +20,21 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Request;
-use CodeInc\Router\RouterInterface;
+use CodeInc\Router\Request\Components\HttpHeaders;
+use CodeInc\Router\Request\Components\RequestQuery;
 use CodeInc\Url\Url;
 
 
 /**
  * Class Request
  *
- * @package CodeInc\GUI\PagesManager\Request
+ * @package CodeInc\Router\Request
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class Request {
-	public const METHOD_GET = 'GET', METHOD_POST = 'POST', METHOD_UNKNOW = null;
-
-	/**
-	 * @var RouterInterface
-	 */
-	private $router;
+	public const METHOD_GET = 'GET';
+	public const METHOD_POST = 'POST';
+	public const METHOD_UNKNOW = null;
 
 	/**
 	 * @var HttpHeaders
@@ -91,12 +89,10 @@ class Request {
 	/**
 	 * Request constructor.
 	 *
-	 * @param RouterInterface $router
 	 * @param Url|null $url
 	 */
-	public function __construct(RouterInterface $router, ?Url $url = null) {
+	public function __construct(?Url $url = null) {
 		$this->url = $url ?: Url::fromCurrentUrl();
-		$this->router = $router;
 
 		// submodules
 		$this->httpHeaders = HttpHeaders::factoryFromGlobals();
@@ -110,14 +106,6 @@ class Request {
 		$this->remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
 		$this->remotePort = $_SERVER['REMOTE_PORT'] ?? null;
 		$this->content = file_get_contents('php://input');
-	}
-
-	/**
-	 * @inheritdoc
-	 * @return RouterInterface
-	 */
-	public function getRouter():RouterInterface {
-		return $this->router;
 	}
 
 	/**

@@ -23,9 +23,9 @@ namespace CodeInc\Router\Response;
 
 
 /**
- * Class BinaryResponse
+ * Class LocalFileResponse
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\Router\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  * @todo
  */

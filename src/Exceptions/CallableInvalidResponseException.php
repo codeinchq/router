@@ -15,8 +15,8 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     15:39
+// Date:     20/02/2018
+// Time:     20:09
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
@@ -26,35 +26,20 @@ use Throwable;
 
 
 /**
- * Class ResponseException
+ * Class CallableInvalidResponse
  *
- * @package CodeInc\GUI\PagesManager\Response\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponseException extends RouterException {
+class CallableInvalidResponseException extends RouterException {
 	/**
-	 * @var ResponseInterface
-	 */
-	private $response;
-
-	/**
-	 * ResponseException constructor.
+	 * CallableInvalidResponseException constructor.
 	 *
-	 * @param string $message
-	 * @param ResponseInterface $response
 	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ResponseInterface $response, ?RouterInterface $router = null,
-		?Throwable $previous = null) {
-		$this->response = $response;
-		parent::__construct($message, $router, $previous);
-	}
-
-	/**
-	 * @return ResponseInterface
-	 */
-	public function getResponse():ResponseInterface {
-		return $this->response;
+	public function __construct(RouterInterface $router, ?Throwable $previous = null) {
+		parent::__construct("The response of the callable must be an object implementing "
+			."\"".ResponseInterface::class."\"", $router, $previous);
 	}
 }

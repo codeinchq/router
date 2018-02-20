@@ -25,9 +25,9 @@ use Throwable;
 
 
 /**
- * Class PagesManagerException
+ * Class RouterException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class RouterException extends \Exception {

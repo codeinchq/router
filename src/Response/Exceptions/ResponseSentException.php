@@ -16,32 +16,28 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     19/02/2018
-// Time:     21:08
+// Time:     18:38
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Response\Exceptions;
 use CodeInc\Router\Response\ResponseInterface;
-use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class ResponseSendingException
+ * Class ResponseSentException
  *
- * @package CodeInc\GUI\PagesManager\Response\Exceptions
+ * @package CodeInc\Router\Response\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponseSendingException extends ResponseException {
+class ResponseSentException extends ResponseException {
 	/**
-	 * ResponseSendingException constructor.
+	 * ResponseSentException constructor.
 	 *
 	 * @param ResponseInterface $response
-	 * @param RouterInterface $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(ResponseInterface $response, RouterInterface $router,
-		?Throwable $previous = null) {
-		parent::__construct("Error while sending the respsonse",
-			$response, $router, $previous);
+	public function __construct(ResponseInterface $response, Throwable $previous = null) {
+		parent::__construct("A response has already been sent to the web browser", $response, $previous);
 	}
 }

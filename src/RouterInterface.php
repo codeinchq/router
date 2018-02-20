@@ -20,28 +20,22 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router;
+use CodeInc\Router\Interfaces\RoutableInterface;
+use CodeInc\Router\Request\Request;
 
 
 /**
  * Interface RouterInterface
  *
- * @package CodeInc\GUI\Router
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface {
+interface RouterInterface extends RoutableInterface {
 	/**
 	 * Verifies if a route is mapped.
 	 *
-	 * @param string $route
+	 * @param Request $request
 	 * @return mixed
 	 */
-	public function hasRoute(string $route):bool;
-
-	/**
-	 * Processes a route.
-	 *
-	 * @throws
-	 * @param string $route
-	 */
-	public function processRoute(string $route):void;
+	public function hasRoute(Request $request):bool;
 }

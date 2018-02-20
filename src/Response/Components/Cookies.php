@@ -19,14 +19,15 @@
 // Time:     20:26
 // Project:  lib-router
 //
-namespace CodeInc\Router\Response;
-use CodeInc\Router\Exceptions\HttpHeadersSentException;
+namespace CodeInc\Router\Response\Components;
+use CodeInc\Router\Response\Exceptions\HttpHeadersSentException;
+use CodeInc\Router\Response\ResponseInterface;
 
 
 /**
  * Class Cookies
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\Router\Response\Components
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class Cookies implements \Iterator {

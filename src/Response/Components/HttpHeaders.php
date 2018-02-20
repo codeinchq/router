@@ -19,16 +19,16 @@
 // Time:     20:38
 // Project:  lib-router
 //
-namespace CodeInc\Router\Response;
+namespace CodeInc\Router\Response\Components;
+use CodeInc\Router\Response\Exceptions\HttpHeadersSentException;
 use CodeInc\Router\Response\ResponseInterface;
 
 
 /**
- * Class ResponseHeaders
+ * Class HttpHeaders
  *
- * @package CodeInc\GUI\PagesManager\Response
+ * @package CodeInc\Router\Response\Components
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @todo finir la doc
  */
 class HttpHeaders implements \Iterator, \ArrayAccess {
 	/**
@@ -39,14 +39,16 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	private $response;
 
 	/**
-	 * @var int
-	 */
-	private $httpResponseCode = 200;
-
-	/**
 	 * @var array
 	 */
 	private $headers = [];
+
+	/**
+	 * HTTP response code.
+	 *
+	 * @var int
+	 */
+	private $responseCode = 200;
 
 	/**
 	 * @var array
@@ -68,20 +70,26 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
-	 * @return int
-	 */
-	public function getHttpResponseCode():int {
-		return $this->httpResponseCode;
-	}
-
-	/**
+	 * Sets the HTTP response code.
+	 *
 	 * @param int $httpResponseCode
 	 */
-	public function setHttpResponseCode(int $httpResponseCode):void {
-		$this->httpResponseCode = $httpResponseCode;
+	public function setResponseCode(int $httpResponseCode):void {
+		$this->responseCode = $httpResponseCode;
 	}
 
 	/**
+	 * Returns the HTTP response code.
+	 *
+	 * @return int
+	 */
+	public function getResponseCode():int {
+		return $this->responseCode;
+	}
+
+	/**
+	 * Adds a header.
+	 *
 	 * @param string $header
 	 * @param string $value
 	 */
@@ -90,6 +98,8 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Verifies if a header is set.
+	 *
 	 * @param string $header
 	 * @return bool
 	 */
@@ -98,6 +108,8 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Returns a header value of null if not set.
+	 *
 	 * @param string $header
 	 * @return null|string
 	 */
@@ -106,6 +118,8 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Removes a header.
+	 *
 	 * @param string $header
 	 */
 	public function removeHeader(string $header):void {
@@ -113,10 +127,27 @@ class HttpHeaders implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Returns all headers in an array.
+	 *
 	 * @return array
 	 */
-	public function getHeaders():array {
+	public function getAll():array {
 		return $this->headers;
+	}
+
+	/**
+	 * Sends the headers.
+	 *
+	 * @throws HttpHeadersSentException
+	 */
+	public function send():void {
+		if (headers_sent()) {
+			throw new HttpHeadersSentException($this->response);
+		}
+		http_response_code($this->getResponseCode());
+		foreach ($this->headers as $header => $value) {
+			header("$header: $value", true);
+		}
 	}
 
 	/**

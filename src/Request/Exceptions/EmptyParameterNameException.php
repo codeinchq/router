@@ -16,42 +16,30 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     19/02/2018
-// Time:     20:01
+// Time:     12:03
 // Project:  lib-router
 //
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Request\Exceptions;
+use CodeInc\Router\Request\Request;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class UnregisteredPageException
+ * Class EmptyParameterNameException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Request\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class UnmappedPageException extends RouterException {
+class EmptyParameterNameException extends RequestException {
 	/**
-	 * @var string
-	 */
-	private $pageClass;
-
-	/**
-	 * UnregisteredPageException constructor.
+	 * EmptyParameterNameException constructor.
 	 *
-	 * @param string $pageClass
-	 * @param RouterInterface $router
+	 * @param Request|null $request
+	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $pageClass, RouterInterface $router, ?Throwable $previous = null) {
-		$this->pageClass = $pageClass;
-		parent::__construct("The page \"$pageClass\" is not registered", $router, $previous);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getPageClass():string {
-		return $this->pageClass;
+	public function __construct(?Request $request = null, ?RouterInterface $router = null, ?Throwable $previous = null) {
+		parent::__construct("The request query parameter can not be empty", $request, $router, $previous);
 	}
 }

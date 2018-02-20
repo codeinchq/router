@@ -15,43 +15,47 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:13
+// Date:     19/02/2018
+// Time:     18:34
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\Request\Request;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class RequestException
+ * Class RouteProcessingException
  *
- * @package CodeInc\GUI\PagesManager\Request\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RequestException extends RouterException {
+class RequestProcessingException extends RouterException {
 	/**
-	 * @var Request|null
+	 * @var Request
 	 */
 	private $request;
 
 	/**
-	 * RequestException constructor.
+	 * RequestProcessingException constructor.
 	 *
-	 * @param string $message
-	 * @param Request|null $request
+	 * @param Request $request
+	 * @param RouterInterface $router
+	 * @param string|null $message
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?Request $request = null, ?Throwable $previous = null) {
+	public function __construct(Request $request, RouterInterface $router, string $message = null,
+		?Throwable $previous = null) {
 		$this->request = $request;
-		parent::__construct($message, $request ? $request->getRouter() : null, $previous);
+		parent::__construct($message ?? "Error while processing the request \"{$request->getUrl()}\"",
+			$router, $previous);
 	}
 
 	/**
-	 * @return Request|null
+	 * @return Request
 	 */
-	public function getRequest():?Request {
+	public function getRequest():Request {
 		return $this->request;
 	}
 }

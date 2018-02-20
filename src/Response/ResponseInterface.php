@@ -20,6 +20,8 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Response;
+use CodeInc\Router\Response\Exceptions\ResponseSendingException;
+use CodeInc\Router\Response\Exceptions\ResponseSentException;
 
 
 /**
@@ -39,7 +41,8 @@ interface ResponseInterface {
 	/**
 	 * Sends the response.
 	 *
-	 * @throws
+	 * @throws ResponseSendingException
+	 * @throws ResponseSentException
 	 */
 	public function send():void;
 }

@@ -15,24 +15,46 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     14:19
+// Date:     19/02/2018
+// Time:     18:35
 // Project:  lib-router
 //
-namespace CodeInc\Router\Interfaces;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Interfaces\RoutableInterface;
+use CodeInc\Router\RouterInterface;
+use Throwable;
 
 
 /**
- * Interface RoutedClassInterface
+ * Class InvalidTargetException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RoutedClassInterface extends RoutableInterface {
+class InvalidTargetException extends RouterException {
 	/**
-	 * Returns the route toward the current class.
+	 * @var string
+	 */
+	private $targetClass;
+
+	/**
+	 * NotAPageException constructor.
 	 *
+	 * @param string|object $target
+	 * @param RouterInterface $router
+	 * @param null|Throwable $previous
+	 */
+	public function __construct($target, RouterInterface $router, ?Throwable $previous = null) {
+		$this->targetClass = is_object($target) ? get_class($target) : (string)$target;
+		parent::__construct("The class \"$this->targetClass\" is not a page and "
+			."(all route targets must implement ".RoutableInterface::class.")",
+			$router, $previous);
+	}
+
+	/**
 	 * @return string
 	 */
-	public static function getRoute():string;
+	public function getTargetClass():string {
+		return $this->targetClass;
+	}
 }

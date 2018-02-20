@@ -20,15 +20,14 @@
 // Project:  lib-router
 //
 namespace CodeInc\Router\Response;
-use CodeInc\Router\Exceptions\HttpHeadersSentException;
-use CodeInc\Router\Exceptions\ResponseSentException;
-use CodeInc\Router\Exceptions\ResponseException;
+use CodeInc\Router\Response\Components\Cookies;
+use CodeInc\Router\Response\Components\HttpHeaders;
 
 
 /**
  * Class AbstractResponse
  *
- * @package CodeInc\GUI\PagesManager\Response\Library
+ * @package CodeInc\Router\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 abstract class AbstractResponse implements ResponseInterface {
@@ -59,89 +58,28 @@ abstract class AbstractResponse implements ResponseInterface {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the HTTP headers manager.
+	 *
+	 * @return HttpHeaders
 	 */
-	public function httpHeaders():HttpHeaders {
+	public function getHttpHeaders():HttpHeaders {
 		return $this->httpHeaders;
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returns the cookies manager.
+	 *
+	 * @return Cookies
 	 */
-	public function cookies():Cookies {
+	public function getCookies():Cookies {
 		return $this->cookies;
 	}
 
 	/**
 	 * @inheritdoc
+	 * @return bool
 	 */
 	public function isSent():bool {
 		return $this->sent;
-	}
-
-	/**
-	 * Returns the response content.
-	 *
-	 * @return null|string
-	 */
-	abstract public function getContent():?string;
-
-	/**
-	 * @throws ResponseException
-	 */
-	public function send():void {
-		try {
-			if ($this->sent) {
-				throw new ResponseSentException($this);
-			}
-			if (headers_sent()) {
-				throw new HttpHeadersSentException($this);
-			}
-			$this->sendHeaders();
-			$this->sendCookies();
-			$this->sendContent();
-			$this->sent = true;
-		}
-		catch (\Throwable $exception) {
-			throw new ResponseException("Error while sending the response", $this, $exception);
-		}
-	}
-
-	/**
-	 * Sends the response headers.
-	 */
-	private function sendHeaders():void {
-		http_response_code($this->httpHeaders()->getHttpResponseCode());
-		foreach ($this->httpHeaders() as $header => $value) {
-			header("$header: $value", true);
-		}
-	}
-
-	/**
-	 * Sends the response cookies.
-	 */
-	private function sendCookies():void {
-		foreach ($this->cookies() as $cookie) {
-			// sending the cooke
-			if (!$cookie->isDeleted()) {
-				setcookie($cookie->getName(), $cookie->getValue(),
-					($cookie->getExpire() ? $cookie->getExpire()->getTimestamp() : null),
-					$cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-			}
-
-			// deleting the cookie
-			else {
-				setcookie($cookie->getName(), null, -1, $cookie->getPath(), $cookie->getDomain());
-			}
-		}
-	}
-
-	/**
-	 * Sends the response content.
-	 */
-	private function sendContent():void {
-		if (($content = $this->getContent()) !== null) {
-			echo $content;
-		}
 	}
 }

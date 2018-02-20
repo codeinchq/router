@@ -25,14 +25,14 @@ use CodeInc\Router\Response\ResponseInterface;
 
 
 /**
- * Interface RoutableObjectInterface
+ * Interface RouterTargetInterface
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 interface RoutableInterface {
 	/**
-	 * Process the current object and returns the response.
+	 * Process a request an returns a reponse object.
 	 *
 	 * @param Request $request
 	 * @return ResponseInterface

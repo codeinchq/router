@@ -15,8 +15,8 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     18:34
+// Date:     20/02/2018
+// Time:     20:04
 // Project:  lib-router
 //
 namespace CodeInc\Router\Exceptions;
@@ -25,33 +25,34 @@ use Throwable;
 
 
 /**
- * Class PageProcessingException
+ * Class UnknownTargetTypeException
  *
- * @package CodeInc\GUI\PagesManager\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class PageProcessingException extends RouterException {
+class UnknownTargetTypeException extends RouterException {
 	/**
-	 * @var string
+	 * @var mixed
 	 */
-	private $pageClass;
+	private $target;
 
 	/**
-	 * PageProcessingException constructor.
+	 * UnknownTargetTypeException constructor.
 	 *
-	 * @param string $pageClass
-	 * @param RouterInterface $router
+	 * @param mixed $target
+	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $pageClass, RouterInterface $router, ?Throwable $previous = null) {
-		$this->pageClass = $pageClass;
-		parent::__construct("Error while processing the page \"$pageClass\"", $router, $previous);
+	public function __construct($target, ?RouterInterface $router = null, ?Throwable $previous = null) {
+		$this->target = $target;
+		parent::__construct("The target type ".gettype($target)." can not be processed",
+			$router, $previous);
 	}
 
 	/**
-	 * @return string
+	 * @return mixed
 	 */
-	public function getPageClass():string {
-		return $this->pageClass;
+	public function getTarget() {
+		return $this->target;
 	}
 }
