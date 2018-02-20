@@ -16,49 +16,29 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     20/02/2018
-// Time:     15:21
+// Time:     18:58
 // Project:  lib-router
 //
-namespace CodeInc\GUI\Templates\HTML;
+declare(strict_types=1);
+namespace CodeInc\Router\Tests;
+use CodeInc\Router\Exceptions\PageNotFoundException;
+use CodeInc\Router\UniversalRouter;
+use PHPUnit\Framework\TestCase;
 
 
 /**
- * Class SimpleHtml5Template
+ * Class RouterTest
  *
- * @package CodeInc\GUI\Templates\HTML
+ * @package CodeInc\Router\Tests
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class SimpleHtml5Template extends AbstractHtmlTemplate {
-	/**
-	 * @inheritdoc
-	 * @return string
-	 */
-	public function getHeader():string {
-		ob_start();
-		?>
-		<!DOCTYPE html>
-		<html lang="<?=htmlspecialchars($this->getLanguage())?>">
-			<head>
-				<meta charset="<?=htmlspecialchars($this->getCharset())?>">
-				<title><?=htmlspecialchars($this->getTitle())?></title>
-				<?=$this->getHeaders()->getAsString()?>
-			</head>
+class RouterTest extends TestCase {
+	public function testRouter() {
+		$assetRouter = new UniversalRouter();
 
-			<body>
-		<?
-		return ob_get_clean();
-	}
-
-	/**
-	 * @inheritdoc
-	 * @return string
-	 */
-	public function getFooter():string {
-		ob_start();
-		?>
-			</body>
-		</html>
-		<?
-		return ob_get_clean();
+		$router = new UniversalRouter();
+		$router->mapClass("/page/*", PageNotFoundException::class);
+		$router->mapObject("/tagada", $router);
+		$router->mapRouter("/assets/*", $assetRouter);
 	}
 }

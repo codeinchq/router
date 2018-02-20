@@ -15,32 +15,33 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     14:46
+// Date:     14/02/2018
+// Time:     16:01
 // Project:  lib-router
 //
-namespace CodeInc\GUI\Views;
+namespace CodeInc\Router;
 
 
 /**
- * Interface ViewInterface
+ * Interface RouterInterface
  *
- * @package CodeInc\GUI\Views
+ * @package CodeInc\GUI\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ViewInterface {
+interface RouterInterface {
 	/**
-	 * Returns the view output code to be display.
+	 * Verifies if a route is mapped.
 	 *
-	 * @return string
+	 * @param string $route
+	 * @return mixed
 	 */
-	public function get():string;
+	public function hasRoute(string $route):bool;
 
 	/**
-	 * Alias of get().
+	 * Processes a route.
 	 *
-	 * @see ViewInterface::get()
-	 * @return string
+	 * @throws
+	 * @param string $route
 	 */
-	public function __toString():string;
+	public function processRoute(string $route):void;
 }

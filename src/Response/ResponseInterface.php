@@ -15,26 +15,31 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     13:38
+// Date:     16/02/2018
+// Time:     10:41
 // Project:  lib-router
 //
-namespace CodeInc\Router\Assets;
-use CodeInc\GUI\Pages\AbstractPage;
-use CodeInc\Router\Response\ResponseInterface;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router\Response;
 
 
 /**
- * Class WebAssetsProxyProxy
+ * Interface ResponseInterface
  *
- * @package CodeInc\Router\Assets
+ * @package CodeInc\GUI\PagesManager\Response
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class WebAssetsProxy implements RouterInterface {
-	private $basePath;
+interface ResponseInterface {
+	/**
+	 * Verifies if the response is set.
+	 *
+	 * @return bool
+	 */
+	public function isSent():bool;
 
-	public function process():ResponseInterface {
-
-	}
+	/**
+	 * Sends the response.
+	 *
+	 * @throws
+	 */
+	public function send():void;
 }

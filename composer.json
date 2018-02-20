@@ -7,14 +7,17 @@
   "license": "MIT",
   "require": {
     "php": ">=7.2",
-    "codeinchq/lib-errordisplay": "dev-master",
-    "codeinchq/lib-url": "dev-master"
+    "codeinchq/lib-url": "dev-master",
+    "codeinchq/lib-ui": "dev-master"
   },
   "require-dev": {
     "phpunit/phpunit": "^7"
   },
   "autoload": {
-    "psr-0": {"": "src/"}
+    "psr-4": {"CodeInc\\Router\\": "src/"}
+  },
+  "autoload-dev": {
+    "psr-4": { "CodeInc\\Router\\Tests\\": "tests/" }
   },
   "authors": [
     {
@@ -30,7 +33,7 @@
     }
   },
   "repositories": [
-    { "type": "vcs", "url": "https://github.com/codeinchq/lib-errordisplay" },
-    { "type": "vcs", "url": "https://github.com/codeinchq/lib-url" }
+    { "type": "vcs", "url": "https://github.com/codeinchq/lib-url" },
+    { "type": "vcs", "url": "https://github.com/codeinchq/lib-ui" }
   ]
 }
