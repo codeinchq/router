@@ -106,7 +106,7 @@ use CodeInc\Router\Router;
 use CodeInc\Router\RouterAggregate;
 use GuzzleHttp\Psr7\ServerRequest;
 
-// creating multiple routers 
+// creating routers 
 $router1 = new Router();
 $router2 = new Router();
 $router3 = new Router();
@@ -118,6 +118,7 @@ $routerAggregte1->addRouter($router2);
 
 // creating a second aggregate
 $routerAggregte2 = new RouterAggregate();
+$routerAggregte2->addRouter($router3);
 $routerAggregte2->addRouter($routerAggregte1);
 
 // calling 
