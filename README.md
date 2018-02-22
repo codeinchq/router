@@ -143,6 +143,14 @@ $response = $parentRouter->processRequest($request);
 $parentRouter->sendResponse($response, $request);
 ```
 
+## Installation
+
+This library is available through [Packagist](https://packagist.org/packages/codeinchq/lib-router) and can be installed using [Composer](https://getcomposer.org/): 
+
+```bash
+composer require codeinchq/lib-url
+```
+
 
 ## Dependencies 
 
