@@ -150,8 +150,8 @@ $parentRouter->sendResponse($response, $request);
 * it is using [`psr/http-message`](https://packagist.org/packages/psr/http-message) for the standard PSR7 objects interfaces ;
 * it is using [`guzzlehttp/psr7`](https://packagist.org/packages/guzzlehttp/psr7) is it's PSR7 implementation through the `Request`, `ServerRequest` and `Response` objects.
 
-**Recommended libraries:**
-* the [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) ibrary is strongly recommended to add cookies to the PSR7 responses.
+**Recommended library:**
+* the [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) library is strongly recommended to add cookies to the PSR7 responses.
 
 
 ## License 
