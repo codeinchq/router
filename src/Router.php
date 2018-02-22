@@ -236,7 +236,7 @@ class Router implements RouterInterface {
 	 * @param ResponseInterface $response
 	 * @throws Exceptions\ResponseSentException
 	 */
-	public function sendResponse(ResponseInterface $response, ?RequestInterface $request = null):void
+	public function sendResponse(ResponseInterface $response, RequestInterface $request):void
 	{
 		if (headers_sent()) {
 			throw new Exceptions\ResponseSentException($response, $this);

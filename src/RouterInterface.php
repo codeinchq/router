@@ -46,5 +46,5 @@ interface RouterInterface extends RoutableInterface {
 	 * @param ResponseInterface $response
 	 * @param RequestInterface $request If set the protocol version of the response is modified to match the request's version
 	 */
-	public function sendResponse(ResponseInterface $response, ?RequestInterface $request = null):void;
+	public function sendResponse(ResponseInterface $response, RequestInterface $request):void;
 }

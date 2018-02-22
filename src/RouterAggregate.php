@@ -102,4 +102,15 @@ class RouterAggregate implements RouterInterface {
 		}
 		return $router->processRequest($request);
 	}
+
+	/**
+	 * Sends the response.
+	 *
+	 * @param ResponseInterface $response
+	 * @param RequestInterface $request
+	 */
+	public function sendResponse(ResponseInterface $response, RequestInterface $request):void
+	{
+		$this->getRequestRouter($request)->sendResponse($response, $request);
+	}
 }
