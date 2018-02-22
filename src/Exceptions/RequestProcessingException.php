@@ -19,8 +19,9 @@
 // Time:     18:34
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Request\Request;
+use Psr\Http\Message\RequestInterface;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
@@ -33,29 +34,29 @@ use Throwable;
  */
 class RequestProcessingException extends RouterException {
 	/**
-	 * @var Request
+	 * @var RequestInterface
 	 */
 	private $request;
 
 	/**
 	 * RequestProcessingException constructor.
 	 *
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @param RouterInterface $router
 	 * @param string|null $message
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(Request $request, RouterInterface $router, string $message = null,
+	public function __construct(RequestInterface $request, RouterInterface $router, string $message = null,
 		?Throwable $previous = null) {
 		$this->request = $request;
-		parent::__construct($message ?? "Error while processing the request \"{$request->getUrl()}\"",
+		parent::__construct($message ?? sprintf("Error while processing the request to \"%s\"", $request->getUri()),
 			$router, $previous);
 	}
 
 	/**
-	 * @return Request
+	 * @return RequestInterface
 	 */
-	public function getRequest():Request {
+	public function getRequest():RequestInterface {
 		return $this->request;
 	}
 }

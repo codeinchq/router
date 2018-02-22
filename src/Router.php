@@ -19,18 +19,11 @@
 // Time:     13:06
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\CallableInvalidResponseException;
-use CodeInc\Router\Exceptions\ExistingRouteException;
-use CodeInc\Router\Exceptions\InvalidTargetException;
-use CodeInc\Router\Exceptions\InexistantNotFoundRouteException;
-use CodeInc\Router\Exceptions\RequestProcessingException;
-use CodeInc\Router\Exceptions\RouteNotFoundException;
-use CodeInc\Router\Exceptions\RouterException;
-use CodeInc\Router\Exceptions\UnknownTargetTypeException;
-use CodeInc\Router\Interfaces\RoutableInterface;
-use CodeInc\Router\Request\Request;
-use CodeInc\Router\Response\ResponseInterface;
+use CodeInc\Router\Exceptions;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 
 /**
@@ -43,14 +36,9 @@ class Router implements RouterInterface {
 	/**
 	 * List of pages URIs (keys) matching pages classes (values)
 	 *
-	 * @var array|RoutableInterface[]
+	 * @var string[]|RoutableInterface[]
 	 */
 	private $routes = [];
-
-	/**
-	 * @var RouterInterface[]
-	 */
-	private $subRouters = [];
 
 	/**
 	 * Not found route.
@@ -63,11 +51,12 @@ class Router implements RouterInterface {
 	 * Sets the not found route.
 	 *
 	 * @param string $route
-	 * @throws InexistantNotFoundRouteException
+	 * @throws Exceptions\InexistantNotFoundRouteException
 	 */
-	public function setNotFoundRoute(string $route):void {
+	public function setNotFoundRoute(string $route):void
+	{
 		if (!isset($this->routes[$route])) {
-			throw new InexistantNotFoundRouteException($route, $this);
+			throw new Exceptions\InexistantNotFoundRouteException($route, $this);
 		}
 		$this->notFoundRoute = $route;
 	}
@@ -77,20 +66,18 @@ class Router implements RouterInterface {
 	 *
 	 * @param string $route Route (can be a pattern compatible with fnmatch())
 	 * @param string|RoutableInterface|callable $target Callable, class or object implementing RoutableInterface
-	 * @throws InvalidTargetException
-	 * @throws ExistingRouteException
+	 * @throws Exceptions\InvalidTargetException
+	 * @throws Exceptions\ExistingRouteException
 	 */
-	public function addRoute(string $route, $target) {
+	public function addRoute(string $route, $target)
+	{
 		if (!is_callable($target) || !is_subclass_of($target, RoutableInterface::class)) {
-			throw new InvalidTargetException($target, $this);
+			throw new Exceptions\InvalidTargetException($target, $this);
 		}
 		if (isset($this->routes[$route])) {
-			throw new ExistingRouteException($route, $this);
+			throw new Exceptions\ExistingRouteException($route, $this);
 		}
 		$this->routes[$route] = $target;
-		if ($target instanceof RouterInterface) {
-			$this->subRouters[$route] = $target;
-		}
 	}
 
 	/**
@@ -98,67 +85,55 @@ class Router implements RouterInterface {
 	 * @param resource $request
 	 * @return bool
 	 */
-	public function hasRoute(Request $request):bool {
-		return $this->getRequestRoute($request) !== null;
+	public function canProcessRequest(RequestInterface $request):bool
+	{
+		return $this->getRequestTarget($request) !== null;
 	}
 
 	/**
 	 * Returns the route for a given request.
 	 *
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @param bool|null $allowNotFound
-	 * @return null|string
+	 * @return string|null
 	 */
-	protected function getRequestRoute(Request $request, bool $allowNotFound = null):?string {
-		$route = $request->getUrl()->getPath();
+	protected function getRequestTarget(RequestInterface $request, bool $allowNotFound = null):?string
+	{
+		$route = $request->getUri()->getPath();
 
-		// if there is a matching route
+		// if there is direct match within the registered routes
 		if (isset($this->routes[$route])) {
-			return $route;
+			return $this->routes[$route];
 		}
 
-		// if a registered route pattern is compatible with the request routed
+		// searching within the registered using fnmatch()
 		foreach ($this->routes as $registeredRoute => $target) {
-			if (fnmatch($registeredRoute, $route) && (!($target instanceof RouterInterface) || $target->hasRoute($target))) {
-				return $registeredRoute;
+			if (fnmatch($registeredRoute, $route)) {
+				return $target;
 			}
 		}
 
-		// if a not found route is registered
+		// if no route is found, using the notfound route
 		if ($allowNotFound !== false && $this->notFoundRoute) {
-			return $this->notFoundRoute;
+			return $this->routes[$this->notFoundRoute];
 		}
 
-		return null;
-	}
-
-	/**
-	 * Returns the target for a given request.
-	 *
-	 * @param Request $request
-	 * @param bool|null $allowNotFound
-	 * @return string|RoutableInterface|callable|null
-	 */
-	protected function getRequestTarget(Request $request, bool $allowNotFound = null) {
-		if (($route = $this->getRequestRoute($request, $allowNotFound)) !== null) {
-			return $this->routes[$route];
-		}
 		return null;
 	}
 
 	/**
 	 * @inheritdoc
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @param bool|null $allowNotFound
 	 * @return ResponseInterface
-	 * @throws RouteNotFoundException
-	 * @throws RouterException
-	 * @throws UnknownTargetTypeException
+	 * @throws Exceptions\RouteNotFoundException
+	 * @throws Exceptions\UnknownTargetTypeException
 	 */
-	public function process(Request $request, bool $allowNotFound = null):ResponseInterface {
+	public function processRequest(RequestInterface $request, bool $allowNotFound = null):ResponseInterface
+	{
 		// getting the target
 		if (($target = $this->getRequestTarget($request, $allowNotFound)) === null) {
-			throw new RouteNotFoundException($request, $this);
+			throw new Exceptions\RouteNotFoundException($request, $this);
 		}
 
 		// if the target is a class
@@ -177,27 +152,30 @@ class Router implements RouterInterface {
 		}
 
 		// if the target is something unknown.
-		throw new UnknownTargetTypeException($target, $this);
+		else {
+			throw new Exceptions\UnknownTargetTypeException($target, $this);
+		}
 	}
 
 	/**
 	 * Processes a class.
 	 *
 	 * @param string $class
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @return ResponseInterface
-	 * @throws RequestProcessingException
+	 * @throws Exceptions\RequestProcessingException
 	 */
-	public function processClass(string $class, Request $request):ResponseInterface {
+	public function processClass(string $class, RequestInterface $request):ResponseInterface
+	{
 		try {
 			/** @var RoutableInterface $object */
 			$object = new $class($this);
-			return $object->process($request);
+			return $object->processRequest($request);
 		}
 		catch (\Throwable $exception) {
-			throw new RequestProcessingException(
+			throw new Exceptions\RequestProcessingException(
 				$request, $this,
-				"Error while processing the request \"{$request->getUrl()}\" using the class \"$class\"",
+				"Error while processing the request \"{$request->getUri()}\" using the class \"$class\"",
 				$exception
 			);
 		}
@@ -207,18 +185,19 @@ class Router implements RouterInterface {
 	 * Processes the object.
 	 *
 	 * @param RoutableInterface $object
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @return ResponseInterface
-	 * @throws RequestProcessingException
+	 * @throws Exceptions\RequestProcessingException
 	 */
-	private function processObject(RoutableInterface $object, Request $request):ResponseInterface {
+	private function processObject(RoutableInterface $object, RequestInterface $request):ResponseInterface
+	{
 		try {
-			return $object->process($request);
+			return $object->processRequest($request);
 		}
 		catch (\Throwable $exception) {
-			throw new RequestProcessingException(
+			throw new Exceptions\RequestProcessingException(
 				$request, $this,
-				"Error while processing the request \"{$request->getUrl()}\" using the object "
+				"Error while processing the request \"{$request->getUri()}\" using the object "
 					."\"".get_class($object)."\"",
 				$exception
 			);
@@ -229,24 +208,61 @@ class Router implements RouterInterface {
 	 * Processses a callable target.
 	 *
 	 * @param callable $callable
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @return mixed
-	 * @throws RequestProcessingException
+	 * @throws Exceptions\RequestProcessingException
 	 */
-	private function processCallable(callable $callable, Request $request):ResponseInterface {
+	private function processCallable(callable $callable, RequestInterface $request):ResponseInterface
+	{
 		try {
 			$response = $callable($request);
 			if ($response instanceof ResponseInterface) {
-				throw new CallableInvalidResponseException($this);
+				throw new Exceptions\CallableInvalidResponseException($this);
 			}
 			return $response;
 		}
 		catch (\Throwable $exception) {
-			throw new RequestProcessingException(
+			throw new Exceptions\RequestProcessingException(
 				$request, $this,
-				"Error while processing the request \"{$request->getUrl()}\" using a callable",
+				"Error while processing the request \"{$request->getUri()}\" using a callable",
 				$exception
 			);
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 * @param RequestInterface $request
+	 * @param ResponseInterface $response
+	 * @throws Exceptions\ResponseSentException
+	 */
+	public function sendResponse(ResponseInterface $response, ?RequestInterface $request = null):void
+	{
+		if (headers_sent()) {
+			throw new Exceptions\ResponseSentException($response, $this);
+		}
+
+		// making the response compatible with the request
+		if ($request && $response->getProtocolVersion() != $response->getProtocolVersion()) {
+			$response = $response->withProtocolVersion($request->getProtocolVersion());
+		}
+
+		// sending the headers
+		header("HTTP/{$response->getProtocolVersion()} {$response->getStatusCode()} {$response->getReasonPhrase()}", true);
+		foreach ($response->getHeaders() as $header => $values) {
+			header("$header: ".implode(", ", $values));
+		}
+
+		// sending the body
+		$body = $response->getBody();
+		if (!$response->hasHeader("Content-Length") && ($size = $body->getSize()) !== null) {
+			header("Content-Length: $size");
+		}
+		while (!$body->eof()) {
+			if ($line = \GuzzleHttp\Psr7\readline($body, 1024)) {
+				echo $line;
+				flush();
+			}
 		}
 	}
 }

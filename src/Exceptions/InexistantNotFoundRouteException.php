@@ -19,6 +19,7 @@
 // Time:     10:37
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
 use Throwable;
@@ -45,7 +46,11 @@ class InexistantNotFoundRouteException extends RouterException {
 	 */
 	public function __construct(string $route, RouterInterface $router, ?Throwable $previous = null) {
 		$this->route = $route;
-		parent::__construct("The not found route \"$route\" does not exist",
+		parent::__construct(
+			sprintf(
+				"The not found route \"%s\" does not exist",
+				$route
+			),
 			$router, $previous);
 	}
 

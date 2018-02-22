@@ -15,65 +15,48 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:57
+// Date:     22/02/2018
+// Time:     21:23
 // Project:  lib-router
 //
-namespace CodeInc\Router\Request\Exceptions;
-use CodeInc\Router\Request\Request;
+declare(strict_types=1);
+namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
+use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
 
 /**
- * Class MissingRequiredParameterException
+ * Class ResponseSentException
  *
- * @package CodeInc\Router\Request\Exceptions
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MissingRequiredParameterException extends RequestException {
+class ResponseSentException extends RouterException {
 	/**
-	 * @var string
+	 * @var ResponseInterface
 	 */
-	private $paramName;
+	private $response;
 
 	/**
-	 * @var string
-	 */
-	private $gpcArray;
-
-	/**
-	 * MissingRequiredParameterException constructor.
+	 * ResponseSentException constructor.
 	 *
-	 * @param string $paramName
-	 * @param string $GPCArray
-	 * @param Request|null $request
+	 * @param ResponseInterface $response
 	 * @param RouterInterface|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $paramName, string $GPCArray, ?Request $request = null,
-		?RouterInterface $router = null, ?Throwable $previous = null) {
-
-		$this->paramName = $paramName;
-		$this->gpcArray = $GPCArray;
-
-		parent::__construct(
-			"The required parameter \"$paramName\" from the GPC array \"$GPCArray\" is missing",
-			$request, $router, $previous
-		);
+	public function __construct(ResponseInterface $response, ?RouterInterface $router = null, ?Throwable $previous = null)
+	{
+		$this->response = $response;
+		parent::__construct("A response have already been sent to the web browser",
+			$router, $previous);
 	}
 
 	/**
-	 * @return string
+	 * @return ResponseInterface
 	 */
-	public function getParamName():string {
-		return $this->paramName;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getGpcArray():string {
-		return $this->gpcArray;
+	public function getResponse():ResponseInterface
+	{
+		return $this->response;
 	}
 }

@@ -19,9 +19,10 @@
 // Time:     16:01
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Interfaces\RoutableInterface;
-use CodeInc\Router\Request\Request;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 
 /**
@@ -32,10 +33,18 @@ use CodeInc\Router\Request\Request;
  */
 interface RouterInterface extends RoutableInterface {
 	/**
-	 * Verifies if a route is mapped.
+	 * Verifies if the router can process a given request.
 	 *
-	 * @param Request $request
-	 * @return mixed
+	 * @param RequestInterface $request
+	 * @return bool
 	 */
-	public function hasRoute(Request $request):bool;
+	public function canProcessRequest(RequestInterface $request):bool;
+
+	/**
+	 * Sends a PSR response to the web browser.
+	 *
+	 * @param ResponseInterface $response
+	 * @param RequestInterface $request If set the protocol version of the response is modified to match the request's version
+	 */
+	public function sendResponse(ResponseInterface $response, ?RequestInterface $request = null):void;
 }

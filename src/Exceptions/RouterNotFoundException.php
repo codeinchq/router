@@ -15,29 +15,50 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     21:08
+// Date:     22/02/2018
+// Time:     16:57
 // Project:  lib-router
 //
-namespace CodeInc\Router\Response\Exceptions;
-use CodeInc\Router\Response\ResponseInterface;
+declare(strict_types=1);
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\RouterAggregate;
+use Psr\Http\Message\RequestInterface;
 use Throwable;
 
 
 /**
- * Class ResponseSendingException
+ * Class RouterAggregateException
  *
- * @package CodeInc\Router\Response\Exceptions
+ * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @method RouterAggregate getRouter()
  */
-class ResponseSendingException extends ResponseException {
+class RouterNotFoundException extends RouterException {
 	/**
-	 * ResponseSendingException constructor.
+	 * @var RequestInterface
+	 */
+	private $request;
+
+	/**
+	 * RouterNotFoundException constructor.
 	 *
-	 * @param ResponseInterface $response
+	 * @param RequestInterface $request
+	 * @param RouterAggregate|null $router
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(ResponseInterface $response, Throwable $previous = null) {
-		parent::__construct("Error while sending the respsonse", $response, $previous);
+	public function __construct(RequestInterface $request, RouterAggregate $router = null, ?Throwable $previous = null) {
+		parent::__construct(
+			sprintf(
+				"Not router found to process the request \"%s\"",
+				$request->getUri()
+			),
+			$router, $previous);
+	}
+
+	/**
+	 * @return RequestInterface
+	 */
+	public function getRequest():RequestInterface {
+		return $this->request;
 	}
 }

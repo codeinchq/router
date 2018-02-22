@@ -19,9 +19,10 @@
 // Time:     20:01
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Request\Request;
 use CodeInc\Router\RouterInterface;
+use Psr\Http\Message\RequestInterface;
 use Throwable;
 
 
@@ -33,27 +34,31 @@ use Throwable;
  */
 class RouteNotFoundException extends RouterException {
 	/**
-	 * @var Request
+	 * @var RequestInterface
 	 */
 	private $request;
 
 	/**
 	 * RouteNotFoundException constructor.
 	 *
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 * @param RouterInterface|null $router
 	 * @param Throwable|null $previous
 	 */
-	public function __construct(Request $request, RouterInterface $router = null, Throwable $previous = null) {
+	public function __construct(RequestInterface $request, RouterInterface $router = null, Throwable $previous = null) {
 		$this->request = $request;
-		parent::__construct("Not route found to process the request \"{$request->getUrl()}\"",
+		parent::__construct(
+			sprintf(
+				"Not route found to process the request \"%s\"",
+				$request->getUri()
+			),
 			$router, $previous);
 	}
 
 	/**
-	 * @return Request
+	 * @return RequestInterface
 	 */
-	public function getRequest():Request {
+	public function getRequest():RequestInterface {
 		return $this->request;
 	}
 }

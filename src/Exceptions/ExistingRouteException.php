@@ -19,6 +19,7 @@
 // Time:     18:36
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
 use Throwable;
@@ -45,7 +46,11 @@ class ExistingRouteException extends RouterException {
 	 */
 	public function __construct(string $route, RouterInterface $router, ?Throwable $previous = null) {
 		$this->route = $route;
-		parent::__construct("The route \"$route\" already exists",
+		parent::__construct(
+			sprintf(
+				"The route \"%s\" already exists",
+				$route
+			),
 			$router, $previous);
 	}
 

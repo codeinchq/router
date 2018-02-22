@@ -19,6 +19,7 @@
 // Time:     13:06
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
 use Throwable;

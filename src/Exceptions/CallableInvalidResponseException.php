@@ -19,9 +19,10 @@
 // Time:     20:09
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Response\ResponseInterface;
 use CodeInc\Router\RouterInterface;
+use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
 
@@ -39,7 +40,11 @@ class CallableInvalidResponseException extends RouterException {
 	 * @param null|Throwable $previous
 	 */
 	public function __construct(RouterInterface $router, ?Throwable $previous = null) {
-		parent::__construct("The response of the callable must be an object implementing "
-			."\"".ResponseInterface::class."\"", $router, $previous);
+		parent::__construct(
+			sprintf(
+				"The response of the callable must be an object implementing %s",
+				ResponseInterface::class
+			),
+			$router, $previous);
 	}
 }

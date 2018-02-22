@@ -19,8 +19,9 @@
 // Time:     18:35
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Interfaces\RoutableInterface;
+use CodeInc\Router\RoutableInterface;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
@@ -46,8 +47,12 @@ class InvalidTargetException extends RouterException {
 	 */
 	public function __construct($target, RouterInterface $router, ?Throwable $previous = null) {
 		$this->targetClass = is_object($target) ? get_class($target) : (string)$target;
-		parent::__construct("The class \"$this->targetClass\" is not a page and "
-			."(all route targets must implement ".RoutableInterface::class.")",
+		parent::__construct(
+			sprintf(
+				"The class %s is not a page and (all route targets must implement %s)",
+				$this->targetClass,
+				RoutableInterface::class
+			),
 			$router, $previous);
 	}
 

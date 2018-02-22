@@ -8,10 +8,15 @@
   "require": {
     "php": ">=7.2",
     "codeinchq/lib-url": "dev-master",
-    "codeinchq/lib-ui": "dev-master"
+    "psr/http-message": "^1.0",
+    "guzzlehttp/psr7": "^1.4"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7"
+    "phpunit/phpunit": "^7",
+    "hansott/psr7-cookies": "^1.0"
+  },
+  "suggest": {
+    "hansott/psr7-cookies": "Allows to inject cookie into the PSR7 response"
   },
   "autoload": {
     "psr-4": {"CodeInc\\Router\\": "src/"}
@@ -33,7 +38,6 @@
     }
   },
   "repositories": [
-    { "type": "vcs", "url": "https://github.com/codeinchq/lib-url" },
-    { "type": "vcs", "url": "https://github.com/codeinchq/lib-ui" }
+    { "type": "vcs", "url": "https://github.com/codeinchq/lib-url" }
   ]
 }

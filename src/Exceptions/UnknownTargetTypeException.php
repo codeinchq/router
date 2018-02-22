@@ -19,6 +19,7 @@
 // Time:     20:04
 // Project:  lib-router
 //
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
 use Throwable;
@@ -45,7 +46,11 @@ class UnknownTargetTypeException extends RouterException {
 	 */
 	public function __construct($target, ?RouterInterface $router = null, ?Throwable $previous = null) {
 		$this->target = $target;
-		parent::__construct("The target type ".gettype($target)." can not be processed",
+		parent::__construct(
+			sprintf(
+				"The target type %s can not be processed",
+				gettype($target)
+			),
 			$router, $previous);
 	}
 
