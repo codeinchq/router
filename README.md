@@ -61,7 +61,7 @@ $myRouter->sendResponse($response, $request);
 
 
 
-### Routable
+### Routable classes
 
 A routable is any class implementing the `RoutableInterface`. Any routable can be plugged into a router. A router itself is routable. However if you can to route multiple routers you should use the `RouterAggregate` class (see below).
 
