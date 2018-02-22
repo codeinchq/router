@@ -14,7 +14,7 @@
 
 ### Using the router
 
-The `Router` class included in the library is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing `RoutableInterface` or a [`callable`](http://php.net/manual/en/language.types.callable.php). The `callable` will received the PSR7 `Request` object as parameter and should return PSR7 `Response` object.
+The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing `RoutableInterface` or a [`callable`](http://php.net/manual/en/language.types.callable.php). The `callable` will received the PSR7 `Request` object as parameter and should return PSR7 `Response` object.
 
 The routes are evaluated using [`fnmatch()`](http://php.net/manual/en/function.fnmatch.php) and are compatible with standard shell patterns. 
 
