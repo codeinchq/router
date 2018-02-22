@@ -21,8 +21,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Tests;
-use CodeInc\Router\Exceptions\InexistantNotFoundRouteException;
-use CodeInc\Router\Router;
 use PHPUnit\Framework\TestCase;
 
 
@@ -33,12 +31,11 @@ use PHPUnit\Framework\TestCase;
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class RouterTest extends TestCase {
+	/**
+	 * @todo
+	 */
 	public function testRouter() {
-		$assetRouter = new Router();
 
-		$router = new Router();
-		$router->mapClass("/page/*", InexistantNotFoundRouteException::class);
-		$router->mapObject("/tagada", $router);
-		$router->mapRouter("/assets/*", $assetRouter);
 	}
+
 }
