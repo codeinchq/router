@@ -111,13 +111,16 @@ $router1 = new Router();
 $router2 = new Router();
 $router3 = new Router();
 
+// creating a first aggregate
 $routerAggregte1 = new RouterAggregate();
 $routerAggregte1->addRouter($router1);
 $routerAggregte1->addRouter($router2);
 
+// creating a second aggregate
 $routerAggregte2 = new RouterAggregate();
 $routerAggregte2->addRouter($routerAggregte1);
 
+// calling 
 $request = ServerRequest::fromGlobals();
 $response = $routerAggregte2->processRequest($request);
 $routerAggregte2->sendResponse($response, $request);
