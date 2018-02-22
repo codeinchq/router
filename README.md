@@ -16,7 +16,7 @@
 
 The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing `RoutableInterface` or a [`callable`](http://php.net/manual/en/language.types.callable.php). The `callable` will received the PSR7 `Request` object as parameter and should return PSR7 `Response` object.
 
-The routes are evaluated using [`fnmatch()`](http://php.net/manual/en/function.fnmatch.php) and are compatible with standard shell patterns. 
+The routes are evaluated using [`fnmatch()`](http://php.net/manual/en/function.fnmatch.php) and are compatible with [standard shell patterns](https://www.gnu.org/software/findutils/manual/html_node/find_html/Shell-Pattern-Matching.html). 
 
 Note: you can also design you own router by implementing `RoutableInterface`.
 
