@@ -16,7 +16,7 @@
     "hansott/psr7-cookies": "^1.0"
   },
   "suggest": {
-    "hansott/psr7-cookies": "Allows to inject cookie into the PSR7 response"
+    "hansott/psr7-cookies": "Allows to add cookies into a PSR7 response"
   },
   "autoload": {
     "psr-4": {"CodeInc\\Router\\": "src/"}
@@ -36,8 +36,5 @@
     "preferred-install": {
       "*": "dist"
     }
-  },
-  "repositories": [
-    { "type": "vcs", "url": "https://github.com/codeinchq/lib-url" }
-  ]
+  }
 }
