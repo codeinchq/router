@@ -21,7 +21,6 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\RouterAggregate;
-use CodeInc\Router\RouterException;
 use CodeInc\Router\RouterLibException;
 use Throwable;
 

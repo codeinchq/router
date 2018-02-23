@@ -19,6 +19,7 @@
   },
   "suggest": {
     "codeinchq/lib-psr7responsesender": "Required to send responses",
+    "middlewares/psr15-middlewares": "Provides a collection of PSR15 middlewares",
     "hansott/psr7-cookies": "Allows to add cookies into a PSR7 response"
   },
   "autoload": {
