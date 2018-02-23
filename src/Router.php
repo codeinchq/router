@@ -21,7 +21,11 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use CodeInc\PSR7ResponseSender\ResponseSenderInterface;
+use GuzzleHttp\Psr7\ServerRequest;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -45,6 +49,33 @@ class Router implements RouterInterface {
 	 * @var string|null
 	 */
 	private $notFoundRoute;
+
+	/**
+	 * @var MiddlewareInterface|null
+	 */
+	private $middleWare;
+
+	/**
+	 * Router constructor.
+	 *
+	 * @param null|MiddlewareInterface $middleware
+	 * @param ResponseSenderInterface|null $responseSender
+	 */
+	public function __construct(?MiddlewareInterface $middleware = null,
+		?ResponseSenderInterface $responseSender = null)
+	{
+		$this->middleWare = $middleware;
+	}
+
+	/**
+	 * Returns the middleware in charge of processing the request or null if no middleware is set.
+	 *
+	 * @return null|MiddlewareInterface
+	 */
+	public function getMiddleWare():?MiddlewareInterface
+	{
+		return $this->middleWare;
+	}
 
 	/**
 	 * Sets the not found route.
@@ -94,7 +125,7 @@ class Router implements RouterInterface {
 	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
-	public function hasHandler(ServerRequestInterface $request):bool
+	public function canProcess(ServerRequestInterface $request):bool
 	{
 		return $this->getRequestRoute($request) !== null;
 	}
@@ -166,5 +197,44 @@ class Router implements RouterInterface {
 		}
 
 		return $handler;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return ResponseInterface
+	 * @throws RouterException
+	 */
+	public function process(ServerRequestInterface $request, ?RequestHandlerInterface $handler = null):ResponseInterface
+	{
+		// is the handler is not set, getting the default handler for the request.
+		if (!$handler) {
+			$handler = $this->getRequestHandler($request);
+		}
+		try {
+			// if a middleware is defined, processing using the middleware
+			if ($middleware = $this->getMiddleWare()) {
+				return $middleware->process($request, $handler);
+			}
+			// else behaving as a middleware
+			else {
+				return $handler->handle($request);
+			}
+		}
+		catch (\Throwable $exception) {
+			throw new RouterException(
+				sprintf("Erorr while processing the request to \"%s\"", $request->getUri()),
+				$this, null, $exception
+			);
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return ResponseInterface
+	 * @throws RouterException
+	 */
+	public function processCurrent(?RequestHandlerInterface $handler = null):ResponseInterface
+	{
+		return $this->process(ServerRequest::fromGlobals(), $handler);
 	}
 }

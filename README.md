@@ -5,9 +5,10 @@
 **Here is how the router works :**
 1. The router receives a PSR7 request (implementing [PSR7 `ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often the request is built form the current web browser request using `ServerRequest::fromGlobals()`)
 2. The router searches for a compatible handler (implementing [PSR15 `RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) to process the request, in order to do so the path of the request's URI is compared with the known routes using `fnmatch()`;
-3. The router calls the handler linked to the route with the [PSR7 `Request`](https://www.php-fig.org/psr/psr-7/#32-psrhttpmessagerequestinterface) object as parameter;
-4. The router processes and returns the [PSR7 `Response`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) recevied from the handler;
-5. The response is sent to the web browser using a response sender (implementing `ResponseSenderInterface`).
+4. The router instantiate (if required) the PSR15 handler.
+5. The router passes the PSR15 handler and the PSR7 request to a middleware in charge of processing the request and building the PSR7 response. 
+6. The router passes the PSR7 response to a PSR7 response sender in charge of streaming the response to the web browser.
+
 
 
 ## Usage
@@ -72,7 +73,7 @@ The order in which you aggregate routers is important. When asked to process a r
 <?php
 use CodeInc\Router\Router;
 use CodeInc\Router\RouterAggregate\RouterAggregate;
-use CodeInc\Router\ResponseSender\ResponseSender;
+use CodeInc\PSR7ResponseSender\ResponseSender;
 use GuzzleHttp\Psr7\ServerRequest;
 
 // creating routers 
@@ -92,7 +93,7 @@ $routerAggregte2->addRouter($routerAggregte1);
 
 // calling 
 $request = ServerRequest::fromGlobals();
-$response = $routerAggregte2->handle($request);
+$response = $routerAggregte2->process($request);
 (new ResponseSender())->sendResponse($response, $request);
 ```
 A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canProcessRequest()`)
@@ -124,12 +125,15 @@ composer require codeinchq/lib-url
 
 ## Dependencies 
 
-* this library requires [PHP 7.2](http://php.net/releases/7_2_0.php)
-* it is using [`psr/http-message`](https://packagist.org/packages/psr/http-message) for the standard PSR7 objects interfaces ;
-* it is using [`guzzlehttp/psr7`](https://packagist.org/packages/guzzlehttp/psr7) is it's PSR7 implementation through the `Request`, `ServerRequest` and `Response` objects.
+* [PHP 7.2](http://php.net/releases/7_2_0.php)
+* [`psr/http-message`](https://packagist.org/packages/psr/http-message) for the standard PSR7 objects interfaces ;
+* [`psr/http-server-middleware`](https://packagist.org/packages/psr/http-server-middleware) for the PSR15 middleware interface ;
+* [`psr/http-server-handler`](https://packagist.org/packages/psr/http-server-handler) for the PSR15 request handler interface ;
+* [`guzzlehttp/psr7`](https://packagist.org/packages/guzzlehttp/psr7) is it's PSR7 implementation of the PSR7 `Request`, `ServerRequest` and `Response` objects.
 
 **Recommended library:**
-* the [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) library is strongly recommended to add cookies to the PSR7 responses.
+* [`codeinchq/lib-psr7responsesender`](https://packagist.org/packages/codeinchq/lib-psr7responsesender) recommended to stream the PSR7 responses to the web browser ;
+* [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) recommended to add cookies to the PSR7. responses.
 
 
 ## License 

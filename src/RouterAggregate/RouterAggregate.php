@@ -22,7 +22,10 @@
 declare(strict_types=1);
 namespace CodeInc\Router\RouterAggregate;
 use CodeInc\Router\RouterInterface;
+use GuzzleHttp\Psr7\ServerRequest;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -31,7 +34,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterAggregate extends AbstractRouterAggregate {
+class RouterAggregate implements RouterAggregateInterface {
 	/**
 	 * @var RouterInterface[]
 	 */
@@ -56,7 +59,7 @@ class RouterAggregate extends AbstractRouterAggregate {
 	public function getRouter(ServerRequestInterface $request):?RouterInterface
 	{
 		foreach ($this->routers as $router) {
-			if (!$router->hasHandler($request)) {
+			if (!$router->canProcess($request)) {
 				return $router;
 			}
 		}
@@ -64,12 +67,41 @@ class RouterAggregate extends AbstractRouterAggregate {
 	}
 
 	/**
-	 * Returns an array of the registered routers.
-	 *
-	 * @return RouterInterface[]
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @return bool
 	 */
-	public function getRouters():array
+	public function canProcess(ServerRequestInterface $request):bool
 	{
-		return $this->routers;
+		return $this->getRouter($request) !== null;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @param null|RequestHandlerInterface $handler
+	 * @return ResponseInterface
+	 * @throws RouterAggregateException
+	 */
+	public function process(ServerRequestInterface $request, ?RequestHandlerInterface $handler = null):ResponseInterface
+	{
+		if (($router = $this->getRouter($request)) === null) {
+			throw new RouterAggregateException(
+				sprintf("No router found to process the request \"%s\"", $request->getUri()),
+				$this
+			);
+		}
+		return $router->process($request, $handler);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @param null|RequestHandlerInterface $handler
+	 * @return ResponseInterface
+	 * @throws RouterAggregateException
+	 */
+	public function processCurrent(?RequestHandlerInterface $handler = null):ResponseInterface
+	{
+		return $this->process(ServerRequest::fromGlobals());
 	}
 }

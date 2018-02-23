@@ -21,7 +21,9 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -31,20 +33,20 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface {
+interface RouterInterface extends MiddlewareInterface {
 	/**
 	 * Verifies if a handler is avaialble to process a request.
 	 *
 	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
-	public function hasHandler(ServerRequestInterface $request):bool;
+	public function canProcess(ServerRequestInterface $request):bool;
 
 	/**
-	 * Returns the handler in charge of processing a request.
+	 * Processes the current request and sends the response to the web browser.
 	 *
-	 * @param ServerRequestInterface $request
-	 * @return RequestHandlerInterface
+	 * @param RequestHandlerInterface|null $handler
+	 * @return ResponseInterface
 	 */
-	public function getRequestHandler(ServerRequestInterface $request):RequestHandlerInterface;
+	public function processCurrent(?RequestHandlerInterface $handler = null):ResponseInterface;
 }
