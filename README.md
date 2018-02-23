@@ -34,6 +34,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
+use CodeInc\Router\Responses\TextResponse;
  
 // example pages
 final class HomePage implements RequestHandlerInterface { 
@@ -56,9 +57,7 @@ $myRouter->addRoute("/license.txt", new LicensePage);
 
 // or even a callable through the CallableRequestHandler class
 $myRouter->addRoute("/error404.html", new ClosureRequestHandler(function(RequestInterface $request):ResponseInterface { 
-    return new Response(404, ["Content-Type" => "text/plain"], 
-        sprintf("The page %s is not found!", $request->getUri()->getPath())
-     );
+    return new TextResponse(sprintf("The page %s is not found!", $request->getUri()->getPath()), null, 404);
 }));
 
 // routes are compatible with standard shell patterns
