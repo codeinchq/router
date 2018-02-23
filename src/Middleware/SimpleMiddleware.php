@@ -15,37 +15,43 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     20:09
-// Project:  lib-router
+// Date:     23/02/2018
+// Time:     14:57
+// Project:  lib-psr15router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\Middleware;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class CallableInvalidResponse
+ * Class SimpleMiddleware
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\Middleware
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class CallableInvalidResponseException extends RouterException {
+class SimpleMiddleware implements MiddlewareInterface {
 	/**
-	 * CallableInvalidResponseException constructor.
-	 *
-	 * @param RouterInterface $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @param RequestHandlerInterface $handler
+	 * @return ResponseInterface
+	 * @throws MiddlewareException
 	 */
-	public function __construct(RouterInterface $router, ?int $code = null, ?Throwable $previous = null) {
-		parent::__construct(
-			sprintf(
-				"The response of the callable must be an object implementing %s",
-				ResponseInterface::class
-			),
-			$router, $code, $previous);
+	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+	{
+		try {
+			return $handler->handle($request);
+		}
+		catch (\Throwable $exception) {
+			throw new MiddlewareException(
+				sprintf("Error while processing the request \"%s\" using the handler %s",
+					$request->getUri(), get_class($handler)),
+				$this
+			);
+		}
 	}
 }

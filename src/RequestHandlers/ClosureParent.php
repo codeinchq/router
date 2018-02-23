@@ -15,47 +15,35 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     20:01
-// Project:  lib-router
+// Date:     23/02/2018
+// Time:     15:16
+// Project:  lib-psr15router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\RequestHandlers;
 use Psr\Http\Message\RequestInterface;
-use Throwable;
 
 
 /**
- * Class RouteNotFoundException
+ * Class ClosureParent
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\RequestHandlers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouteNotFoundException extends RouterException {
+class ClosureParent {
 	/**
 	 * @var RequestInterface
 	 */
 	private $request;
 
 	/**
-	 * RouteNotFoundException constructor.
+	 * ClosureParent constructor.
 	 *
 	 * @param RequestInterface $request
-	 * @param RouterInterface|null $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
 	 */
-	public function __construct(RequestInterface $request, RouterInterface $router = null,
-		?int $code = null, ?Throwable $previous = null)
+	public function __construct(RequestInterface $request)
 	{
 		$this->request = $request;
-		parent::__construct(
-			sprintf(
-				"Not route found to process the request \"%s\"",
-				$request->getUri()
-			),
-			$router, $code, $previous);
 	}
 
 	/**

@@ -56,7 +56,7 @@ class RouterAggregate extends AbstractRouterAggregate {
 	public function getRouter(ServerRequestInterface $request):?RouterInterface
 	{
 		foreach ($this->routers as $router) {
-			if (!$router->canHandle($request)) {
+			if (!$router->hasHandler($request)) {
 				return $router;
 			}
 		}

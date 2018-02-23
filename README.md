@@ -1,29 +1,31 @@
-# Code Inc. router library
+# Code Inc. PSR7 & PSR15 router library
 
-`lib-router` is a [PSR7](https://www.php-fig.org/psr/psr-7/) router library written in PHP 7. A router is a component in charge of determining which code to execute to answer a request, to execute the selected code and then to stream the HTTP response to the web browser. It knowns a list of routes and their matching handlers. A handler can be anything [`callable`](http://php.net/manual/en/language.types.callable.php). 
+`lib-psr15router` is a [PSR15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR7](https://www.php-fig.org/psr/psr-7/) [requests](https://www.php-fig.org/psr/psr-7/#32-psrhttpmessagerequestinterface) and [responses](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface). A router is a component in charge of determining which handler to call to answer a request, to call the selected handler and then to returns the HTTP response to the web browser. It knowns a list of routes and their matching handlers. A handler can be any class implementing [PSR7 `ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface) or even a 
 
 **Here is how the router works :**
-1. The router receives a request (often the request is built form the current web browser request using `ServerRequest::fromGlobals()`)
-2. The router searches for a compatible handler to process the request, in order to do so the path of the request's URI is compared with the known routes using `fnmatch()`;
+1. The router receives a PSR7 request (implementing [PSR7 `ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often the request is built form the current web browser request using `ServerRequest::fromGlobals()`)
+2. The router searches for a compatible handler (implementing [PSR15 `RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) to process the request, in order to do so the path of the request's URI is compared with the known routes using `fnmatch()`;
 3. The router calls the handler linked to the route with the [PSR7 `Request`](https://www.php-fig.org/psr/psr-7/#32-psrhttpmessagerequestinterface) object as parameter;
-4. The router receives a [PSR7 `Response`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) object returned by the handler;
-5. The router send the response to the web browser.
+4. The router processes and returns the [PSR7 `Response`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface) recevied from the handler;
+5. The response is sent to the web browser using a response sender (implementing `ResponseSenderInterface`).
 
 
 ## Usage
 
 ### Using the router
 
-The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing `RoutableInterface` or a [`callable`](http://php.net/manual/en/language.types.callable.php). The `callable` will received the PSR7 `Request` object as parameter and should return PSR7 `Response` object.
+The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing `RequestHandlerInterface`. It also can be a [`callable`](http://php.net/manual/en/language.types.callable.php) through the `CallableRequestHandler` class. The `callable` will received the PSR7 `Request` object as parameter and should return PSR7 `Response` object.
 
 The routes are evaluated in order using [`fnmatch()`](http://php.net/manual/en/function.fnmatch.php) and are compatible with [standard shell patterns](https://www.gnu.org/software/findutils/manual/html_node/find_html/Shell-Pattern-Matching.html). A directly matching route will always be winning over a pattern. For instance for the `/article-3.html` request,
 the `/article-3.html` route will win over the `/article-[0-9].html` pattern route even if the later one has been added first.
 
-Note: you can also design you own router by implementing `RoutableInterface`.
+Note: you can also design you own router by implementing `RouterInterface`.
 
 ```php
 <?php
 use CodeInc\Router\Router;
+use CodeInc\Router\ResponseSender\ResponseSender;
+use CodeInc\Router\RequestHandlers\CallableRequestHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
@@ -31,18 +33,18 @@ use GuzzleHttp\Psr7\ServerRequest;
  
 $myRouter = new Router();
 
-// a page can be a class name implementing RoutableInterface
+// a page can be a class name implementing RequestHandlerInterface
 $myRouter->addRoute("/", HomePage::class); 
 
-// an object implementing RoutableInterface
+// an object implementing RequestHandlerInterface
 $myRouter->addRoute("/license.txt", new LicensePage); 
 
-// or even a callable
-$myRouter->addRoute("/error404.html", function(RequestInterface $request):ResponseInterface { 
-	return new Response(404, ["Content-Type" => "text/plain"], 
-	    sprintf("The page %s is not found!", $request->getUri()->getPath())
-    );
-});
+// or even a callable through the CallableRequestHandler class
+$myRouter->addRoute("/error404.html", new CallableRequestHandler(function(RequestInterface $request):ResponseInterface { 
+    return new Response(404, ["Content-Type" => "text/plain"], 
+        sprintf("The page %s is not found!", $request->getUri()->getPath())
+     );
+}));
 
 // routes are compatible with standard shell patterns
 $myRouter->addRoute("/article-[0-9]/*", ArticlePage::class); 
@@ -52,46 +54,12 @@ $myRouter->setNotFoundRoute("/error404.html");
 
 // processing and sending the response
 $request = ServerRequest::fromGlobals();
-$response = $myRouter->processRequest($request);
-$myRouter->sendResponse($response, $request); 
+$response = $myRouter->handle($request);
+(new ResponseSender())->sendResponse($response, $request);
 
 // Note: passing the request object to the send response 
 // method allows the router to make sure the response 
 // will be sent using the same version of the HTTP protocol
-```
-
-
-
-### Routable classes
-
-A routable is a class implementing the `RoutableInterface`. Any routable can be plugged into a router. A router itself is routable. However, if you need to aggregate multiple routers you should use the `RouterAggregate` class ([see below](https://github.com/CodeIncHQ/lib-router#aggregating-routers)).
-
-```php
-<?php
-use CodeInc\Router\RoutableInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\RequestInterface;
-use GuzzleHttp\Psr7\Response;
-
-// an example routable class 
-class HomePage implements RoutableInterface {
-	public function processRequest(RequestInterface $request):ResponseInterface {
-        return new Response(200, ["Content-Type" => "text/plain; charset=utf-8"], 
-            "Hello world!\nThe is the home page"
-        );
-    }
-}
-
-// another routable class sending a local file
-class LicensePage implements RoutableInterface {
-    public function processRequest(RequestInterface $request):ResponseInterface {
-        return new Response(200,
-            ["Content-Disposition" => "attachment; filename=\"license.txt\"",
-                "Content-Type" => "text/plain; charset=utf-8"],
-            \GuzzleHttp\Psr7\stream_for("/path/to/an/example/file.txt")
-        );
-    }
-}
 ```
 
 ### Aggregating routers
@@ -103,7 +71,8 @@ The order in which you aggregate routers is important. When asked to process a r
 ```php
 <?php
 use CodeInc\Router\Router;
-use CodeInc\Router\RouterAggregate;
+use CodeInc\Router\RouterAggregate\RouterAggregate;
+use CodeInc\Router\ResponseSender\ResponseSender;
 use GuzzleHttp\Psr7\ServerRequest;
 
 // creating routers 
@@ -123,14 +92,15 @@ $routerAggregte2->addRouter($routerAggregte1);
 
 // calling 
 $request = ServerRequest::fromGlobals();
-$response = $routerAggregte2->processRequest($request);
-$routerAggregte2->sendResponse($response, $request);
+$response = $routerAggregte2->handle($request);
+(new ResponseSender())->sendResponse($response, $request);
 ```
 A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canProcessRequest()`)
 
 ```php
 <?php 
 use CodeInc\Router\Router;
+use CodeInc\Router\ResponseSender\ResponseSender;
 use GuzzleHttp\Psr7\ServerRequest;
 
 $parentRouter = new Router();
@@ -139,8 +109,8 @@ $parentRouter->addRoute("/images/*.jpg", $imageRouter);
 $parentRouter->addRoute("/images/*.png", $imageRouter); // you also can add multiple routes to the same target
 
 $request = ServerRequest::fromGlobals();
-$response = $parentRouter->processRequest($request);
-$parentRouter->sendResponse($response, $request);
+$response = $parentRouter->handle($request);
+(new ResponseSender())->sendResponse($response, $request);
 ```
 
 ## Installation

@@ -1,8 +1,8 @@
 {
-  "name": "codeinchq/lib-psr15router",
+  "name": "codeinchq/lib-router",
   "version": "1.1.0",
-  "description": "Code Inc. PSR15 router library",
-  "homepage": "https://github.com/codeinchq/lib-psr15router",
+  "description": "Code Inc. PSR7 & PSR15 router library",
+  "homepage": "https://github.com/codeinchq/lib-router",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -10,7 +10,8 @@
     "codeinchq/lib-url": "dev-master",
     "psr/http-message": "^1.0",
     "guzzlehttp/psr7": "^1.4",
-    "psr/http-server-handler": "^1.0"
+    "psr/http-server-handler": "^1.0",
+    "psr/http-server-middleware": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^7",

@@ -15,50 +15,47 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     16/02/2018
-// Time:     10:37
+// Date:     13/02/2018
+// Time:     13:06
 // Project:  lib-router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router;
 use Throwable;
 
 
 /**
- * Class RouteNotFoundException
+ * Class RouterException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class InexistantNotFoundRouteException extends RouterException {
+class RouterException extends RouterLibException {
 	/**
-	 * @var string
+	 * @var RouterInterface
 	 */
-	private $route;
+	private $router;
 
 	/**
-	 * InexistantNotFoundRouteException constructor.
+	 * RouterException constructor.
 	 *
-	 * @param string $route
+	 * @param string $message
 	 * @param RouterInterface $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $route, RouterInterface $router, ?int $code = null, ?Throwable $previous = null) {
-		$this->route = $route;
-		parent::__construct(
-			sprintf(
-				"The not found route \"%s\" does not exist",
-				$route
-			),
-			$router, $code, $previous);
+	public function __construct(string $message, RouterInterface $router, ?int $code = null,
+		?Throwable $previous = null)
+	{
+		$this->router = $router;
+		parent::__construct($message, $code, $previous);
 	}
 
 	/**
-	 * @return string
+	 * @return RouterInterface
 	 */
-	public function getRoute():string {
-		return $this->route;
+	public function getRouter():RouterInterface
+	{
+		return $this->router;
 	}
 }

@@ -15,50 +15,48 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/02/2018
-// Time:     21:23
+// Date:     23/02/2018
+// Time:     13:48
 // Project:  lib-router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\ResponseSender\Exceptions;
-use CodeInc\Router\ResponseSender\ResponseSenderInterface;
-use Psr\Http\Message\ResponseInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\ResponseSender;
+use CodeInc\Router\RouterLibException;
 use Throwable;
 
 
 /**
- * Class ResponseSentException
+ * Class ResponsSenderException
  *
  * @package CodeInc\Router\ResponseSender\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponseSentException extends ResponsSenderException {
+class ResponsSenderException extends RouterLibException {
 	/**
-	 * @var ResponseInterface
+	 * @var ResponseSenderInterface
 	 */
-	private $response;
+	private $responseSender;
 
 	/**
-	 * ResponseSentException constructor.
+	 * ResponsSenderException constructor.
 	 *
-	 * @param ResponseInterface $response
+	 * @param string $message
 	 * @param ResponseSenderInterface $responseSender
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(ResponseInterface $response, ResponseSenderInterface $responseSender,
-		?int $code = null, ?Throwable $previous = null)
+	public function __construct(string $message, ResponseSenderInterface $responseSender, ?int $code = null,
+		?Throwable $previous = null)
 	{
-		$this->response = $response;
-		parent::__construct("A response have already been sent to the web browser",
-			$responseSender, $code, $previous);
+		$this->responseSender = $responseSender;
+		parent::__construct($message, $code, $previous);
 	}
 
 	/**
-	 * @return ResponseInterface
+	 * @return ResponseSenderInterface
 	 */
-	public function getResponse():ResponseInterface
+	public function getResponseSender():ResponseSenderInterface
 	{
-		return $this->response;
+		return $this->responseSender;
 	}
 }

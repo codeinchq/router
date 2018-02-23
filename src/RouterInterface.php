@@ -31,12 +31,20 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends RequestHandlerInterface {
+interface RouterInterface {
 	/**
-	 * Verifies if the router can process a given request.
+	 * Verifies if a handler is avaialble to process a request.
 	 *
 	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
-	public function canHandle(ServerRequestInterface $request):bool;
+	public function hasHandler(ServerRequestInterface $request):bool;
+
+	/**
+	 * Returns the handler in charge of processing a request.
+	 *
+	 * @param ServerRequestInterface $request
+	 * @return RequestHandlerInterface
+	 */
+	public function getRequestHandler(ServerRequestInterface $request):RequestHandlerInterface;
 }

@@ -15,45 +15,49 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
-// Project:  lib-router
+// Date:     23/02/2018
+// Time:     15:01
+// Project:  lib-psr15router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\Middleware;
+use CodeInc\Router\RouterLibException;
+use Psr\Http\Server\MiddlewareInterface;
 use Throwable;
 
 
 /**
- * Class RouterException
+ * Class MiddlewareException
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\Middleware
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class MiddlewareException extends RouterLibException {
 	/**
-	 * @var RouterInterface|null
+	 * @var MiddlewareInterface
 	 */
-	private $router;
+	private $middleware;
 
 	/**
-	 * RouterException constructor.
+	 * MiddlewareException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param MiddlewareInterface $middleware
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?int $code = null, ?Throwable $previous = null) {
-		$this->router = $router;
+	public function __construct(string $message, MiddlewareInterface $middleware, ?int $code = null,
+		?Throwable $previous = null)
+	{
+		$this->middleware = $middleware;
 		parent::__construct($message, $code, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return MiddlewareInterface
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getMiddleware():MiddlewareInterface
+	{
+		return $this->middleware;
 	}
 }

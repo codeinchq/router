@@ -21,6 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\ResponseSender;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 
@@ -35,6 +36,7 @@ interface ResponseSenderInterface {
 	 * Sends a reponse to the web browser.
 	 *
 	 * @param ResponseInterface $response
+	 * @param RequestInterface $request
 	 */
-	public function sendResponse(ResponseInterface $response):void;
+	public function send(ResponseInterface $response, ?RequestInterface $request = null):void;
 }

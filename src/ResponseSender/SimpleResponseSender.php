@@ -21,29 +21,29 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\ResponseSender;
-use CodeInc\Router\ResponseSender\Exceptions\ResponseSentException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 
 /**
- * Class ResponseSender
+ * Class SimpleResponseSender
  *
  * @package CodeInc\Router\ResponseSender
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponseSender implements ResponseSenderInterface {
+class SimpleResponseSender implements ResponseSenderInterface {
 	/**
 	 * @inheritdoc
 	 * @param ResponseInterface $response
 	 * @param null|RequestInterface $request
-	 * @throws ResponseSentException
+	 * @throws ResponsSenderException
 	 */
-	public function sendResponse(ResponseInterface $response, ?RequestInterface $request = null):void
+	public function send(ResponseInterface $response, ?RequestInterface $request = null):void
 	{
 		// checking if a reponse is sent
 		if (headers_sent()) {
-			throw new ResponseSentException($response, $this);
+			throw new ResponsSenderException("A response have already been sent to the web browser",
+				$this);
 		}
 
 		// making the response compatible with the request
@@ -57,25 +57,14 @@ class ResponseSender implements ResponseSenderInterface {
 	}
 
 	/**
-	 * Returns the first header of the HTTP response including the protocol version and the status code.
-	 *
-	 * @param ResponseInterface $response
-	 * @return string
-	 */
-	protected function getResponseProtocolHeader(ResponseInterface $response):string
-	{
-		return "HTTP/{$response->getProtocolVersion()} {$response->getStatusCode()} "
-			."{$response->getReasonPhrase()}";
-	}
-
-	/**
 	 * Sedns the response headers.
 	 *
 	 * @param ResponseInterface $response
 	 */
 	protected function sendResponseHeaders(ResponseInterface $response):void
 	{
-		header($this->getResponseProtocolHeader($response), true);
+		header("HTTP/{$response->getProtocolVersion()} {$response->getStatusCode()} "
+			."{$response->getReasonPhrase()}", true);
 		foreach ($response->getHeaders() as $header => $values) {
 			header("$header: ".implode(", ", $values));
 		}

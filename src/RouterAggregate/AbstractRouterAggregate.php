@@ -21,9 +21,9 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\RouterAggregate;
-use CodeInc\Router\Exceptions\RouterNotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -38,7 +38,7 @@ abstract class AbstractRouterAggregate implements RouterAggregateInterface {
 	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
-	public function canHandle(ServerRequestInterface $request):bool
+	public function hasHandler(ServerRequestInterface $request):bool
 	{
 		return $this->getRouter($request) !== null;
 	}
@@ -47,13 +47,16 @@ abstract class AbstractRouterAggregate implements RouterAggregateInterface {
 	 * @inheritdoc
 	 * @param ServerRequestInterface $request
 	 * @return ResponseInterface
-	 * @throws RouterNotFoundException
+	 * @throws RouterAggregateException
 	 */
-	public function handle(ServerRequestInterface $request):ResponseInterface
+	public function getRequestHandler(ServerRequestInterface $request):RequestHandlerInterface
 	{
 		if (($router = $this->getRouter($request)) === null) {
-			throw new RouterNotFoundException($request, $this);
+			throw new RouterAggregateException(
+				sprintf("No router found to process the request \"%s\"", $request->getUri()),
+				$this
+			);
 		}
-		return $router->handle($request);
+		return $router->getRequestHandler($request);
 	}
 }

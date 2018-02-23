@@ -16,48 +16,57 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     23/02/2018
-// Time:     13:48
-// Project:  lib-router
+// Time:     15:13
+// Project:  lib-psr15router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\ResponseSender\Exceptions;
-use CodeInc\Router\Exceptions\RouterException;
-use CodeInc\Router\ResponseSender\ResponseSenderInterface;
-use Throwable;
+namespace CodeInc\Router\RequestHandlers;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class ResponsSenderException
+ * Class ClosureRequestHandler
  *
- * @package CodeInc\Router\ResponseSender\Exceptions
+ * @package CodeInc\Router\RequestHandlers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponsSenderException extends RouterException {
+class ClosureRequestHandler implements RequestHandlerInterface {
 	/**
-	 * @var ResponseSenderInterface|null
+	 * @var \Closure
 	 */
-	private $responseSender;
+	private $closure;
 
 	/**
-	 * ResponsSenderException constructor.
+	 * CallableRequestHandler constructor.
 	 *
-	 * @param string $message
-	 * @param ResponseSenderInterface|null $responseSender
-	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @param \Closure $closure
 	 */
-	public function __construct(string $message, ?ResponseSenderInterface $responseSender,
-		?int $code = null, ?Throwable $previous = null)
+	public function __construct(\Closure $closure)
 	{
-		$this->responseSender = $responseSender;
-		parent::__construct($message, null, $code, $previous);
+		$this->closure = $closure;
 	}
 
 	/**
-	 * @return ResponseSenderInterface|null
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @return ResponseInterface
+	 * @throws RequestHandlerException
 	 */
-	public function getResponseSender():?ResponseSenderInterface
+	public function handle(ServerRequestInterface $request):ResponseInterface
 	{
-		return $this->responseSender;
+		$response = $this->closure->call(new ClosureParent($request), $request);
+		if (!$response instanceof RequestInterface) {
+			throw new RequestHandlerException(
+				sprintf(
+					"The response of the closure must be an object implementing %s",
+					ResponseInterface::class
+				),
+				$this
+			);
+		}
+		return $response;
 	}
 }

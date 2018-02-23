@@ -15,53 +15,28 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     20:04
-// Project:  lib-router
+// Date:     23/02/2018
+// Time:     14:32
+// Project:  lib-psr15router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+declare(strict_types = 1);
+namespace CodeInc\Router\RequestHandlers;
 
 
 /**
- * Class UnknownTargetTypeException
+ * Class CallableRequestHandler
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class UnknownTargetTypeException extends RouterException {
+class CallableRequestHandler extends ClosureRequestHandler {
 	/**
-	 * @var mixed
-	 */
-	private $target;
-
-	/**
-	 * UnknownTargetTypeException constructor.
+	 * CallableRequestHandler constructor.
 	 *
-	 * @param $target
-	 * @param RouterInterface|null $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @param callable $callable
 	 */
-	public function __construct($target, ?RouterInterface $router = null, ?int $code = null,
-		?Throwable $previous = null)
+	public function __construct(callable $callable)
 	{
-		$this->target = $target;
-		parent::__construct(
-			sprintf(
-				"The target type %s can not be processed",
-				gettype($target)
-			),
-			$router, $code, $previous);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getTarget()
-	{
-		return $this->target;
+		parent::__construct(\Closure::fromCallable($callable));
 	}
 }

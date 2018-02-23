@@ -21,7 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\RouterAggregate;
-use CodeInc\Router\Exceptions\RouterException;
+use CodeInc\Router\RouterException;
+use CodeInc\Router\RouterLibException;
 use Throwable;
 
 
@@ -31,18 +32,32 @@ use Throwable;
  * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterAggregateException extends RouterException {
+class RouterAggregateException extends RouterLibException {
+	/**
+	 * @var RouterAggregateInterface
+	 */
+	private $routerAggregate;
+
 	/**
 	 * RouterAggregateException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterAggregateInterface|null $router
+	 * @param RouterAggregateInterface $routerAggregate
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterAggregateInterface $router = null, ?int $code = null,
+	public function __construct(string $message, RouterAggregateInterface $routerAggregate, ?int $code = null,
 		?Throwable $previous = null)
 	{
-		parent::__construct($message, $router, $code, $previous);
+		$this->routerAggregate = $routerAggregate;
+		parent::__construct($message, $code, $previous);
+	}
+
+	/**
+	 * @return RouterAggregateInterface
+	 */
+	public function getRouterAggregate():RouterAggregateInterface
+	{
+		return $this->routerAggregate;
 	}
 }

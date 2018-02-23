@@ -15,53 +15,20 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     19/02/2018
-// Time:     18:34
-// Project:  lib-router
+// Date:     23/02/2018
+// Time:     15:02
+// Project:  lib-psr15router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use Psr\Http\Message\RequestInterface;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+declare(strict_types = 1);
+namespace CodeInc\Router;
 
 
 /**
- * Class RouteProcessingException
+ * Class RouterLibException
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RequestProcessingException extends RouterException {
-	/**
-	 * @var RequestInterface
-	 */
-	private $request;
+class RouterLibException extends \Exception {
 
-	/**
-	 * RequestProcessingException constructor.
-	 *
-	 * @param RequestInterface $request
-	 * @param RouterInterface $router
-	 * @param string|null $message
-	 * @param int|null $code
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(RequestInterface $request, RouterInterface $router, string $message = null,
-		?int $code = null, ?Throwable $previous = null)
-	{
-		$this->request = $request;
-		parent::__construct(
-			$message ?? sprintf("Error while processing the request to \"%s\"", $request->getUri()),
-			$router, $code, $previous
-		);
-	}
-
-	/**
-	 * @return RequestInterface
-	 */
-	public function getRequest():RequestInterface
-	{
-		return $this->request;
-	}
 }

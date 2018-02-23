@@ -15,54 +15,49 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/02/2018
-// Time:     16:57
-// Project:  lib-router
+// Date:     23/02/2018
+// Time:     14:34
+// Project:  lib-psr15router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterAggregate\RouterAggregate;
-use Psr\Http\Message\RequestInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\RequestHandlers;
+use CodeInc\Router\RouterLibException;
+use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
 
 /**
- * Class RouterAggregateException
+ * Class RequestHandlerException
  *
- * @package CodeInc\Router\RouterAggregate
+ * @package CodeInc\Router\RequestHandlers
  * @author Joan Fabrégat <joan@codeinc.fr>
- * @method RouterAggregate getRouter()
  */
-class RouterNotFoundException extends RouterException {
+class RequestHandlerException extends RouterLibException {
 	/**
-	 * @var RequestInterface
+	 * @var RequestHandlerInterface
 	 */
-	private $request;
+	private $requestHandler;
 
 	/**
-	 * RouterNotFoundException constructor.
+	 * RequestHandlerException constructor.
 	 *
-	 * @param RequestInterface $request
-	 * @param RouterAggregate|null $router
+	 * @param string $message
+	 * @param RequestHandlerInterface $requestHandler
 	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @param Throwable|null $previous
 	 */
-	public function __construct(RequestInterface $request, RouterAggregate $router = null, ?int $code = null,
-		?Throwable $previous = null)
+	public function __construct(string $message, RequestHandlerInterface $requestHandler,
+		?int $code = null, Throwable $previous = null)
 	{
-		parent::__construct(
-			sprintf(
-				"Not router found to process the request \"%s\"",
-				$request->getUri()
-			),
-			$router, $code, $previous);
+		$this->requestHandler = $requestHandler;
+		parent::__construct($message, $code, $previous);
 	}
 
 	/**
-	 * @return RequestInterface
+	 * @return RequestHandlerInterface
 	 */
-	public function getRequest():RequestInterface
+	public function getRequestHandler():RequestHandlerInterface
 	{
-		return $this->request;
+		return $this->requestHandler;
 	}
 }
