@@ -27,12 +27,25 @@ Note: you can also design you own router by implementing `RouterInterface`.
 <?php
 use CodeInc\Router\Router;
 use CodeInc\PSR7ResponseSender\ResponseSender;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use CodeInc\Router\RequestHandlers\CallableRequestHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
  
+// example pages
+final class HomePage implements RequestHandlerInterface { 
+	public function handle(ServerRequestInterface $request): ResponseInterface { return new Response(); }
+} 
+final class LicensePage implements RequestHandlerInterface { 
+	public function handle(ServerRequestInterface $request): ResponseInterface { return new Response(); }
+} 
+final class ArticlePage implements RequestHandlerInterface { 
+	public function handle(ServerRequestInterface $request): ResponseInterface { return new Response(); }
+} 
+
 $myRouter = new Router();
 
 // a page can be a class name implementing RequestHandlerInterface
@@ -56,7 +69,7 @@ $myRouter->setNotFoundRoute("/error404.html");
 
 // processing and sending the response
 $request = ServerRequest::fromGlobals();
-$response = $myRouter->process($request);
+$response = $myRouter->handle($request);
 (new ResponseSender())->sendResponse($response, $request);
 ```
 
@@ -92,7 +105,7 @@ $routerAggregte2->addRouter($routerAggregte1);
 
 // calling 
 $request = ServerRequest::fromGlobals();
-$response = $routerAggregte2->process($request);
+$response = $routerAggregte2->handle($request);
 (new ResponseSender())->sendResponse($response, $request);
 ```
 A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canHandle()`)
@@ -106,10 +119,11 @@ use GuzzleHttp\Psr7\ServerRequest;
 $parentRouter = new Router();
 $imageRouter = new Router();
 $parentRouter->addRoute("/images/*.jpg", $imageRouter);
-$parentRouter->addRoute("/images/*.png", $imageRouter); // you also can add multiple routes to the same target
+$parentRouter->addRoute("/images/*.png", $imageRouter); 
+// Note: you can add multiple routes to the same target
 
 $request = ServerRequest::fromGlobals();
-$response = $parentRouter->process($request);
+$response = $parentRouter->handle($request);
 (new ResponseSender())->sendResponse($response, $request);
 ```
 
