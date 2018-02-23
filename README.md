@@ -2,7 +2,7 @@
 
 `lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which handler to call to answer a request, to call the selected handler and then to returns the HTTP response to the web browser. It knowns a list of routes and their matching handlers. 
 
-A router is technically a PSR-15 middleware and request handler (it implements [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface) and [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)).
+A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)).
 
 **Here is how the router works :**
 1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often built using `ServerRequest::fromGlobals()`)
@@ -26,7 +26,7 @@ Note: you can also design you own router by implementing `RouterInterface`.
 ```php
 <?php
 use CodeInc\Router\Router;
-use CodeInc\PSR7ResponseSender\ResponseSender;
+use CodeInc\PSR7ResponseSender\ResponseSender; // from the lib-psr7responsesender package
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use CodeInc\Router\RequestHandlers\ClosureRequestHandler;
@@ -69,6 +69,36 @@ $myRouter->setNotFoundRoute("/error404.html");
 // processing and sending the response
 $request = ServerRequest::fromGlobals();
 $response = $myRouter->handle($request);
+(new ResponseSender())->send($response, $request);
+```
+
+### Using the router with PSR-15 middlewares
+
+A router geing a PSR-15 request handler, you can use it with PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) in order to modify the PSR-7 request or response. 
+
+```php
+<?php 
+use CodeInc\Router\Router;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Psr7\ServerRequest;
+use CodeInc\Psr7ResponseSender\ResponseSender; 
+
+class MyMiddleware implements MiddlewareInterface {
+	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface 
+	{
+		$response = $handler->handle($request);
+		return $response->withHeader("X-Powered-By", "This example");
+    }
+}
+
+$myRouter = new Router();
+$myMiddleware = new MyMiddleware();
+
+$request = ServerRequest::fromGlobals();
+$response = $myMiddleware->process($request, $myRouter);
 (new ResponseSender())->send($response, $request);
 ```
 
