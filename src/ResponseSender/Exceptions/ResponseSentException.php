@@ -15,45 +15,50 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     22/02/2018
+// Time:     21:23
 // Project:  lib-router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router\ResponseSender\Exceptions;
+use CodeInc\Router\ResponseSender\ResponseSenderInterface;
+use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
 
 /**
- * Class RouterException
+ * Class ResponseSentException
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\ResponseSender\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class ResponseSentException extends ResponsSenderException {
 	/**
-	 * @var RouterInterface|null
+	 * @var ResponseInterface
 	 */
-	private $router;
+	private $response;
 
 	/**
-	 * RouterException constructor.
+	 * ResponseSentException constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param ResponseInterface $response
+	 * @param ResponseSenderInterface $responseSender
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?int $code = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, $code, $previous);
+	public function __construct(ResponseInterface $response, ResponseSenderInterface $responseSender,
+		?int $code = null, ?Throwable $previous = null)
+	{
+		$this->response = $response;
+		parent::__construct("A response have already been sent to the web browser",
+			$responseSender, $code, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return ResponseInterface
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getResponse():ResponseInterface
+	{
+		return $this->response;
 	}
 }

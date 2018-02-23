@@ -15,45 +15,34 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     23/02/2018
+// Time:     14:03
 // Project:  lib-router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\RouterAggregate;
+use CodeInc\Router\Exceptions\RouterException;
 use Throwable;
 
 
 /**
- * Class RouterException
+ * Class RouterAggregateException
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class RouterAggregateException extends RouterException {
 	/**
-	 * @var RouterInterface|null
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * RouterAggregateException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param RouterAggregateInterface|null $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?int $code = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, $code, $previous);
-	}
-
-	/**
-	 * @return RouterInterface|null
-	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function __construct(string $message, ?RouterAggregateInterface $router = null, ?int $code = null,
+		?Throwable $previous = null)
+	{
+		parent::__construct($message, $router, $code, $previous);
 	}
 }

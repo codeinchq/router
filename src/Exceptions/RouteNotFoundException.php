@@ -43,22 +43,26 @@ class RouteNotFoundException extends RouterException {
 	 *
 	 * @param RequestInterface $request
 	 * @param RouterInterface|null $router
-	 * @param Throwable|null $previous
+	 * @param int|null $code
+	 * @param null|Throwable $previous
 	 */
-	public function __construct(RequestInterface $request, RouterInterface $router = null, Throwable $previous = null) {
+	public function __construct(RequestInterface $request, RouterInterface $router = null,
+		?int $code = null, ?Throwable $previous = null)
+	{
 		$this->request = $request;
 		parent::__construct(
 			sprintf(
 				"Not route found to process the request \"%s\"",
 				$request->getUri()
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 
 	/**
 	 * @return RequestInterface
 	 */
-	public function getRequest():RequestInterface {
+	public function getRequest():RequestInterface
+	{
 		return $this->request;
 	}
 }

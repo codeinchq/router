@@ -15,48 +15,28 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/02/2018
-// Time:     21:23
+// Date:     23/02/2018
+// Time:     14:02
 // Project:  lib-router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
+declare(strict_types = 1);
+namespace CodeInc\Router\RouterAggregate;
 use CodeInc\Router\RouterInterface;
-use Psr\Http\Message\ResponseInterface;
-use Throwable;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class ResponseSentException
+ * Interface RouterAggregateInterface
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResponseSentException extends RouterException {
+interface RouterAggregateInterface extends RouterInterface {
 	/**
-	 * @var ResponseInterface
-	 */
-	private $response;
-
-	/**
-	 * ResponseSentException constructor.
+	 * Returns the first available router capable of processing a given request.
 	 *
-	 * @param ResponseInterface $response
-	 * @param RouterInterface|null $router
-	 * @param null|Throwable $previous
+	 * @param ServerRequestInterface $request
+	 * @return RouterInterface|null
 	 */
-	public function __construct(ResponseInterface $response, ?RouterInterface $router = null, ?Throwable $previous = null)
-	{
-		$this->response = $response;
-		parent::__construct("A response have already been sent to the web browser",
-			$router, $previous);
-	}
-
-	/**
-	 * @return ResponseInterface
-	 */
-	public function getResponse():ResponseInterface
-	{
-		return $this->response;
-	}
+	public function getRouter(ServerRequestInterface $request):?RouterInterface;
 }

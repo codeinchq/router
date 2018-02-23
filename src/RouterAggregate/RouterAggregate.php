@@ -20,19 +20,18 @@
 // Project:  lib-router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\RouterNotFoundException;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router\RouterAggregate;
+use CodeInc\Router\RouterInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
  * Class RouterAggregate
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterAggregate implements RouterInterface {
+class RouterAggregate extends AbstractRouterAggregate {
 	/**
 	 * @var RouterInterface[]
 	 */
@@ -49,30 +48,15 @@ class RouterAggregate implements RouterInterface {
 	}
 
 	/**
-	 * @inheritdoc
-	 * @param RequestInterface $request
-	 * @return bool
-	 */
-	public function canProcessRequest(RequestInterface $request):bool
-	{
-		foreach ($this->routers as $router) {
-			if (!$router->canProcessRequest($request)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Returns the first available router capable of processing a given request.
 	 *
-	 * @param RequestInterface $request
+	 * @param ServerRequestInterface $request
 	 * @return RouterInterface|null
 	 */
-	public function getRequestRouter(RequestInterface $request):?RouterInterface
+	public function getRouter(ServerRequestInterface $request):?RouterInterface
 	{
 		foreach ($this->routers as $router) {
-			if (!$router->canProcessRequest($request)) {
+			if (!$router->canHandle($request)) {
 				return $router;
 			}
 		}
@@ -87,30 +71,5 @@ class RouterAggregate implements RouterInterface {
 	public function getRouters():array
 	{
 		return $this->routers;
-	}
-
-	/**
-	 * @inheritdoc
-	 * @param RequestInterface $request
-	 * @return ResponseInterface
-	 * @throws RouterNotFoundException
-	 */
-	public function processRequest(RequestInterface $request):ResponseInterface
-	{
-		if (($router = $this->getRequestRouter($request)) === null) {
-			throw new RouterNotFoundException($request, $this);
-		}
-		return $router->processRequest($request);
-	}
-
-	/**
-	 * Sends the response.
-	 *
-	 * @param ResponseInterface $response
-	 * @param RequestInterface $request
-	 */
-	public function sendResponse(ResponseInterface $response, RequestInterface $request):void
-	{
-		$this->getRequestRouter($request)->sendResponse($response, $request);
 	}
 }

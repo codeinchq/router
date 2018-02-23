@@ -15,45 +15,45 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     22/02/2018
+// Time:     16:50
 // Project:  lib-router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\RouterAggregate;
+use CodeInc\Router\Exceptions\RouterNotFoundException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class RouterException
+ * Class AbstractRouterAggregate
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\RouterAggregate
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+abstract class AbstractRouterAggregate implements RouterAggregateInterface {
 	/**
-	 * @var RouterInterface|null
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @return bool
 	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
-	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?int $code = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, $code, $previous);
+	public function canHandle(ServerRequestInterface $request):bool
+	{
+		return $this->getRouter($request) !== null;
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @return ResponseInterface
+	 * @throws RouterNotFoundException
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function handle(ServerRequestInterface $request):ResponseInterface
+	{
+		if (($router = $this->getRouter($request)) === null) {
+			throw new RouterNotFoundException($request, $this);
+		}
+		return $router->handle($request);
 	}
 }

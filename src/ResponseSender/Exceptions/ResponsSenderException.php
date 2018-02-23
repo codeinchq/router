@@ -15,45 +15,49 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     23/02/2018
+// Time:     13:48
 // Project:  lib-router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\ResponseSender\Exceptions;
+use CodeInc\Router\Exceptions\RouterException;
+use CodeInc\Router\ResponseSender\ResponseSenderInterface;
 use Throwable;
 
 
 /**
- * Class RouterException
+ * Class ResponsSenderException
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\ResponseSender\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class ResponsSenderException extends RouterException {
 	/**
-	 * @var RouterInterface|null
+	 * @var ResponseSenderInterface|null
 	 */
-	private $router;
+	private $responseSender;
 
 	/**
-	 * RouterException constructor.
+	 * ResponsSenderException constructor.
 	 *
 	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param ResponseSenderInterface|null $responseSender
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null, ?int $code = null, ?Throwable $previous = null) {
-		$this->router = $router;
-		parent::__construct($message, $code, $previous);
+	public function __construct(string $message, ?ResponseSenderInterface $responseSender,
+		?int $code = null, ?Throwable $previous = null)
+	{
+		$this->responseSender = $responseSender;
+		parent::__construct($message, null, $code, $previous);
 	}
 
 	/**
-	 * @return RouterInterface|null
+	 * @return ResponseSenderInterface|null
 	 */
-	public function getRouter():?RouterInterface {
-		return $this->router;
+	public function getResponseSender():?ResponseSenderInterface
+	{
+		return $this->responseSender;
 	}
 }

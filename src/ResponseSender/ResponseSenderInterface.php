@@ -15,28 +15,26 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     20/02/2018
-// Time:     14:15
+// Date:     23/02/2018
+// Time:     13:45
 // Project:  lib-router
 //
-declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\RequestInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\ResponseSender;
 use Psr\Http\Message\ResponseInterface;
 
 
 /**
- * Interface RouterTargetInterface
+ * Interface ResponseSenderInterface
  *
- * @package CodeInc\Router\Interfaces
+ * @package CodeInc\Router\ResponseSender
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RoutableInterface {
+interface ResponseSenderInterface {
 	/**
-	 * Process a request an returns a reponse object.
+	 * Sends a reponse to the web browser.
 	 *
-	 * @param RequestInterface $request
-	 * @return ResponseInterface
+	 * @param ResponseInterface $response
 	 */
-	public function processRequest(RequestInterface $request):ResponseInterface;
+	public function sendResponse(ResponseInterface $response):void;
 }

@@ -21,7 +21,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterAggregate;
+use CodeInc\Router\RouterAggregate\RouterAggregate;
 use Psr\Http\Message\RequestInterface;
 use Throwable;
 
@@ -44,21 +44,25 @@ class RouterNotFoundException extends RouterException {
 	 *
 	 * @param RequestInterface $request
 	 * @param RouterAggregate|null $router
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(RequestInterface $request, RouterAggregate $router = null, ?Throwable $previous = null) {
+	public function __construct(RequestInterface $request, RouterAggregate $router = null, ?int $code = null,
+		?Throwable $previous = null)
+	{
 		parent::__construct(
 			sprintf(
 				"Not router found to process the request \"%s\"",
 				$request->getUri()
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 
 	/**
 	 * @return RequestInterface
 	 */
-	public function getRequest():RequestInterface {
+	public function getRequest():RequestInterface
+	{
 		return $this->request;
 	}
 }

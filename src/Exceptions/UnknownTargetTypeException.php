@@ -40,24 +40,28 @@ class UnknownTargetTypeException extends RouterException {
 	/**
 	 * UnknownTargetTypeException constructor.
 	 *
-	 * @param mixed $target
+	 * @param $target
 	 * @param RouterInterface|null $router
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct($target, ?RouterInterface $router = null, ?Throwable $previous = null) {
+	public function __construct($target, ?RouterInterface $router = null, ?int $code = null,
+		?Throwable $previous = null)
+	{
 		$this->target = $target;
 		parent::__construct(
 			sprintf(
 				"The target type %s can not be processed",
 				gettype($target)
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getTarget() {
+	public function getTarget()
+	{
 		return $this->target;
 	}
 }

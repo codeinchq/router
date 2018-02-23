@@ -24,6 +24,8 @@ namespace CodeInc\Router;
 use CodeInc\Router\Exceptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -71,7 +73,7 @@ class Router implements RouterInterface {
 	 */
 	public function addRoute(string $route, $target)
 	{
-		if (!is_callable($target) || !is_subclass_of($target, RoutableInterface::class)) {
+		if (!is_callable($target) || !is_subclass_of($target, RequestHandlerInterface::class)) {
 			throw new Exceptions\InvalidTargetException($target, $this);
 		}
 		if (isset($this->routes[$route])) {
@@ -85,51 +87,20 @@ class Router implements RouterInterface {
 	 * @param resource $request
 	 * @return bool
 	 */
-	public function canProcessRequest(RequestInterface $request):bool
+	public function canHandle(ServerRequestInterface $request):bool
 	{
 		return $this->getRequestTarget($request) !== null;
 	}
 
 	/**
-	 * Returns the route for a given request.
-	 *
-	 * @param RequestInterface $request
-	 * @param bool|null $allowNotFound
-	 * @return string|null
-	 */
-	protected function getRequestTarget(RequestInterface $request, bool $allowNotFound = null):?string
-	{
-		$route = $request->getUri()->getPath();
-
-		// if there is direct match within the registered routes
-		if (isset($this->routes[$route])) {
-			return $this->routes[$route];
-		}
-
-		// searching within the registered using fnmatch()
-		foreach ($this->routes as $registeredRoute => $target) {
-			if (fnmatch($registeredRoute, $route)) {
-				return $target;
-			}
-		}
-
-		// if no route is found, using the notfound route
-		if ($allowNotFound !== false && $this->notFoundRoute) {
-			return $this->routes[$this->notFoundRoute];
-		}
-
-		return null;
-	}
-
-	/**
 	 * @inheritdoc
-	 * @param RequestInterface $request
+	 * @param ServerRequestInterface $request
 	 * @param bool|null $allowNotFound
 	 * @return ResponseInterface
 	 * @throws Exceptions\RouteNotFoundException
 	 * @throws Exceptions\UnknownTargetTypeException
 	 */
-	public function processRequest(RequestInterface $request, bool $allowNotFound = null):ResponseInterface
+	public function handle(ServerRequestInterface $request, bool $allowNotFound = null):ResponseInterface
 	{
 		// getting the target
 		if (($target = $this->getRequestTarget($request, $allowNotFound)) === null) {
@@ -158,6 +129,37 @@ class Router implements RouterInterface {
 	}
 
 	/**
+	 * Returns the route for a given request.
+	 *
+	 * @param ServerRequestInterface $request
+	 * @param bool|null $allowNotFound
+	 * @return string|null
+	 */
+	protected function getRequestTarget(ServerRequestInterface $request, bool $allowNotFound = null):?string
+	{
+		$route = $request->getUri()->getPath();
+
+		// if there is direct match within the registered routes
+		if (isset($this->routes[$route])) {
+			return $this->routes[$route];
+		}
+
+		// searching within the registered using fnmatch()
+		foreach ($this->routes as $registeredRoute => $target) {
+			if (fnmatch($registeredRoute, $route)) {
+				return $target;
+			}
+		}
+
+		// if no route is found, using the notfound route
+		if ($allowNotFound !== false && $this->notFoundRoute) {
+			return $this->routes[$this->notFoundRoute];
+		}
+
+		return null;
+	}
+
+	/**
 	 * Processes a class.
 	 *
 	 * @param string $class
@@ -165,7 +167,7 @@ class Router implements RouterInterface {
 	 * @return ResponseInterface
 	 * @throws Exceptions\RequestProcessingException
 	 */
-	public function processClass(string $class, RequestInterface $request):ResponseInterface
+	private function processClass(string $class, RequestInterface $request):ResponseInterface
 	{
 		try {
 			/** @var RoutableInterface $object */
@@ -175,8 +177,9 @@ class Router implements RouterInterface {
 		catch (\Throwable $exception) {
 			throw new Exceptions\RequestProcessingException(
 				$request, $this,
-				"Error while processing the request \"{$request->getUri()}\" using the class \"$class\"",
-				$exception
+				sprintf("Error while processing the request \"%s\" using the class %s",
+					$request->getUri(), $class),
+				null, $exception
 			);
 		}
 	}
@@ -197,9 +200,9 @@ class Router implements RouterInterface {
 		catch (\Throwable $exception) {
 			throw new Exceptions\RequestProcessingException(
 				$request, $this,
-				"Error while processing the request \"{$request->getUri()}\" using the object "
-					."\"".get_class($object)."\"",
-				$exception
+				sprintf("Error while processing the request \"%s\" using the object %s",
+					$request->getUri(), get_class($object)),
+				null, $exception
 			);
 		}
 	}
@@ -224,45 +227,9 @@ class Router implements RouterInterface {
 		catch (\Throwable $exception) {
 			throw new Exceptions\RequestProcessingException(
 				$request, $this,
-				"Error while processing the request \"{$request->getUri()}\" using a callable",
-				$exception
+				sprintf("Error while processing the request \"%s\" using a callable", $request->getUri()),
+				null, $exception
 			);
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 * @param RequestInterface $request
-	 * @param ResponseInterface $response
-	 * @throws Exceptions\ResponseSentException
-	 */
-	public function sendResponse(ResponseInterface $response, RequestInterface $request):void
-	{
-		if (headers_sent()) {
-			throw new Exceptions\ResponseSentException($response, $this);
-		}
-
-		// making the response compatible with the request
-		if ($request && $response->getProtocolVersion() != $response->getProtocolVersion()) {
-			$response = $response->withProtocolVersion($request->getProtocolVersion());
-		}
-
-		// sending the headers
-		header("HTTP/{$response->getProtocolVersion()} {$response->getStatusCode()} {$response->getReasonPhrase()}", true);
-		foreach ($response->getHeaders() as $header => $values) {
-			header("$header: ".implode(", ", $values));
-		}
-
-		// sending the body
-		$body = $response->getBody();
-		if (!$response->hasHeader("Content-Length") && ($size = $body->getSize()) !== null) {
-			header("Content-Length: $size");
-		}
-		while (!$body->eof()) {
-			if ($line = \GuzzleHttp\Psr7\readline($body, 1024)) {
-				echo $line;
-				flush();
-			}
 		}
 	}
 }

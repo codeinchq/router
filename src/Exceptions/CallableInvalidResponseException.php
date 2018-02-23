@@ -36,15 +36,16 @@ class CallableInvalidResponseException extends RouterException {
 	/**
 	 * CallableInvalidResponseException constructor.
 	 *
-	 * @param RouterInterface|null $router
+	 * @param RouterInterface $router
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(RouterInterface $router, ?Throwable $previous = null) {
+	public function __construct(RouterInterface $router, ?int $code = null, ?Throwable $previous = null) {
 		parent::__construct(
 			sprintf(
 				"The response of the callable must be an object implementing %s",
 				ResponseInterface::class
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 }

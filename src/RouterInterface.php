@@ -21,8 +21,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -31,20 +31,12 @@ use Psr\Http\Message\ResponseInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends RoutableInterface {
+interface RouterInterface extends RequestHandlerInterface {
 	/**
 	 * Verifies if the router can process a given request.
 	 *
-	 * @param RequestInterface $request
+	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
-	public function canProcessRequest(RequestInterface $request):bool;
-
-	/**
-	 * Sends a PSR response to the web browser.
-	 *
-	 * @param ResponseInterface $response
-	 * @param RequestInterface $request If set the protocol version of the response is modified to match the request's version
-	 */
-	public function sendResponse(ResponseInterface $response, RequestInterface $request):void;
+	public function canHandle(ServerRequestInterface $request):bool;
 }

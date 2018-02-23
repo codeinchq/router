@@ -39,13 +39,14 @@ class InvalidTargetException extends RouterException {
 	private $targetClass;
 
 	/**
-	 * NotAPageException constructor.
+	 * InvalidTargetException constructor.
 	 *
-	 * @param string|object $target
+	 * @param $target
 	 * @param RouterInterface $router
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct($target, RouterInterface $router, ?Throwable $previous = null) {
+	public function __construct($target, RouterInterface $router, ?int $code = null, ?Throwable $previous = null) {
 		$this->targetClass = is_object($target) ? get_class($target) : (string)$target;
 		parent::__construct(
 			sprintf(
@@ -53,7 +54,7 @@ class InvalidTargetException extends RouterException {
 				$this->targetClass,
 				RoutableInterface::class
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 
 	/**

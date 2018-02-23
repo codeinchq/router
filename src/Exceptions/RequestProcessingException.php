@@ -44,19 +44,24 @@ class RequestProcessingException extends RouterException {
 	 * @param RequestInterface $request
 	 * @param RouterInterface $router
 	 * @param string|null $message
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
 	public function __construct(RequestInterface $request, RouterInterface $router, string $message = null,
-		?Throwable $previous = null) {
+		?int $code = null, ?Throwable $previous = null)
+	{
 		$this->request = $request;
-		parent::__construct($message ?? sprintf("Error while processing the request to \"%s\"", $request->getUri()),
-			$router, $previous);
+		parent::__construct(
+			$message ?? sprintf("Error while processing the request to \"%s\"", $request->getUri()),
+			$router, $code, $previous
+		);
 	}
 
 	/**
 	 * @return RequestInterface
 	 */
-	public function getRequest():RequestInterface {
+	public function getRequest():RequestInterface
+	{
 		return $this->request;
 	}
 }

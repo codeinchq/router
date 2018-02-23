@@ -38,20 +38,21 @@ class InexistantNotFoundRouteException extends RouterException {
 	private $route;
 
 	/**
-	 * PageNotFoundException constructor.
+	 * InexistantNotFoundRouteException constructor.
 	 *
 	 * @param string $route
 	 * @param RouterInterface $router
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $route, RouterInterface $router, ?Throwable $previous = null) {
+	public function __construct(string $route, RouterInterface $router, ?int $code = null, ?Throwable $previous = null) {
 		$this->route = $route;
 		parent::__construct(
 			sprintf(
 				"The not found route \"%s\" does not exist",
 				$route
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 
 	/**

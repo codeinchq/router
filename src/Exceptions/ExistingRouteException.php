@@ -38,20 +38,21 @@ class ExistingRouteException extends RouterException {
 	private $route;
 
 	/**
-	 * ExistingPageException constructor.
+	 * ExistingRouteException constructor.
 	 *
 	 * @param string $route
 	 * @param RouterInterface $router
+	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $route, RouterInterface $router, ?Throwable $previous = null) {
+	public function __construct(string $route, RouterInterface $router, ?int $code = null, ?Throwable $previous = null) {
 		$this->route = $route;
 		parent::__construct(
 			sprintf(
 				"The route \"%s\" already exists",
 				$route
 			),
-			$router, $previous);
+			$router, $code, $previous);
 	}
 
 	/**
