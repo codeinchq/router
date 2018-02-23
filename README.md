@@ -70,7 +70,7 @@ $myRouter->setNotFoundRoute("/error404.html");
 // processing and sending the response
 $request = ServerRequest::fromGlobals();
 $response = $myRouter->handle($request);
-(new ResponseSender())->sendResponse($response, $request);
+(new ResponseSender())->send($response, $request);
 ```
 
 ### Aggregating routers
@@ -106,7 +106,7 @@ $routerAggregte2->addRouter($routerAggregte1);
 // calling 
 $request = ServerRequest::fromGlobals();
 $response = $routerAggregte2->handle($request);
-(new ResponseSender())->sendResponse($response, $request);
+(new ResponseSender())->send($response, $request);
 ```
 A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canHandle()`)
 
@@ -124,7 +124,7 @@ $parentRouter->addRoute("/images/*.png", $imageRouter);
 
 $request = ServerRequest::fromGlobals();
 $response = $parentRouter->handle($request);
-(new ResponseSender())->sendResponse($response, $request);
+(new ResponseSender())->send($response, $request);
 ```
 
 ### Streaming responses
@@ -144,7 +144,7 @@ $response = new Response();
 
 // sending 
 $sender = new ResponseSender();
-$sender->sendResponse($response, $request); 
+$sender->send($response, $request); 
 
 // Note: passing the request object to the response sender 
 // allows the sender to make sure the response will be sent
