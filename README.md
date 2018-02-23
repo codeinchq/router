@@ -1,4 +1,4 @@
-# Code Inc. PSR-7 & PSR-15 router library
+# PSR-7 & PSR-15 router library
 
 `lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which handler to call to answer a request, to call the selected handler and then to returns the HTTP response to the web browser. It knowns a list of routes and their matching handlers. 
 
