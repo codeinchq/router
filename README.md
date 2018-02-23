@@ -29,7 +29,7 @@ use CodeInc\Router\Router;
 use CodeInc\PSR7ResponseSender\ResponseSender;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use CodeInc\Router\RequestHandlers\CallableRequestHandler;
+use CodeInc\Router\RequestHandlers\ClosureRequestHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
@@ -55,7 +55,7 @@ $myRouter->addRoute("/", HomePage::class);
 $myRouter->addRoute("/license.txt", new LicensePage); 
 
 // or even a callable through the CallableRequestHandler class
-$myRouter->addRoute("/error404.html", new CallableRequestHandler(function(RequestInterface $request):ResponseInterface { 
+$myRouter->addRoute("/error404.html", new ClosureRequestHandler(function(RequestInterface $request):ResponseInterface { 
     return new Response(404, ["Content-Type" => "text/plain"], 
         sprintf("The page %s is not found!", $request->getUri()->getPath())
      );
