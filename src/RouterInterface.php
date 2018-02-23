@@ -32,7 +32,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends RequestHandlerInterface, MiddlewareInterface {
+interface RouterInterface extends RequestHandlerInterface {
 	/**
 	 * Verifies if a handler is avaialble to process a request.
 	 *

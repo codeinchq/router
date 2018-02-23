@@ -178,17 +178,6 @@ class Router implements RouterInterface {
 	 */
 	public function handle(ServerRequestInterface $request):ResponseInterface
 	{
-		return $this->process($request, $this->getRequestHandler($request));
-	}
-
-	/**
-	 * @inheritdoc
-	 * @see MiddlewareInterface::process()
-	 * @return ResponseInterface
-	 * @throws RouterException
-	 */
-	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
-	{
 		try {
 			return $this->getRequestHandler($request)->handle($request);
 		}
