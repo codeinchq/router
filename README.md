@@ -5,10 +5,10 @@
 A router is technically a PSR-15 middleware and request handler (it implements [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface) and [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)).
 
 **Here is how the router works :**
-1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often the request is built form the current web browser request using `ServerRequest::fromGlobals()`)
+1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often built using `ServerRequest::fromGlobals()`)
 2. The router searches for a compatible PSR-15 handler (implementing [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) in its internal stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
 4. The router calls (and instantiate if required) the PSR-15 handler with the PSR-7 request. The handler returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
-7. The response can be passed to a PSR-15 MiddleWare or directly streamed to the browser using a [response sender](https://github.com/CodeIncHQ/lib-psr7responsesender).
+7. The response can be passed to a PSR-15 Middleware or directly streamed to the browser using a [response sender](#streaming-responses).
 
 
 
@@ -16,7 +16,7 @@ A router is technically a PSR-15 middleware and request handler (it implements [
 
 ### Using the router
 
-The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface). It also can be a [`callable`](http://php.net/manual/en/language.types.callable.php) or a [`Closure`](http://php.net/manual/fr/class.closure.php) through the `CallableRequestHandler` and `ClosureRequestHandler` classes. The `callable` will received the PSR-7 `Request` object as parameter and should return PSR-7 `Response` object.
+The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface). It also can be a [`callable`](http://php.net/manual/en/language.types.callable.php) or a [`Closure`](http://php.net/manual/fr/class.closure.php) through the `CallableRequestHandler` and `ClosureRequestHandler` classes. 
 
 The routes are evaluated in order using [`fnmatch()`](http://php.net/manual/en/function.fnmatch.php) and are compatible with [standard shell patterns](https://www.gnu.org/software/findutils/manual/html_node/find_html/Shell-Pattern-Matching.html). A directly matching route will always be winning over a pattern. For instance for the `/article-3.html` request,
 the `/article-3.html` route will win over the `/article-[0-9].html` pattern route even if the later one has been added first.
@@ -64,7 +64,7 @@ $response = $myRouter->process($request);
 
 You can aggregate multiple router usign the `RouterAggregate` class. This can come handy for large projects with independent modules having their own internal router or to mix different router types, for instance a web page router and a web asset router.
 
-The order in which you aggregate routers is important. When asked to process a request, `RouterAggregate` will call the first router capable of processing the request (the first returning `true` for `canProcessRequest()`).  
+The order in which you aggregate routers is important. When asked to process a request, `RouterAggregate` will call the first router capable of processing the request (the first returning `true` for `canHandle()`).  
 
 `RouterAggregate` is also a router (implement `RouterInterface`), so you can aggregate both aggregators and routers within a `RouterAggregate`.
 
@@ -95,7 +95,7 @@ $request = ServerRequest::fromGlobals();
 $response = $routerAggregte2->process($request);
 (new ResponseSender())->sendResponse($response, $request);
 ```
-A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canProcessRequest()`)
+A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canHandle()`)
 
 ```php
 <?php 
