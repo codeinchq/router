@@ -155,19 +155,38 @@ class Router implements RouterInterface {
 
 		// if the handler is a class name, instantiating
 		if (!$handler instanceof RequestHandlerInterface) {
-			try {
-				$handler = new $handler($this);
-			}
-			catch (\Throwable $exception) {
-				throw new RouterException(
-					sprintf("Error while instantiating the request handler %s for the request \"%s\"",
-						(is_object($handler) ? get_class($handler) : (string)$handler), $request->getUri()),
-					$this, null, $exception
-				);
-			}
+			$handler = $this->instantiateHandler($handler);
 		}
 
 		return $handler;
+	}
+
+	/**
+	 * Returns an instantiated handler.
+	 *
+	 * @param string $handlerClass
+	 * @return RequestHandlerInterface
+	 * @throws RouterException
+	 */
+	protected function instantiateHandler(string $handlerClass):RequestHandlerInterface
+	{
+		try {
+			$handler = new $handlerClass();
+			if (!$handler instanceof RequestHandlerInterface) {
+				throw new RouterException(
+					sprintf("The class %s is not a valid PSR-7 request handler. All handler must implement %s.",
+						$handlerClass, RequestHandlerInterface::class),
+					$this
+				);
+			}
+			return $handler;
+		}
+		catch (\Throwable $exception) {
+			throw new RouterException(
+				sprintf("Error while instantiating the request handler %s", $handlerClass),
+				$this, null, $exception
+			);
+		}
 	}
 
 	/**
