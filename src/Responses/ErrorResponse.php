@@ -16,7 +16,7 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     23/02/2018
-// Time:     17:53
+// Time:     22:13
 // Project:  lib-router
 //
 declare(strict_types = 1);
@@ -25,28 +25,16 @@ use GuzzleHttp\Psr7\Response;
 
 
 /**
- * Class HtmlResponse
+ * Class ErrorResponse
  *
  * @package CodeInc\Router\Responses
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HtmlResponse extends Response {
-	public const DEFAULT_CHARSET = "utf-8";
-
-	/**
-	 * HtmlResponse constructor.
-	 *
-	 * @param string $html
-	 * @param null|string $charset
-	 * @param int $status
-	 * @param array $headers
-	 * @param string $version
-	 * @param null|string $reason
-	 */
-	public function __construct(string $html, ?string $charset = null, int $status = 200, array $headers = [],
+class ErrorResponse extends Response {
+	public function __construct(\Throwable $error, int $status = 200, array $headers = [],
 		string $version = '1.1', ?string $reason = null)
 	{
-		$headers["Content-Type"] = "text/html; charset=".($charset ?? self::DEFAULT_CHARSET);
-		parent::__construct($status, $headers, $html, $version, $reason);
+		//todo
+		//parent::__construct($status, $headers, $body, $version, $reason);
 	}
 }
