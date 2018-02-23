@@ -74,7 +74,7 @@ $response = $myRouter->handle($request);
 
 ### Using the router with PSR-15 middlewares
 
-A router geing a PSR-15 request handler, you can use it with PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) in order to modify the PSR-7 request or response. 
+A router being a PSR-15 request handler, you can use it with any PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) in order to modify the PSR-7 request or response. 
 
 ```php
 <?php 
