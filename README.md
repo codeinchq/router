@@ -64,7 +64,7 @@ $response = $myRouter->process($request);
 
 You can aggregate multiple router usign the `RouterAggregate` class. This can come handy for large projects with independent modules having their own internal router or to mix different router types, for instance a web page router and a web asset router.
 
-The order in which you aggregate routers is important. When asked to process a request, `RouterAggregate` will call the first router capable of processing the request (the first returning `true` for `canHandle()`).  
+The order in which you aggregate routers matters. When asked to process a request, `RouterAggregate` will call the first router capable of processing the request (the first returning `true` for `canHandle($request)`).  
 
 `RouterAggregate` is also a router (implement `RouterInterface`), so you can aggregate both aggregators and routers within a `RouterAggregate`.
 
