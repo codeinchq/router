@@ -23,7 +23,6 @@ declare(strict_types=1);
 namespace CodeInc\Router;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -108,7 +107,8 @@ class Router implements RouterInterface {
 	 * @param bool|null $allowNotFound
 	 * @return null|string
 	 */
-	protected function getRequestRoute(ServerRequestInterface $request, bool $allowNotFound = null):?string {
+	protected function getRequestRoute(ServerRequestInterface $request, bool $allowNotFound = null):?string
+	{
 		$route = $request->getUri()->getPath();
 
 		// if there is direct match within the registered routes
