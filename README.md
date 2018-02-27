@@ -34,7 +34,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
-use CodeInc\Router\Responses\TextResponse;
+use CodeInc\Psr7Responses\TextResponse;
  
 // example pages
 final class HomePage implements RequestHandlerInterface { 
@@ -69,7 +69,7 @@ $myRouter->setNotFoundRoute("/error404.html");
 // processing and sending the response
 $request = ServerRequest::fromGlobals();
 $response = $myRouter->handle($request);
-(new ResponseSender())->send($response, $request);
+(new ResponseSender())->send($response);
 ```
 
 ### Using the router with PSR-15 middlewares
@@ -99,7 +99,7 @@ $myMiddleware = new MyMiddleware();
 
 $request = ServerRequest::fromGlobals();
 $response = $myMiddleware->process($request, $myRouter);
-(new ResponseSender())->send($response, $request);
+(new ResponseSender())->send($response);
 ```
 
 ### Aggregating routers
@@ -135,7 +135,7 @@ $routerAggregte2->addRouter($routerAggregte1);
 // calling 
 $request = ServerRequest::fromGlobals();
 $response = $routerAggregte2->handle($request);
-(new ResponseSender())->send($response, $request);
+(new ResponseSender())->send($response);
 ```
 A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canHandle()`)
 
@@ -153,7 +153,7 @@ $parentRouter->addRoute("/images/*.png", $imageRouter);
 
 $request = ServerRequest::fromGlobals();
 $response = $parentRouter->handle($request);
-(new ResponseSender())->send($response, $request);
+(new ResponseSender())->send($response);
 ```
 
 ### Streaming responses
@@ -173,8 +173,7 @@ $response = new Response();
 
 // sending 
 $sender = new ResponseSender();
-$sender->send($response, $request); 
-
+$sender->send($response); 
 // Note: passing the request object to the response sender 
 // allows the sender to make sure the response will be sent
 // using the same version of the HTTP protocol
@@ -185,20 +184,12 @@ $sender->send($response, $request);
 This library is available through [Packagist](https://packagist.org/packages/codeinchq/lib-router) and can be installed using [Composer](https://getcomposer.org/): 
 
 ```bash
-composer require codeinchq/lib-url
+composer require codeinchq/lib-router
 ```
 
-
-## Dependencies 
-
-* [PHP 7.2](http://php.net/releases/7_2_0.php)
-* [`psr/http-message`](https://packagist.org/packages/psr/http-message) for the standard PSR-7 objects interfaces ;
-* [`psr/http-server-middleware`](https://packagist.org/packages/psr/http-server-middleware) for the PSR-15 middleware interface ;
-* [`psr/http-server-handler`](https://packagist.org/packages/psr/http-server-handler) for the PSR-15 request handler interface ;
-* [`guzzlehttp/psr7`](https://packagist.org/packages/guzzlehttp/psr7) is it's PSR-7 implementation of the `Request`, `ServerRequest` and `Response` objects.
-
-**Recommended library:**
-* [`codeinchq/lib-psr7responsesender`](https://packagist.org/packages/codeinchq/lib-psr7responsesender) recommended to stream the PSR7 responses to the web browser ;
+## Recommended libraries
+* [`codeinchq/lib-psr7responsesender`](https://packagist.org/packages/codeinchq/lib-psr7responsesender) recommended to stream the PSR-7 responses to the web browser ;
+* [`codeinchq/lib-psr7responses`](https://packagist.org/packages/codeinchq/lib-psr7responses) provides a collection of PSR-7 responses ;
 * [`codeinchq/lib-psr15middlewares`](https://packagist.org/packages/codeinchq/lib-psr15middlewares) provides a collection PSR-15 middlewares ;
 * [`middlewares/psr15-middlewares`](https://github.com/middlewares/psr15-middlewares) provides a collection PSR-15 middlewares ;
 * [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) recommended to add cookies to the PSR-7. responses.
