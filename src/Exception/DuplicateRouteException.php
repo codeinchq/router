@@ -15,49 +15,50 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/02/2018
-// Time:     14:34
-// Project:  lib-psr15router
+// Date:     05/03/2018
+// Time:     12:06
+// Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\RequestHandlers;
-use CodeInc\Router\RouterLibException;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\Router\Exception;
+use CodeInc\Router\Exceptions\RouterException;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class RequestHandlerException
+ * Class DuplicateRouteException
  *
- * @package CodeInc\Router\RequestHandlers
+ * @package CodeInc\Router\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RequestHandlerException extends RouterLibException {
+class DuplicateRouteException extends RouterException {
 	/**
-	 * @var RequestHandlerInterface
+	 * @var string
 	 */
-	private $requestHandler;
+	private $route;
 
 	/**
-	 * RequestHandlerException constructor.
+	 * DuplicateRouteException constructor.
 	 *
-	 * @param string $message
-	 * @param RequestHandlerInterface $requestHandler
+	 * @param string $route
+	 * @param RouterInterface $router
 	 * @param int|null $code
-	 * @param Throwable|null $previous
+	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, RequestHandlerInterface $requestHandler,
-		?int $code = null, Throwable $previous = null)
+	public function __construct(string $route, RouterInterface $router, ?int $code = null,
+		?Throwable $previous = null)
 	{
-		$this->requestHandler = $requestHandler;
-		parent::__construct($message, $code, $previous);
+		$this->route = $route;
+		parent::__construct(sprintf("A controller already exists for the route \"%s\"", $route),
+			$router, $code, $previous);
 	}
 
 	/**
-	 * @return RequestHandlerInterface
+	 * @return string
 	 */
-	public function getRequestHandler():RequestHandlerInterface
+	public function getRoute():string
 	{
-		return $this->requestHandler;
+		return $this->route;
 	}
 }

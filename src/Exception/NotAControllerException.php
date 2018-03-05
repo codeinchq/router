@@ -15,47 +15,52 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     05/03/2018
+// Time:     12:05
 // Project:  lib-router
 //
-declare(strict_types=1);
-namespace CodeInc\Router;
+declare(strict_types = 1);
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Controller\ControllerInterface;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class RouterException
+ * Class NotAControllerException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends RouterLibException {
+class NotAControllerException extends RouterException {
 	/**
-	 * @var RouterInterface
+	 * @var string
 	 */
-	private $router;
+	private $controllerClass;
 
 	/**
-	 * RouterException constructor.
+	 * NotAControllerException constructor.
 	 *
-	 * @param string $message
+	 * @param string $controllerClass
 	 * @param RouterInterface $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, RouterInterface $router, ?int $code = null,
+	public function __construct(string $controllerClass, RouterInterface $router, ?int $code = null,
 		?Throwable $previous = null)
 	{
-		$this->router = $router;
-		parent::__construct($message, $code, $previous);
+		$this->controllerClass = $controllerClass;
+		parent::__construct(
+			sprintf("The class %s is not a controller. All controller must implement %s.",
+				$this->controllerClass, ControllerInterface::class),
+			$router, $code, $previous);
 	}
 
 	/**
-	 * @return RouterInterface
+	 * @return string
 	 */
-	public function getRouter():RouterInterface
+	public function getControllerClass():string
 	{
-		return $this->router;
+		return $this->controllerClass;
 	}
 }

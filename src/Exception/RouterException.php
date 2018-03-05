@@ -15,28 +15,48 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/02/2018
-// Time:     14:32
-// Project:  lib-psr15router
+// Date:     04/03/2018
+// Time:     13:15
+// Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\RequestHandlers;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\RouterInterface;
+use Throwable;
 
 
 /**
- * Class CallableRequestHandler
+ * Class RouterException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class CallableRequestHandler extends ClosureRequestHandler {
+class RouterException extends \Exception {
 	/**
-	 * CallableRequestHandler constructor.
-	 *
-	 * @param callable $callable
+	 * @var RouterInterface
 	 */
-	public function __construct(callable $callable)
+	private $router;
+
+	/**
+	 * RouterException constructor.
+	 *
+	 * @param string $message
+	 * @param RouterInterface $router
+	 * @param int|null $code
+	 * @param null|Throwable $previous
+	 */
+	public function __construct(string $message, RouterInterface $router,
+		?int $code = null, ?Throwable $previous = null)
 	{
-		parent::__construct(\Closure::fromCallable($callable));
+		$this->router = $router;
+		parent::__construct($message, $code ?? 0, $previous);
+	}
+
+	/**
+	 * @return RouterInterface
+	 */
+	public function getRouter():RouterInterface
+	{
+		return $this->router;
 	}
 }

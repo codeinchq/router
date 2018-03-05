@@ -15,28 +15,72 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/02/2018
-// Time:     14:02
+// Date:     05/03/2018
+// Time:     12:13
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\RouterAggregate;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface RouterAggregateInterface
+ * Class RouterAggregator
  *
- * @package CodeInc\Router\RouterAggregate
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterAggregateInterface extends RouterInterface {
+class RouterAggregator implements RouterInterface {
 	/**
-	 * Returns the first available router capable of processing a given request.
+	 * @var RouterInterface[]
+	 */
+	private $routers = [];
+
+	/**
+	 * Adds a router
+	 *
+	 * @param RouterInterface $router
+	 */
+	public function addRouter(RouterInterface $router):void
+	{
+		$this->routers[] = $router;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function canHandle(ServerRequestInterface $request):bool
+	{
+		return $this->getRouter($request) !== null;
+	}
+
+	/**
+	 * Returns the first router capable of handeling the request.
 	 *
 	 * @param ServerRequestInterface $request
 	 * @return RouterInterface|null
 	 */
-	public function getRouter(ServerRequestInterface $request):?RouterInterface;
+	public function getRouter(ServerRequestInterface $request):?RouterInterface
+	{
+		foreach ($this->routers as $router) {
+			if ($router->canHandle($request)) {
+				return $router;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param ServerRequestInterface $request
+	 * @return ResponseInterface
+	 */
+	public function handle(ServerRequestInterface $request):ResponseInterface
+	{
+		if ($router = $this->getRouter($request)) {
+			return $router->handle($request);
+		}
+		return new Response(404);
+	}
 }

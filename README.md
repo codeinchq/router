@@ -1,74 +1,51 @@
 # PSR-7 & PSR-15 router library
 
-`lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which handler to call to answer a request, to call the selected handler and then to returns the HTTP response to the web browser. It knowns a list of routes and their matching handlers. 
+`lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which controller to call to answer a request, to call the selected controller and then to returns the PSR-7 response. It knowns a list of routes and their matching controllers. A controller is defined by the `ControllerInterface` interface. 
 
-A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)).
+A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) and can be used with [middlewares](PSR-15 https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface). 
 
 **Here is how the router works :**
 1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often built using `ServerRequest::fromGlobals()`)
-2. The router searches for a compatible PSR-15 handler (implementing [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) in its internal stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
-4. The router calls (and instantiate if required) the PSR-15 handler with the PSR-7 request. The handler returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
+2. The router searches for a controller in its internal stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
+4. The router instantiate the controller with the PSR-7 request and calls the controller `handle()` method. The controller returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
 7. The response can be passed to a PSR-15 Middleware or directly streamed to the browser using a [response sender](#streaming-responses).
 
 
 
 ## Usage
 
-### Using the router
-
-The `Router` class is able to mix various handlers to process routes. A handler is either a class or an instantiated object implementing [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface). It also can be a [`callable`](http://php.net/manual/en/language.types.callable.php) or a [`Closure`](http://php.net/manual/fr/class.closure.php) through the `CallableRequestHandler` and `ClosureRequestHandler` classes. 
-
-The routes are evaluated in order using [`fnmatch()`](http://php.net/manual/en/function.fnmatch.php) and are compatible with [standard shell patterns](https://www.gnu.org/software/findutils/manual/html_node/find_html/Shell-Pattern-Matching.html). A directly matching route will always be winning over a pattern. For instance for the `/article-3.html` request,
-the `/article-3.html` route will win over the `/article-[0-9].html` pattern route even if the later one has been added first.
-
-Note: you can also design you own router by implementing `RouterInterface`.
-
 ```php
 <?php
 use CodeInc\Router\Router;
 use CodeInc\PSR7ResponseSender\ResponseSender; // from the lib-psr7responsesender package
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use CodeInc\Router\RequestHandlers\ClosureRequestHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use CodeInc\Psr7Responses\TextResponse;
- 
-// example pages
-final class HomePage implements RequestHandlerInterface { 
-	public function handle(ServerRequestInterface $request): ResponseInterface { return new Response(); }
+use CodeInc\Router\Controller\ControllerInterface; 
+
+// example controllers
+final class HomeController implements ControllerInterface { 
 } 
-final class LicensePage implements RequestHandlerInterface { 
-	public function handle(ServerRequestInterface $request): ResponseInterface { return new Response(); }
+final class LicenseController implements ControllerInterface { 
 } 
-final class ArticlePage implements RequestHandlerInterface { 
-	public function handle(ServerRequestInterface $request): ResponseInterface { return new Response(); }
+final class ArticleController implements ControllerInterface { 
 } 
 
+// adding routes
 $myRouter = new Router();
-
-// a page can be a class name implementing RequestHandlerInterface
-$myRouter->addRoute("/", HomePage::class); 
-
-// an object implementing RequestHandlerInterface
-$myRouter->addRoute("/license.txt", new LicensePage); 
-
-// or even a callable through the CallableRequestHandler class
-$myRouter->addRoute("/error404.html", new ClosureRequestHandler(function(RequestInterface $request):ResponseInterface { 
-    return new TextResponse(sprintf("The page %s is not found!", $request->getUri()->getPath()), null, 404);
-}));
-
-// routes are compatible with standard shell patterns
-$myRouter->addRoute("/article-[0-9]/*", ArticlePage::class); 
+$myRouter->addRoute("/", HomeController::class); 
+$myRouter->addRoute("/license.txt", LicenseController::class); 
+$myRouter->addRoute("/article-[0-9]/*", ArticleController::class); 
 
 // is is possible to define where not found request should be routed
-$myRouter->setNotFoundRoute("/error404.html");
+$myRouter->setNotFoundController("/error404.html");
 
-// processing and sending the response
+// processing and the response
 $request = ServerRequest::fromGlobals();
 $response = $myRouter->handle($request);
+
+// sending the response to the web browser using codeinchq/lib-psr7responsesender
 (new ResponseSender())->send($response);
 ```
 
@@ -108,13 +85,12 @@ You can aggregate multiple router usign the `RouterAggregate` class. This can co
 
 The order in which you aggregate routers matters. When asked to process a request, `RouterAggregate` will call the first router capable of processing the request (the first returning `true` for `canHandle($request)`).  
 
-`RouterAggregate` is also a router (implement `RouterInterface`), so you can aggregate both aggregators and routers within a `RouterAggregate`.
+`RouterAggregate` is also a router (implement `RouterInterface` and therefor `RequestHandlerInterface`), so you can aggregate both aggregators and routers within a `RouterAggregate`.
 
 ```php
 <?php
 use CodeInc\Router\Router;
-use CodeInc\Router\RouterAggregate\RouterAggregate;
-use CodeInc\PSR7ResponseSender\ResponseSender;
+use CodeInc\Router\RouterAggregator;
 use GuzzleHttp\Psr7\ServerRequest;
 
 // creating routers 
@@ -123,52 +99,29 @@ $router2 = new Router();
 $router3 = new Router();
 
 // creating a first aggregate
-$routerAggregte1 = new RouterAggregate();
-$routerAggregte1->addRouter($router1);
-$routerAggregte1->addRouter($router2);
+$aggregator1 = new RouterAggregator();
+$aggregator1->addRouter($router1);
+$aggregator1->addRouter($router2);
 
 // creating a second aggregate
-$routerAggregte2 = new RouterAggregate();
-$routerAggregte2->addRouter($router3);
-$routerAggregte2->addRouter($routerAggregte1);
+$aggregator2 = new RouterAggregator();
+$aggregator2->addRouter($router3);
+$aggregator2->addRouter($aggregator1);
 
-// calling 
+// handling a request 
 $request = ServerRequest::fromGlobals();
-$response = $routerAggregte2->handle($request);
-(new ResponseSender())->send($response);
-```
-A router is a routable, so you can aggregate a router directly in another router. In this case the behavior is different than when using `RouterAggregate`: the sub router will be called only (and always) for it's matching route (the parent router will never asked the sub router if it can process the route through `canHandle()`)
-
-```php
-<?php 
-use CodeInc\Router\Router;
-use CodeInc\PSR7ResponseSender\ResponseSender;
-use GuzzleHttp\Psr7\ServerRequest;
-
-$parentRouter = new Router();
-$imageRouter = new Router();
-$parentRouter->addRoute("/images/*.jpg", $imageRouter);
-$parentRouter->addRoute("/images/*.png", $imageRouter); 
-// Note: you can add multiple routes to the same target
-
-$request = ServerRequest::fromGlobals();
-$response = $parentRouter->handle($request);
-(new ResponseSender())->send($response);
+$response = $aggregator2->handle($request);
 ```
 
 ### Streaming responses
 
-A companion library [`lib-psr7responsesender`](https://github.com/CodeIncHQ/lib-psr7responsesender) is available to stream PSR-7 response to the web browser. The library also provides a standard interface for PSR-7 response senders.
+A companion library [`lib-psr7responsesender`](https://github.com/CodeIncHQ/lib-psr7responsesender) is available to stream PSR-7 response to the web browser. The library also provides a standard interface `ResponseSenderInterface` for PSR-7 response senders.
 ```php
 <?php 
 use CodeInc\PSR7ResponseSender\ResponseSender;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\ServerRequest;
 
-// an example request
-$request = ServerRequest::fromGlobals();
-
-// any response implementing ResponseInterface
+// any PSR-7 response 
 $response = new Response();
 
 // sending 
@@ -189,9 +142,8 @@ composer require codeinchq/lib-router
 
 ## Recommended libraries
 * [`codeinchq/lib-psr7responsesender`](https://packagist.org/packages/codeinchq/lib-psr7responsesender) recommended to stream the PSR-7 responses to the web browser ;
-* [`codeinchq/lib-psr7responses`](https://packagist.org/packages/codeinchq/lib-psr7responses) provides a collection of PSR-7 responses ;
 * [`codeinchq/lib-psr15middlewares`](https://packagist.org/packages/codeinchq/lib-psr15middlewares) provides a collection PSR-15 middlewares ;
-* [`middlewares/psr15-middlewares`](https://github.com/middlewares/psr15-middlewares) provides a collection PSR-15 middlewares ;
+* [`middlewares/psr15-middlewares`](https://github.com/middlewares/psr15-middlewares) provides an even bigger collection PSR-15 middlewares ;
 * [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) recommended to add cookies to the PSR-7. responses.
 
 

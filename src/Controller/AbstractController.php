@@ -15,48 +15,44 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/02/2018
-// Time:     14:03
+// Date:     02/03/2018
+// Time:     11:28
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\RouterAggregate;
-use CodeInc\Router\RouterLibException;
-use Throwable;
+namespace CodeInc\Router\Controller;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class RouterAggregateException
+ * Class AbstractController
  *
- * @package CodeInc\Router\RouterAggregate
+ * @package CodeInc\Router\Controller
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterAggregateException extends RouterLibException {
+abstract class AbstractController implements ControllerInterface {
 	/**
-	 * @var RouterAggregateInterface
+	 * @var ServerRequestInterface
 	 */
-	private $routerAggregate;
+	private $request;
 
 	/**
-	 * RouterAggregateException constructor.
+	 * Controller constructor.
 	 *
-	 * @param string $message
-	 * @param RouterAggregateInterface $routerAggregate
-	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @param ServerRequestInterface $request
 	 */
-	public function __construct(string $message, RouterAggregateInterface $routerAggregate, ?int $code = null,
-		?Throwable $previous = null)
+	public function __construct(ServerRequestInterface $request)
 	{
-		$this->routerAggregate = $routerAggregate;
-		parent::__construct($message, $code, $previous);
+		$this->request = $request;
 	}
 
 	/**
-	 * @return RouterAggregateInterface
+	 * Returns the parent request object.
+	 *
+	 * @return ServerRequestInterface
 	 */
-	public function getRouterAggregate():RouterAggregateInterface
+	public function getRequest():ServerRequestInterface
 	{
-		return $this->routerAggregate;
+		return $this->request;
 	}
 }

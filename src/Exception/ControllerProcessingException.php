@@ -15,31 +15,54 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/02/2018
-// Time:     15:02
-// Project:  lib-psr15router
+// Date:     05/03/2018
+// Time:     12:10
+// Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Exception;
+use CodeInc\Router\Controller\ControllerInterface;
+use CodeInc\Router\Exceptions\RouterException;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class RouterLibException
+ * Class ControllerProcessingException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterLibException extends \Exception {
+class ControllerProcessingException extends RouterException {
 	/**
-	 * RouterLibException constructor.
+	 * @var string
+	 */
+	private $controllerClass;
+
+	/**
+	 * ControllerProcessingException constructor.
 	 *
-	 * @param string $message
+	 * @param string|ControllerInterface $controllerClass
+	 * @param RouterInterface $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?int $code = null, ?Throwable $previous = null)
+	public function __construct(string $controllerClass, RouterInterface $router, ?int $code = null,
+		?Throwable $previous = null)
 	{
-		parent::__construct($message, $code ?? 0, $previous);
+		$this->controllerClass = $controllerClass;
+		parent::__construct(
+			sprintf("Error while processing the controller %s",
+				$this->controllerClass),
+			$router, $code, $previous
+		);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getControllerClass():string
+	{
+		return $this->controllerClass;
 	}
 }

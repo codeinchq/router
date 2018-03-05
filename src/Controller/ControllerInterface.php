@@ -15,42 +15,26 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     23/02/2018
-// Time:     15:16
-// Project:  lib-psr15router
+// Date:     04/03/2018
+// Time:     09:50
+// Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\RequestHandlers;
-use Psr\Http\Message\RequestInterface;
+namespace CodeInc\Router\Controller;
+use Psr\Http\Message\ResponseInterface;
 
 
 /**
- * Class ClosureParent
+ * Interface ControllerInterface
  *
- * @package CodeInc\Router\RequestHandlers
+ * @package CodeInc\Router\Controller
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ClosureParent {
+interface ControllerInterface {
 	/**
-	 * @var RequestInterface
-	 */
-	private $request;
-
-	/**
-	 * ClosureParent constructor.
+	 * Processes the page en returns the response.
 	 *
-	 * @param RequestInterface $request
+	 * @return ResponseInterface
 	 */
-	public function __construct(RequestInterface $request)
-	{
-		$this->request = $request;
-	}
-
-	/**
-	 * @return RequestInterface
-	 */
-	public function getRequest():RequestInterface
-	{
-		return $this->request;
-	}
+	public function process():ResponseInterface;
 }

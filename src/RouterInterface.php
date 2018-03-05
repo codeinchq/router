@@ -15,12 +15,13 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     14/02/2018
-// Time:     16:01
+// Date:     05/03/2018
+// Time:     11:55
 // Project:  lib-router
 //
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -28,15 +29,22 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Interface RouterInterface
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 interface RouterInterface extends RequestHandlerInterface {
 	/**
-	 * Verifies if a handler is avaialble to process a request.
+	 * Verifies if the router can handle a request.
 	 *
 	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
 	public function canHandle(ServerRequestInterface $request):bool;
+
+	/**
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @return ResponseInterface
+	 */
+	public function handle(ServerRequestInterface $request):ResponseInterface;
 }

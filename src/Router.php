@@ -15,12 +15,14 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/02/2018
-// Time:     13:06
+// Date:     02/03/2018
+// Time:     09:52
 // Project:  lib-router
 //
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace CodeInc\Router;
+use CodeInc\Router\Controller\ControllerInterface;
+use CodeInc\Router\Exception\ControllerProcessingException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -32,179 +34,23 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Router implements RouterInterface {
-	/**
-	 * List of pages URIs (keys) matching pages classes (values)
-	 *
-	 * @var string[]|RequestHandlerInterface[]
-	 */
-	private $routes = [];
-
-	/**
-	 * Not found route.
-	 *
-	 * @var string|null
-	 */
-	private $notFoundRoute;
-
-	/**
-	 * Sets the not found route.
-	 *
-	 * @param string $route
-	 * @throws RouterException
-	 */
-	public function setNotFoundRoute(string $route):void
-	{
-		if (!isset($this->routes[$route])) {
-			throw new RouterException(
-				sprintf("The route %s does not exist", $route),
-				$this
-			);
-		}
-		$this->notFoundRoute = $route;
-	}
-
-	/**
-	 * Adds a route.
-	 *
-	 * @param string $route Route (can be a pattern compatible with fnmatch())
-	 * @param string|RequestHandlerInterface $target Callable, class or object implementing RoutableInterface
-	 * @throws RouterException
-	 */
-	public function addRoute(string $route, $target)
-	{
-		if (!is_subclass_of($target, RequestHandlerInterface::class)) {
-			throw new RouterException(
-				sprintf("The target for the route \"%s\" must be either a class name or an object implementing %s",
-					$route, RequestHandlerInterface::class),
-				$this
-			);
-		}
-		if (isset($this->routes[$route])) {
-			throw new RouterException(
-				sprintf("The route \"%s\" already exist", $route),
-				$this
-			);
-		}
-		$this->routes[$route] = $target;
-	}
-
+class Router extends AbstractRouter implements RequestHandlerInterface {
 	/**
 	 * @inheritdoc
-	 * @see RouterInterface::hasHandler()
+	 * @param string $controllerClass
 	 * @param ServerRequestInterface $request
-	 * @return bool
-	 */
-	public function canHandle(ServerRequestInterface $request):bool
-	{
-		return $this->getRequestRoute($request) !== null;
-	}
-
-	/**
-	 * Returns the route corresponding to a request or null if no route is found.
-	 *
-	 * @param ServerRequestInterface $request
-	 * @param bool|null $allowNotFound
-	 * @return null|string
-	 */
-	protected function getRequestRoute(ServerRequestInterface $request, bool $allowNotFound = null):?string
-	{
-		$route = $request->getUri()->getPath();
-
-		// if there is direct match within the registered routes
-		if (isset($this->routes[$route])) {
-			return $route;
-		}
-
-		// searching within the registered using fnmatch()
-		else {
-			foreach ($this->routes as $registeredRoute => $target) {
-				if (fnmatch($registeredRoute, $route)) {
-					return $target;
-				}
-			}
-		}
-
-		// if no route is found, using the notfound route
-		if ($allowNotFound !== false && $this->notFoundRoute) {
-			return $route;
-		}
-
-		return null;
-	}
-
-	/**
-	 * @inheritdoc
-	 * @see RouterInterface::getRequestHandler()
-	 * @param ServerRequestInterface $request
-	 * @param bool|null $allowNotFound
-	 * @return RequestHandlerInterface
-	 * @throws RouterException
-	 */
-	public function getRequestHandler(ServerRequestInterface $request,
-		bool $allowNotFound = null):RequestHandlerInterface
-	{
-		// getting the handler
-		if (($route = $this->getRequestRoute($request, $allowNotFound)) === null) {
-			throw new RouterException(
-				sprintf("No route found for the request \"%s\"", $request->getUri()),
-				$this
-			);
-		}
-		$handler = $this->routes[$route];
-
-		// if the handler is a class name, instantiating
-		if (!$handler instanceof RequestHandlerInterface) {
-			$handler = $this->instantiateHandler($handler);
-		}
-
-		return $handler;
-	}
-
-	/**
-	 * Returns an instantiated handler.
-	 *
-	 * @param string $handlerClass
-	 * @return RequestHandlerInterface
-	 * @throws RouterException
-	 */
-	protected function instantiateHandler(string $handlerClass):RequestHandlerInterface
-	{
-		try {
-			$handler = new $handlerClass();
-			if (!$handler instanceof RequestHandlerInterface) {
-				throw new RouterException(
-					sprintf("The class %s is not a valid PSR-7 request handler. All handler must implement %s.",
-						$handlerClass, RequestHandlerInterface::class),
-					$this
-				);
-			}
-			return $handler;
-		}
-		catch (\Throwable $exception) {
-			throw new RouterException(
-				sprintf("Error while instantiating the request handler %s", $handlerClass),
-				$this, null, $exception
-			);
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 * @see RequestHandlerInterface::handle()
 	 * @return ResponseInterface
-	 * @throws RouterException
+	 * @throws ControllerProcessingException
 	 */
-	public function handle(ServerRequestInterface $request):ResponseInterface
+	protected function processController(string $controllerClass, ServerRequestInterface $request):ResponseInterface
 	{
 		try {
-			return $this->getRequestHandler($request)->handle($request);
+			/** @var ControllerInterface $controller */
+			$controller = new $controllerClass($request);
+			return $controller->process();
 		}
 		catch (\Throwable $exception) {
-			throw new RouterException(
-				sprintf("Erorr while processing the request to \"%s\"", $request->getUri()),
-				$this, null, $exception
-			);
+			throw new ControllerProcessingException($controllerClass, $this, null, $exception);
 		}
 	}
 }
