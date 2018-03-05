@@ -2,11 +2,11 @@
 
 `lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which controller to call to answer a request, to call the selected controller and then to returns the PSR-7 response. It knowns a list of routes and their matching controllers. A controller is defined by the `ControllerInterface` interface. 
 
-A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) and can be used with [PSR-15 middlewares](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface). 
+A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) and can be used with any [PSR-15 middlewares](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface). 
 
 **Here is how the router works :**
-1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often built using `ServerRequest::fromGlobals()`)
-2. The router searches for a controller in its internal stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
+1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface))
+2. The router searches for a controller in its internal routes stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
 4. The router instantiate the controller with the PSR-7 request and calls the controller `handle()` method. The controller returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
 7. The response can be passed to a PSR-15 Middleware or directly streamed to the browser using a [response sender](#streaming-responses).
 
@@ -18,10 +18,7 @@ A router is technically a PSR-15 request handler (it implements [`RequestHandler
 <?php
 use CodeInc\Router\Router;
 use CodeInc\PSR7ResponseSender\ResponseSender; // from the lib-psr7responsesender package
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\ServerRequest;
-use CodeInc\Psr7Responses\TextResponse;
 use CodeInc\Router\Controller\ControllerInterface; 
 
 // example controllers
