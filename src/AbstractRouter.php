@@ -54,7 +54,7 @@ abstract class AbstractRouter implements RouterInterface {
 	 */
 	public function setNotFoundController(string $notFoundControllerClass):void
 	{
-		if (is_subclass_of($notFoundControllerClass, ControllerInterface::class)) {
+		if (!is_subclass_of($notFoundControllerClass, ControllerInterface::class)) {
 			throw new NotAControllerException($notFoundControllerClass, $this);
 		}
 		$this->notFoundControllerClass = $notFoundControllerClass;
