@@ -15,42 +15,42 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     02/03/2018
-// Time:     09:52
+// Date:     05/03/2018
+// Time:     13:01
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router;
-use CodeInc\Router\Controller\ControllerInterface;
-use CodeInc\Router\Exception\ControllerProcessingException;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router\Controller;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class Router
+ * Class AbstractController
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Controller
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Router extends AbstractRouter implements RequestHandlerInterface {
+abstract class AbstractController implements ControllerInterface {
 	/**
-	 * @inheritdoc
-	 * @param string $controllerClass
-	 * @param ServerRequestInterface $request
-	 * @return ResponseInterface
-	 * @throws ControllerProcessingException
+	 * @var ServerRequestInterface
 	 */
-	protected function processController(string $controllerClass, ServerRequestInterface $request):ResponseInterface
+	private $request;
+
+	/**
+	 * AbstractController constructor.
+	 *
+	 * @param ServerRequestInterface $request
+	 */
+	public function __construct(ServerRequestInterface $request)
 	{
-		try {
-			/** @var ControllerInterface $controller */
-			$controller = new $controllerClass($request);
-			return $controller->process();
-		}
-		catch (\Throwable $exception) {
-			throw new ControllerProcessingException($controllerClass, $this, null, $exception);
-		}
+		$this->request = $request;
+	}
+
+	/**
+	 * @return ServerRequestInterface
+	 */
+	protected function getRequest():ServerRequestInterface
+	{
+		return $this->request;
 	}
 }

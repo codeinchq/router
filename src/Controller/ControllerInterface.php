@@ -20,7 +20,7 @@
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -28,7 +28,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Interface ControllerInterface
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Controller
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 interface ControllerInterface {
