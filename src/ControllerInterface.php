@@ -20,17 +20,25 @@
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Controller;
+namespace CodeInc\Router;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
  * Interface ControllerInterface
  *
- * @package CodeInc\Router\Controller
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 interface ControllerInterface {
+	/**
+	 * ControllerInterface constructor.
+	 *
+	 * @param ServerRequestInterface $request
+	 */
+	public function __construct(ServerRequestInterface $request);
+
 	/**
 	 * Processes the page en returns the response.
 	 *

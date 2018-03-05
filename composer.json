@@ -1,6 +1,6 @@
 {
   "name": "codeinchq/lib-router",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/codeinchq/lib-router",
   "type": "library",
