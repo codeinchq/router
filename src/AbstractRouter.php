@@ -73,7 +73,7 @@ abstract class AbstractRouter implements RouterInterface {
 		if (isset($this->routes[$route])) {
 			throw new DuplicateRouteException($route, $this);
 		}
-		if (is_subclass_of($controllerClass, ControllerInterface::class)) {
+		if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
 			throw new NotAControllerException($controllerClass, $this);
 		}
 		$this->routes[$route] = $controllerClass;
