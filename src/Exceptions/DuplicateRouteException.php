@@ -16,53 +16,48 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     05/03/2018
-// Time:     12:10
+// Time:     12:06
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Exception;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\Exceptions\RouterException;
+namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class ControllerProcessingException
+ * Class DuplicateRouteException
  *
  * @package CodeInc\Router\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerProcessingException extends RouterException {
+class DuplicateRouteException extends RouterException {
 	/**
 	 * @var string
 	 */
-	private $controllerClass;
+	private $route;
 
 	/**
-	 * ControllerProcessingException constructor.
+	 * DuplicateRouteException constructor.
 	 *
-	 * @param string|ControllerInterface $controllerClass
+	 * @param string $route
 	 * @param RouterInterface $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $controllerClass, RouterInterface $router, ?int $code = null,
+	public function __construct(string $route, RouterInterface $router, ?int $code = null,
 		?Throwable $previous = null)
 	{
-		$this->controllerClass = $controllerClass;
-		parent::__construct(
-			sprintf("Error while processing the controller %s",
-				$this->controllerClass),
-			$router, $code, $previous
-		);
+		$this->route = $route;
+		parent::__construct(sprintf("A controller already exists for the route \"%s\"", $route),
+			$router, $code, $previous);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getControllerClass():string
+	public function getRoute():string
 	{
-		return $this->controllerClass;
+		return $this->route;
 	}
 }

@@ -22,9 +22,8 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\Exception\ControllerProcessingException;
-use CodeInc\Router\Exception\DuplicateRouteException;
+use CodeInc\Router\Exceptions\ControllerProcessingException;
+use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

@@ -22,7 +22,7 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\Exception\ControllerProcessingException;
+use CodeInc\Router\Exceptions\ControllerProcessingException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
