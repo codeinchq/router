@@ -2,7 +2,7 @@
 
 `lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which controller to call to answer a request, to call the selected controller and then to returns the PSR-7 response. It knowns a list of routes and their matching controllers. A controller is defined by the `ControllerInterface` interface. 
 
-A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) and can be used with [middlewares](PSR-15 https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface). 
+A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) and can be used with [PSR-15 middlewares](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface). 
 
 **Here is how the router works :**
 1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface), often built using `ServerRequest::fromGlobals()`)
