@@ -21,7 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\Controller\ControllerInterface;
+use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Exception\ControllerProcessingException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
