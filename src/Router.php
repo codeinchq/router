@@ -25,6 +25,7 @@ use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\Router\Interfaces\ControllerInterface;
 use CodeInc\Router\Interfaces\ControllerValidatorInterface;
 use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
 use CodeInc\Router\Interfaces\RouterInterface;
@@ -55,23 +56,14 @@ class Router implements RouterInterface {
 	private $instantiator;
 
 	/**
-	 * @var ControllerValidatorInterface
-	 */
-	private $validator;
-
-	/**
 	 * Router constructor.
 	 *
 	 * @param ControllerInstantiatorInterface|null $instantiator
-	 * @param ControllerValidatorInterface|null $validator
 	 */
-	public function __construct(?ControllerInstantiatorInterface $instantiator = null,
-		?ControllerValidatorInterface $validator = null)
+	public function __construct(?ControllerInstantiatorInterface $instantiator = null)
 	{
 		$this->setInstantiator($instantiator
 			?? new DefaultControllerInstantiator());
-		$this->setValidator($validator
-			?? new DefaultControllerValidator());
 	}
 
 	/**
@@ -83,14 +75,6 @@ class Router implements RouterInterface {
 	}
 
 	/**
-	 * @param ControllerValidatorInterface $validator
-	 */
-	public function setValidator(ControllerValidatorInterface $validator):void
-	{
-		$this->validator = $validator;
-	}
-
-	/**
 	 * Sets the not found controller class.
 	 *
 	 * @param string $notFoundControllerClass
@@ -98,7 +82,7 @@ class Router implements RouterInterface {
 	 */
 	public function setNotFoundController(string $notFoundControllerClass):void
 	{
-		if (!$this->validator->validate($notFoundControllerClass)) {
+		if (!is_subclass_of($notFoundControllerClass, ControllerInterface::class)) {
 			throw new NotAControllerException($notFoundControllerClass, $this);
 		}
 		$this->notFoundControllerClass = $notFoundControllerClass;
@@ -117,7 +101,7 @@ class Router implements RouterInterface {
 		if (isset($this->routes[$route])) {
 			throw new DuplicateRouteException($route, $this);
 		}
-		if (!$this->validator->validate($controllerClass)) {
+		if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
 			throw new NotAControllerException($controllerClass, $this);
 		}
 		$this->routes[$route] = $controllerClass;
@@ -168,9 +152,9 @@ class Router implements RouterInterface {
 	{
 		if ($controllerClass = $this->getControllerClass($request)) {
 			try {
-				$controller = $this->instantiator->instanciateController($controllerClass);
-				$controller->injectRequest($request);
-				return $controller->getResponse();
+				return $this->instantiator
+					->instanciate($controllerClass, $request)
+					->getResponse();
 			}
 			catch (\Throwable $exception) {
 				throw new ControllerHandlingException($controllerClass, $this, null, $exception);

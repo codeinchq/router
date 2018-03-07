@@ -22,7 +22,6 @@
 declare(strict_types = 1);
 namespace CodeInc\Router\Interfaces;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
@@ -32,13 +31,6 @@ use Psr\Http\Message\ServerRequestInterface;
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 interface ControllerInterface {
-	/**
-	 * Injects the request object into the controller
-	 *
-	 * @param ServerRequestInterface $request
-	 */
-	public function injectRequest(ServerRequestInterface $request);
-
 	/**
 	 * Processes the page en returns the response.
 	 *

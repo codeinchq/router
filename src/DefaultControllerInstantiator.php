@@ -23,6 +23,7 @@ declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
 use CodeInc\Router\Interfaces\ControllerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
@@ -35,8 +36,8 @@ class DefaultControllerInstantiator implements ControllerInstantiatorInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function instanciateController(string $controllerClass):ControllerInterface
+	public function instanciate(string $controllerClass, ServerRequestInterface $request):ControllerInterface
 	{
-		return new $controllerClass;
+		return new $controllerClass($request);
 	}
 }
