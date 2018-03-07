@@ -58,6 +58,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class MyInstantiator implements ControllerInstantiatorInterface {
     public function instanciate(string $controllerClass, ServerRequestInterface $request):ControllerInterface {
+    	// for instance your could pass Doctrine's EntityManager to your controllers
         return new $controllerClass($request, $this->doctrineEntityManager);        
     }
 }
