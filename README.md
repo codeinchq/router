@@ -46,6 +46,25 @@ $response = $myRouter->handle($request);
 (new ResponseSender())->send($response);
 ```
 
+### Defining your own instanciator
+Sometimes you've extra information you need to pass to the controller in order to instantiate it. To do so you can define your down instantiator class by implementing `ControllerInstantiatorInterface`:
+
+```php
+<?php
+use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
+use CodeInc\Router\Interfaces\ControllerInterface;
+use CodeInc\Router\Router;
+use Psr\Http\Message\ServerRequestInterface;
+
+class MyInstantiator implements ControllerInstantiatorInterface {
+    public function instanciate(string $controllerClass, ServerRequestInterface $request):ControllerInterface {
+        return new $controllerClass($request, $this->doctrineEntityManager);        
+    }
+}
+
+$router = new Router(new MyInstantiator);
+```
+
 ### Using the router with PSR-15 middlewares
 
 A router being a PSR-15 request handler, you can use it with any PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) in order to modify the PSR-7 request or response. 
