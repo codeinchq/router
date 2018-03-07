@@ -1,6 +1,6 @@
 {
   "name": "codeinchq/lib-router",
-  "version": "1.1.7",
+  "version": "1.2.0",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/codeinchq/lib-router",
   "type": "library",
@@ -21,8 +21,7 @@
   "suggest": {
     "codeinchq/lib-psr7responsesender": "Required to send responses",
     "codeinchq/lib-psr15middlewares": "Provides a collection of PSR15 middlewares",
-    "middlewares/psr15-middlewares": "Provides a collection of PSR15 middlewares",
-    "hansott/psr7-cookies": "Allows to add cookies into a PSR7 response"
+    "middlewares/psr15-middlewares": "Provides a collection of PSR15 middlewares"
   },
   "autoload": {
     "psr-4": {"CodeInc\\Router\\": "src/"}

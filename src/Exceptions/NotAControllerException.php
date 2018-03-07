@@ -21,8 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\RouterInterface;
+use CodeInc\Router\Interfaces\ControllerInterface;
+use CodeInc\Router\Interfaces\RouterInterface;
 use Throwable;
 
 

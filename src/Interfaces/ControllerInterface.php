@@ -16,47 +16,33 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     04/03/2018
-// Time:     13:15
+// Time:     09:50
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Interfaces\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\Interfaces;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class RouterException
+ * Interface ControllerInterface
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+interface ControllerInterface {
 	/**
-	 * @var RouterInterface
-	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
+	 * Injects the request object into the controller
 	 *
-	 * @param string $message
-	 * @param RouterInterface $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @param ServerRequestInterface $request
 	 */
-	public function __construct(string $message, RouterInterface $router,
-		?int $code = null, ?Throwable $previous = null)
-	{
-		$this->router = $router;
-		parent::__construct($message, $code ?? 0, $previous);
-	}
+	public function injectRequest(ServerRequestInterface $request);
 
 	/**
-	 * @return RouterInterface
+	 * Processes the page en returns the response.
+	 *
+	 * @return ResponseInterface
 	 */
-	public function getRouter():RouterInterface
-	{
-		return $this->router;
-	}
+	public function getResponse():ResponseInterface;
 }

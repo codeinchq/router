@@ -141,7 +141,6 @@ composer require codeinchq/lib-router
 * [`codeinchq/lib-psr7responsesender`](https://packagist.org/packages/codeinchq/lib-psr7responsesender) recommended to stream the PSR-7 responses to the web browser ;
 * [`codeinchq/lib-psr15middlewares`](https://packagist.org/packages/codeinchq/lib-psr15middlewares) provides a collection PSR-15 middlewares ;
 * [`middlewares/psr15-middlewares`](https://github.com/middlewares/psr15-middlewares) provides an even bigger collection PSR-15 middlewares ;
-* [`hansott/psr7-cookies`](https://packagist.org/packages/hansott/psr7-cookies) recommended to add cookies to the PSR-7. responses.
 
 
 ## License 

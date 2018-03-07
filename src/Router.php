@@ -15,17 +15,21 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     02/03/2018
-// Time:     09:52
+// Date:     05/03/2018
+// Time:     11:53
 // Project:  lib-router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerProcessingException;
+use CodeInc\Router\Exceptions\DuplicateRouteException;
+use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
+use CodeInc\Router\Interfaces\ControllerInterface;
+use CodeInc\Router\Interfaces\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -34,10 +38,124 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Router extends AbstractRouter implements RequestHandlerInterface {
+abstract class Router implements RouterInterface {
+	/**
+	 * @var string[]
+	 */
+	private $routes = [];
+
+	/**
+	 * @var string
+	 */
+	private $notFoundControllerClass;
+
+	/**
+	 * @var ControllerInstantiatorInterface|null
+	 */
+	private $controllerInstantiator;
+
+	/**
+	 * @param ControllerInstantiatorInterface $controllerInstantiator
+	 */
+	public function setControllerInstantiator(ControllerInstantiatorInterface $controllerInstantiator):void
+	{
+		$this->controllerInstantiator = $controllerInstantiator;
+	}
+
+	/**
+	 * @return ControllerInstantiatorInterface|null
+	 */
+	public function getControllerInstantiator():?ControllerInstantiatorInterface
+	{
+		return $this->controllerInstantiator;
+	}
+
+	/**
+	 * Sets the not found controller class.
+	 *
+	 * @param string $notFoundControllerClass
+	 * @throws NotAControllerException
+	 */
+	public function setNotFoundController(string $notFoundControllerClass):void
+	{
+		if (!is_subclass_of($notFoundControllerClass, ControllerInterface::class)) {
+			throw new NotAControllerException($notFoundControllerClass, $this);
+		}
+		$this->notFoundControllerClass = $notFoundControllerClass;
+	}
+
+	/**
+	 * Adds a route to a controller.
+	 *
+	 * @param string $route
+	 * @param string $controllerClass
+	 * @throws DuplicateRouteException
+	 * @throws NotAControllerException
+	 */
+	public function addRoute(string $route, string $controllerClass):void
+	{
+		if (isset($this->routes[$route])) {
+			throw new DuplicateRouteException($route, $this);
+		}
+		if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+			throw new NotAControllerException($controllerClass, $this);
+		}
+		$this->routes[$route] = $controllerClass;
+	}
+
 	/**
 	 * @inheritdoc
-	 * @param string $controllerClass
+	 */
+	public function canHandle(ServerRequestInterface $request):bool
+	{
+		return $this->getControllerClass($request) !== null;
+	}
+
+	/**
+	 * Processes a controller
+	 *
+	 * @param ServerRequestInterface $request
+	 * @return null|string
+	 */
+	protected function getControllerClass(ServerRequestInterface $request):?string
+	{
+		$requestRoute = $request->getUri()->getPath();
+
+		// if there is a direct route matching the request
+		if (isset($this->routes[$requestRoute])) {
+			return $this->routes[$requestRoute];
+		}
+
+		// if there is a pattern route matching the request
+		foreach ($this->routes as $route => $controller) {
+			if (fnmatch($route, $requestRoute)) {
+				return $controller;
+			}
+		}
+
+		// not found controller
+		if ($this->notFoundControllerClass) {
+			return $this->notFoundControllerClass;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function handle(ServerRequestInterface $request):ResponseInterface
+	{
+		if ($controller = $this->getControllerClass($request)) {
+			return $this->processController($controller, $request);
+		}
+		return new NotFoundResponse();
+	}
+
+	/**
+	 * Processes the controller and returns the PSR-7 response.
+	 *
+	 * @param string|ControllerInterface $controllerClass
 	 * @param ServerRequestInterface $request
 	 * @return ResponseInterface
 	 * @throws ControllerProcessingException
@@ -45,9 +163,15 @@ class Router extends AbstractRouter implements RequestHandlerInterface {
 	protected function processController(string $controllerClass, ServerRequestInterface $request):ResponseInterface
 	{
 		try {
-			/** @var ControllerInterface $controller */
-			$controller = new $controllerClass($request);
-			return $controller->process();
+			if ($this->getControllerInstantiator()) {
+				$controller = $this->getControllerInstantiator()->instanciateController($controllerClass);
+			}
+			else {
+				/** @var ControllerInterface $controller */
+				$controller = new $controllerClass;
+			}
+			$controller->injectRequest($request);
+			return $controller->getResponse();
 		}
 		catch (\Throwable $exception) {
 			throw new ControllerProcessingException($controllerClass, $this, null, $exception);
