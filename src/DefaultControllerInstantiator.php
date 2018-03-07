@@ -15,48 +15,28 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/03/2018
-// Time:     13:15
+// Date:     07/03/2018
+// Time:     19:59
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Interfaces\RouterInterface;
-use Throwable;
+namespace CodeInc\Router;
+use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
+use CodeInc\Router\Interfaces\ControllerInterface;
 
 
 /**
- * Class RouterException
+ * Class DefaultControllerInstantiator
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class DefaultControllerInstantiator implements ControllerInstantiatorInterface {
 	/**
-	 * @var RouterInterface
+	 * @inheritdoc
 	 */
-	private $router;
-
-	/**
-	 * RouterException constructor.
-	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $message, ?RouterInterface $router = null,
-		?int $code = null, ?Throwable $previous = null)
+	public function instanciateController(string $controllerClass):ControllerInterface
 	{
-		$this->router = $router;
-		parent::__construct($message, $code ?? 0, $previous);
-	}
-
-	/**
-	 * @return RouterInterface
-	 */
-	public function getRouter():RouterInterface
-	{
-		return $this->router;
+		return new $controllerClass;
 	}
 }

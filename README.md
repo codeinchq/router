@@ -19,7 +19,7 @@ A router is technically a PSR-15 request handler (it implements [`RequestHandler
 use CodeInc\Router\Router;
 use CodeInc\PSR7ResponseSender\ResponseSender; // from the lib-psr7responsesender package
 use GuzzleHttp\Psr7\ServerRequest;
-use CodeInc\Router\ControllerInterface; 
+use CodeInc\Router\Interfaces\ControllerInterface; 
 
 // example controllers
 final class HomeController implements ControllerInterface { 

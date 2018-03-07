@@ -22,11 +22,11 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
-use CodeInc\Router\Exceptions\ControllerProcessingException;
+use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\Router\Interfaces\ControllerCheckerInterface;
 use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
-use CodeInc\Router\Interfaces\ControllerInterface;
 use CodeInc\Router\Interfaces\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -38,7 +38,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class Router implements RouterInterface {
+class Router implements RouterInterface {
 	/**
 	 * @var string[]
 	 */
@@ -50,9 +50,29 @@ abstract class Router implements RouterInterface {
 	private $notFoundControllerClass;
 
 	/**
-	 * @var ControllerInstantiatorInterface|null
+	 * @var ControllerInstantiatorInterface
 	 */
 	private $controllerInstantiator;
+
+	/**
+	 * @var ControllerCheckerInterface
+	 */
+	private $controllerChecker;
+
+	/**
+	 * Router constructor.
+	 *
+	 * @param ControllerInstantiatorInterface|null $controllerInstantiator
+	 * @param ControllerCheckerInterface|null $controllerChecker
+	 */
+	public function __construct(?ControllerInstantiatorInterface $controllerInstantiator = null,
+		?ControllerCheckerInterface $controllerChecker = null)
+	{
+		$this->setControllerInstantiator($controllerInstantiator
+			?? new DefaultControllerInstantiator());
+		$this->setControllerChecker($controllerChecker
+			?? new DefaultControllerChecker());
+	}
 
 	/**
 	 * @param ControllerInstantiatorInterface $controllerInstantiator
@@ -63,11 +83,11 @@ abstract class Router implements RouterInterface {
 	}
 
 	/**
-	 * @return ControllerInstantiatorInterface|null
+	 * @param ControllerCheckerInterface $controllerChecker
 	 */
-	public function getControllerInstantiator():?ControllerInstantiatorInterface
+	public function setControllerChecker(ControllerCheckerInterface $controllerChecker):void
 	{
-		return $this->controllerInstantiator;
+		$this->controllerChecker = $controllerChecker;
 	}
 
 	/**
@@ -78,7 +98,7 @@ abstract class Router implements RouterInterface {
 	 */
 	public function setNotFoundController(string $notFoundControllerClass):void
 	{
-		if (!is_subclass_of($notFoundControllerClass, ControllerInterface::class)) {
+		if (!$this->controllerChecker->isAController($notFoundControllerClass)) {
 			throw new NotAControllerException($notFoundControllerClass, $this);
 		}
 		$this->notFoundControllerClass = $notFoundControllerClass;
@@ -97,7 +117,7 @@ abstract class Router implements RouterInterface {
 		if (isset($this->routes[$route])) {
 			throw new DuplicateRouteException($route, $this);
 		}
-		if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+		if (!$this->controllerChecker->isAController($controllerClass)) {
 			throw new NotAControllerException($controllerClass, $this);
 		}
 		$this->routes[$route] = $controllerClass;
@@ -146,35 +166,16 @@ abstract class Router implements RouterInterface {
 	 */
 	public function handle(ServerRequestInterface $request):ResponseInterface
 	{
-		if ($controller = $this->getControllerClass($request)) {
-			return $this->processController($controller, $request);
+		if ($controllerClass = $this->getControllerClass($request)) {
+			try {
+				$controller = $this->controllerInstantiator->instanciateController($controllerClass);
+				$controller->injectRequest($request);
+				return $controller->getResponse();
+			}
+			catch (\Throwable $exception) {
+				throw new ControllerHandlingException($controllerClass, $this, null, $exception);
+			}
 		}
 		return new NotFoundResponse();
-	}
-
-	/**
-	 * Processes the controller and returns the PSR-7 response.
-	 *
-	 * @param string|ControllerInterface $controllerClass
-	 * @param ServerRequestInterface $request
-	 * @return ResponseInterface
-	 * @throws ControllerProcessingException
-	 */
-	protected function processController(string $controllerClass, ServerRequestInterface $request):ResponseInterface
-	{
-		try {
-			if ($this->getControllerInstantiator()) {
-				$controller = $this->getControllerInstantiator()->instanciateController($controllerClass);
-			}
-			else {
-				/** @var ControllerInterface $controller */
-				$controller = new $controllerClass;
-			}
-			$controller->injectRequest($request);
-			return $controller->getResponse();
-		}
-		catch (\Throwable $exception) {
-			throw new ControllerProcessingException($controllerClass, $this, null, $exception);
-		}
 	}
 }

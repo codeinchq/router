@@ -15,53 +15,26 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     12:10
+// Date:     07/03/2018
+// Time:     19:58
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Interfaces\ControllerInterface;
-use CodeInc\Router\Interfaces\RouterInterface;
-use Throwable;
+namespace CodeInc\Router\Interfaces;
 
 
 /**
- * Class ControllerProcessingException
+ * Interface ControllerCheckerInterface
  *
- * @package CodeInc\Router\Exception
+ * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerProcessingException extends RouterException {
+interface ControllerCheckerInterface {
 	/**
-	 * @var string
-	 */
-	private $controllerClass;
-
-	/**
-	 * ControllerProcessingException constructor.
+	 * Checks if a class is a controller.
 	 *
-	 * @param string|ControllerInterface $controllerClass
-	 * @param RouterInterface $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
+	 * @param string $controllerClass
+	 * @return bool
 	 */
-	public function __construct(string $controllerClass, RouterInterface $router, ?int $code = null,
-		?Throwable $previous = null)
-	{
-		$this->controllerClass = $controllerClass;
-		parent::__construct(
-			sprintf("Error while processing the controller %s",
-				$this->controllerClass),
-			$router, $code, $previous
-		);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getControllerClass():string
-	{
-		return $this->controllerClass;
-	}
+	public function isAController(string $controllerClass):bool;
 }

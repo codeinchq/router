@@ -15,48 +15,53 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/03/2018
-// Time:     13:15
+// Date:     05/03/2018
+// Time:     12:10
 // Project:  lib-router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Interfaces\ControllerInterface;
 use CodeInc\Router\Interfaces\RouterInterface;
 use Throwable;
 
 
 /**
- * Class RouterException
+ * Class ControllerProcessingException
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class ControllerHandlingException extends RouterException {
 	/**
-	 * @var RouterInterface
+	 * @var string
 	 */
-	private $router;
+	private $controllerClass;
 
 	/**
-	 * RouterException constructor.
+	 * ControllerProcessingException constructor.
 	 *
-	 * @param string $message
-	 * @param RouterInterface|null $router
+	 * @param string|ControllerInterface $controllerClass
+	 * @param RouterInterface $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $message, ?RouterInterface $router = null,
-		?int $code = null, ?Throwable $previous = null)
+	public function __construct(string $controllerClass, RouterInterface $router, ?int $code = null,
+		?Throwable $previous = null)
 	{
-		$this->router = $router;
-		parent::__construct($message, $code ?? 0, $previous);
+		$this->controllerClass = $controllerClass;
+		parent::__construct(
+			sprintf("Error while handling the controller %s",
+				$this->controllerClass),
+			$router, $code, $previous
+		);
 	}
 
 	/**
-	 * @return RouterInterface
+	 * @return string
 	 */
-	public function getRouter():RouterInterface
+	public function getControllerClass():string
 	{
-		return $this->router;
+		return $this->controllerClass;
 	}
 }
