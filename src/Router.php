@@ -25,7 +25,7 @@ use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
-use CodeInc\Router\Interfaces\ControllerCheckerInterface;
+use CodeInc\Router\Interfaces\ControllerValidatorInterface;
 use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
 use CodeInc\Router\Interfaces\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -52,42 +52,42 @@ class Router implements RouterInterface {
 	/**
 	 * @var ControllerInstantiatorInterface
 	 */
-	private $controllerInstantiator;
+	private $instantiator;
 
 	/**
-	 * @var ControllerCheckerInterface
+	 * @var ControllerValidatorInterface
 	 */
-	private $controllerChecker;
+	private $validator;
 
 	/**
 	 * Router constructor.
 	 *
-	 * @param ControllerInstantiatorInterface|null $controllerInstantiator
-	 * @param ControllerCheckerInterface|null $controllerChecker
+	 * @param ControllerInstantiatorInterface|null $instantiator
+	 * @param ControllerValidatorInterface|null $validator
 	 */
-	public function __construct(?ControllerInstantiatorInterface $controllerInstantiator = null,
-		?ControllerCheckerInterface $controllerChecker = null)
+	public function __construct(?ControllerInstantiatorInterface $instantiator = null,
+		?ControllerValidatorInterface $validator = null)
 	{
-		$this->setControllerInstantiator($controllerInstantiator
+		$this->setInstantiator($instantiator
 			?? new DefaultControllerInstantiator());
-		$this->setControllerChecker($controllerChecker
-			?? new DefaultControllerChecker());
+		$this->setValidator($validator
+			?? new DefaultControllerValidator());
 	}
 
 	/**
-	 * @param ControllerInstantiatorInterface $controllerInstantiator
+	 * @param ControllerInstantiatorInterface $instantiator
 	 */
-	public function setControllerInstantiator(ControllerInstantiatorInterface $controllerInstantiator):void
+	public function setInstantiator(ControllerInstantiatorInterface $instantiator):void
 	{
-		$this->controllerInstantiator = $controllerInstantiator;
+		$this->instantiator = $instantiator;
 	}
 
 	/**
-	 * @param ControllerCheckerInterface $controllerChecker
+	 * @param ControllerValidatorInterface $validator
 	 */
-	public function setControllerChecker(ControllerCheckerInterface $controllerChecker):void
+	public function setValidator(ControllerValidatorInterface $validator):void
 	{
-		$this->controllerChecker = $controllerChecker;
+		$this->validator = $validator;
 	}
 
 	/**
@@ -98,7 +98,7 @@ class Router implements RouterInterface {
 	 */
 	public function setNotFoundController(string $notFoundControllerClass):void
 	{
-		if (!$this->controllerChecker->isAController($notFoundControllerClass)) {
+		if (!$this->validator->validate($notFoundControllerClass)) {
 			throw new NotAControllerException($notFoundControllerClass, $this);
 		}
 		$this->notFoundControllerClass = $notFoundControllerClass;
@@ -117,7 +117,7 @@ class Router implements RouterInterface {
 		if (isset($this->routes[$route])) {
 			throw new DuplicateRouteException($route, $this);
 		}
-		if (!$this->controllerChecker->isAController($controllerClass)) {
+		if (!$this->validator->validate($controllerClass)) {
 			throw new NotAControllerException($controllerClass, $this);
 		}
 		$this->routes[$route] = $controllerClass;
@@ -168,7 +168,7 @@ class Router implements RouterInterface {
 	{
 		if ($controllerClass = $this->getControllerClass($request)) {
 			try {
-				$controller = $this->controllerInstantiator->instanciateController($controllerClass);
+				$controller = $this->instantiator->instanciateController($controllerClass);
 				$controller->injectRequest($request);
 				return $controller->getResponse();
 			}

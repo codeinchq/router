@@ -24,17 +24,17 @@ namespace CodeInc\Router\Interfaces;
 
 
 /**
- * Interface ControllerCheckerInterface
+ * Interface ControllerValidatorInterface
  *
  * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerCheckerInterface {
+interface ControllerValidatorInterface {
 	/**
-	 * Checks if a class is a controller.
+	 * Checks if a class is a valid controller.
 	 *
 	 * @param string $controllerClass
 	 * @return bool
 	 */
-	public function isAController(string $controllerClass):bool;
+	public function validate(string $controllerClass):bool;
 }

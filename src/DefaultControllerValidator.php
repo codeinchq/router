@@ -21,7 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\Interfaces\ControllerCheckerInterface;
+use CodeInc\Router\Interfaces\ControllerValidatorInterface;
 use CodeInc\Router\Interfaces\ControllerInterface;
 
 
@@ -31,11 +31,11 @@ use CodeInc\Router\Interfaces\ControllerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DefaultControllerChecker implements ControllerCheckerInterface {
+class DefaultControllerValidator implements ControllerValidatorInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function isAController(string $controllerClass):bool
+	public function validate(string $controllerClass):bool
 	{
 		return is_subclass_of($controllerClass, ControllerInterface::class);
 	}
