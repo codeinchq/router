@@ -46,8 +46,8 @@ $response = $myRouter->handle($request);
 (new ResponseSender())->send($response);
 ```
 
-### Defining your own instanciator
-Sometimes you've extra information you need to pass to the controller in order to instantiate it. To do so you can define your down instantiator class by implementing `ControllerInstantiatorInterface`:
+### Defining your own instantiator
+Sometimes you've extra information you need to pass to the controller in order to instantiate it. To do so you can define your own controller instantiator class by implementing `ControllerInstantiatorInterface`:
 
 ```php
 <?php
