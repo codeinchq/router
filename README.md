@@ -151,10 +151,10 @@ $sender->send($response);
 
 ## Installation
 
-This library is available through [Packagist](https://packagist.org/packages/codeinchq/lib-router) and can be installed using [Composer](https://getcomposer.org/): 
+This library is available through [Packagist](https://packagist.org/packages/codeinc/lib-router) and can be installed using [Composer](https://getcomposer.org/): 
 
 ```bash
-composer require codeinchq/lib-router
+composer require codeinc/lib-router
 ```
 
 ## Recommended libraries
@@ -164,6 +164,6 @@ composer require codeinchq/lib-router
 
 
 ## License 
-This library is published under the MIT license (see the [`LICENSE`](https://github.com/codeinchq/lib-gui/blob/master/LICENSE) file).
+This library is published under the MIT license (see the [`LICENSE`](LICENSE) file).
 
 
