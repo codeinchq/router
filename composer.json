@@ -41,9 +41,5 @@
     "preferred-install": {
       "*": "dist"
     }
-  },
-  "repositories": [
-    { "type": "vcs", "url": "https://github.com/CodeIncHQ/lib-psr7responsesender" },
-    { "type": "vcs", "url": "https://github.com/CodeIncHQ/lib-psr7responses" }
-  ]
+  }
 }
