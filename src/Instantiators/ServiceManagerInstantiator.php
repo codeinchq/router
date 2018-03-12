@@ -23,6 +23,7 @@ declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
 use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\ServiceManager\ServiceInterface;
 use CodeInc\ServiceManager\ServiceManager;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -33,7 +34,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ServiceManagerInstantiator implements InstantiatorInterface
+class ServiceManagerInstantiator implements InstantiatorInterface, ServiceInterface
 {
     /**
      * @var ServiceManager
