@@ -57,7 +57,9 @@ class ServiceManagerInstantiator implements InstantiatorInterface, ServiceInterf
     public function instanciate(string $controllerClass,
         ServerRequestInterface $request):ControllerInterface
     {
-        $this->serviceManager->addInstance($request);
+        if (!$this->serviceManager->hasInstance(ServerRequestInterface::class)) {
+            $this->serviceManager->addInstance($request);
+        }
         $controller = $this->serviceManager->getInstance($controllerClass);
         if (!$controller instanceof ControllerInterface) {
             throw new NotAControllerException($controllerClass);
