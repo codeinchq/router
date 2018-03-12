@@ -21,6 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use CodeInc\Instantiator\Instantiator;
 use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
@@ -49,16 +50,16 @@ class Router implements RouterInterface
 	private $notFoundControllerClass;
 
     /**
-     * @var InstantiatorInterface
+     * @var Instantiator
      */
     private $instantiator;
 
     /**
      * Router constructor.
      *
-     * @param InstantiatorInterface $instantiator
+     * @param Instantiator $instantiator
      */
-	public function __construct(InstantiatorInterface $instantiator)
+	public function __construct(Instantiator $instantiator)
 	{
 	    $this->instantiator = $instantiator;
 	}
@@ -134,9 +135,11 @@ class Router implements RouterInterface
 	{
 		if ($controllerClass = $this->getControllerClass($request)) {
 			try {
-			    ;
+			    if (!$this->instantiator->hasInstance(ServerRequestInterface::class)) {
+                    $this->instantiator->addInstance($request);
+                }
 				return $this->instantiator
-                    ->instanciate($controllerClass, $request)
+                    ->getInstance($controllerClass)
                     ->getResponse();
 			}
 			catch (\Throwable $exception) {
