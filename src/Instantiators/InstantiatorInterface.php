@@ -15,26 +15,31 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     04/03/2018
-// Time:     09:50
+// Date:     07/03/2018
+// Time:     19:52
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Interfaces;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router\Instantiators;
+use CodeInc\Router\ControllerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface ControllerInterface
+ * Interface ControllerInstantiatorInterface
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInterface {
+interface InstantiatorInterface
+{
 	/**
-	 * Processes the page en returns the response.
+	 * Instanciates a controller.
 	 *
-	 * @return ResponseInterface
+	 * @param string $controllerClass
+	 * @param ServerRequestInterface $request
+	 * @return ControllerInterface
 	 */
-	public function getResponse():ResponseInterface;
+	public function instanciate(string $controllerClass,
+        ServerRequestInterface $request):ControllerInterface;
 }

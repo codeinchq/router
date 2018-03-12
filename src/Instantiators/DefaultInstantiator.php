@@ -15,36 +15,33 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     11:55
+// Date:     07/03/2018
+// Time:     19:59
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Interfaces;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router\Instantiators;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RouterInterface
+ * Class DefaultControllerInstantiator
  *
- * @package CodeInc\Router\Interfaces
+ * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends RequestHandlerInterface {
-	/**
-	 * Verifies if the router can handle a request.
-	 *
-	 * @param ServerRequestInterface $request
-	 * @return bool
-	 */
-	public function canHandle(ServerRequestInterface $request):bool;
-
+class DefaultInstantiator implements InstantiatorInterface {
 	/**
 	 * @inheritdoc
-	 * @param ServerRequestInterface $request
-	 * @return ResponseInterface
 	 */
-	public function handle(ServerRequestInterface $request):ResponseInterface;
+	public function instanciate(string $controllerClass,
+        ServerRequestInterface $request):ControllerInterface
+	{
+	    if (is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw new NotAControllerException($controllerClass);
+        }
+		return new $controllerClass($request);
+	}
 }

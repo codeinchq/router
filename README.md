@@ -19,7 +19,7 @@ A router is technically a PSR-15 request handler (it implements [`RequestHandler
 use CodeInc\Router\Router;
 use CodeInc\PSR7ResponseSender\ResponseSender; // from the lib-psr7responsesender package
 use GuzzleHttp\Psr7\ServerRequest;
-use CodeInc\Router\Interfaces\ControllerInterface; 
+use CodeInc\Router\ControllerInterface; 
 
 // example controllers
 final class HomeController implements ControllerInterface { 
@@ -51,8 +51,8 @@ Sometimes you've extra information you need to pass to the controller in order t
 
 ```php
 <?php
-use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
-use CodeInc\Router\Interfaces\ControllerInterface;
+use CodeInc\Router\Instantiators\InstantiatorInterface;
+use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Router;
 use Psr\Http\Message\ServerRequestInterface;
 

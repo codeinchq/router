@@ -15,54 +15,52 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     12:05
+// Date:     12/03/2018
+// Time:     18:19
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Instantiators;
 use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\ServiceManager\ServiceManager;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class NotAControllerException
+ * Class ServiceManagerInstantiator
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotAControllerException extends RouterException
+class ServiceManagerInstantiator implements InstantiatorInterface
 {
     /**
-     * @var string
+     * @var ServiceManager
      */
-	private $controllerClass;
+    private $serviceManager;
 
     /**
-     * NotAControllerException constructor.
+     * ServiceManagerInstantiator constructor.
      *
-     * @param string $controllerClass
-     * @param RouterInterface|null $router
-     * @param int|null $code
-     * @param null|Throwable $previous
+     * @param ServiceManager $serviceManager
      */
-	public function __construct(string $controllerClass,
-        ?RouterInterface $router = null, ?int $code = null,
-		?Throwable $previous = null)
-	{
-		$this->controllerClass = $controllerClass;
-		parent::__construct(
-			sprintf("The class %s is not a controller. All controller must implement %s.",
-				$this->controllerClass, ControllerInterface::class),
-			$router, $code, $previous);
-	}
+    public function __construct(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getControllerClass():string
-	{
-		return $this->controllerClass;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function instanciate(string $controllerClass,
+        ServerRequestInterface $request):ControllerInterface
+    {
+        $this->serviceManager->addInstance($request);
+        $controller = $this->serviceManager->getInstance($controllerClass);
+        if (!$controller instanceof ControllerInterface) {
+            throw new NotAControllerException($controllerClass);
+        }
+        return $controller;
+    }
 }

@@ -21,8 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Interfaces\ControllerInterface;
-use CodeInc\Router\Interfaces\RouterInterface;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
@@ -32,7 +32,8 @@ use Throwable;
  * @package CodeInc\Router\Exception
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerHandlingException extends RouterException {
+class ControllerHandlingException extends RouterException
+{
 	/**
 	 * @var string
 	 */
@@ -46,7 +47,8 @@ class ControllerHandlingException extends RouterException {
 	 * @param int|null $code
 	 * @param null|Throwable $previous
 	 */
-	public function __construct(string $controllerClass, RouterInterface $router, ?int $code = null,
+	public function __construct(string $controllerClass,
+        RouterInterface $router, ?int $code = null,
 		?Throwable $previous = null)
 	{
 		$this->controllerClass = $controllerClass;

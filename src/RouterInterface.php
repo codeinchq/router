@@ -15,28 +15,38 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     07/03/2018
-// Time:     19:52
+// Date:     05/03/2018
+// Time:     11:55
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Interfaces;
+namespace CodeInc\Router;
+use CodeInc\ServiceManager\ServiceInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface ControllerInstantiatorInterface
+ * Interface RouterInterface
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInstantiatorInterface {
+interface RouterInterface extends RequestHandlerInterface, ServiceInterface
+{
 	/**
-	 * Instanciates a controller.
+	 * Verifies if the router can handle a request.
 	 *
-	 * @param string $controllerClass
 	 * @param ServerRequestInterface $request
-	 * @return ControllerInterface
+	 * @return bool
 	 */
-	public function instanciate(string $controllerClass, ServerRequestInterface $request):ControllerInterface;
+	public function canHandle(ServerRequestInterface $request):bool;
+
+	/**
+	 * @inheritdoc
+	 * @param ServerRequestInterface $request
+	 * @return ResponseInterface
+	 */
+	public function handle(ServerRequestInterface $request):ResponseInterface;
 }

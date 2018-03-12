@@ -21,7 +21,6 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\Interfaces\RouterInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,7 +32,8 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterAggregator implements RouterInterface {
+class RouterAggregator implements RouterInterface
+{
 	/**
 	 * @var RouterInterface[]
 	 */

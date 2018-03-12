@@ -21,7 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Interfaces\RouterInterface;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
@@ -31,7 +31,8 @@ use Throwable;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterException extends \Exception {
+class RouterException extends \Exception
+{
 	/**
 	 * @var RouterInterface
 	 */

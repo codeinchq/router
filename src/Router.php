@@ -25,10 +25,7 @@ use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
-use CodeInc\Router\Interfaces\ControllerInterface;
-use CodeInc\Router\Interfaces\ControllerValidatorInterface;
-use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
-use CodeInc\Router\Interfaces\RouterInterface;
+use CodeInc\Router\Instantiators\InstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -39,7 +36,8 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Router implements RouterInterface {
+class Router implements RouterInterface
+{
 	/**
 	 * @var string[]
 	 */
@@ -50,41 +48,28 @@ class Router implements RouterInterface {
 	 */
 	private $notFoundControllerClass;
 
-	/**
-	 * @var ControllerInstantiatorInterface
-	 */
-	private $instantiator;
+    /**
+     * @var InstantiatorInterface
+     */
+    private $instantiator;
 
-	/**
-	 * Router constructor.
-	 *
-	 * @param ControllerInstantiatorInterface|null $instantiator
-	 */
-	public function __construct(?ControllerInstantiatorInterface $instantiator = null)
+    /**
+     * Router constructor.
+     *
+     * @param InstantiatorInterface $instantiator
+     */
+	public function __construct(InstantiatorInterface $instantiator)
 	{
-		$this->setInstantiator($instantiator
-			?? new DefaultControllerInstantiator());
-	}
-
-	/**
-	 * @param ControllerInstantiatorInterface $instantiator
-	 */
-	public function setInstantiator(ControllerInstantiatorInterface $instantiator):void
-	{
-		$this->instantiator = $instantiator;
+	    $this->instantiator = $instantiator;
 	}
 
 	/**
 	 * Sets the not found controller class.
 	 *
 	 * @param string $notFoundControllerClass
-	 * @throws NotAControllerException
 	 */
 	public function setNotFoundController(string $notFoundControllerClass):void
 	{
-		if (!is_subclass_of($notFoundControllerClass, ControllerInterface::class)) {
-			throw new NotAControllerException($notFoundControllerClass, $this);
-		}
 		$this->notFoundControllerClass = $notFoundControllerClass;
 	}
 
@@ -94,15 +79,11 @@ class Router implements RouterInterface {
 	 * @param string $route
 	 * @param string $controllerClass
 	 * @throws DuplicateRouteException
-	 * @throws NotAControllerException
 	 */
 	public function addRoute(string $route, string $controllerClass):void
 	{
 		if (isset($this->routes[$route])) {
 			throw new DuplicateRouteException($route, $this);
-		}
-		if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-			throw new NotAControllerException($controllerClass, $this);
 		}
 		$this->routes[$route] = $controllerClass;
 	}
@@ -147,17 +128,24 @@ class Router implements RouterInterface {
 
 	/**
 	 * @inheritdoc
+     * @throws NotAControllerException
 	 */
 	public function handle(ServerRequestInterface $request):ResponseInterface
 	{
 		if ($controllerClass = $this->getControllerClass($request)) {
 			try {
+			    ;
 				return $this->instantiator
-					->instanciate($controllerClass, $request)
-					->getResponse();
+                    ->instanciate($controllerClass, $request)
+                    ->getResponse();
 			}
 			catch (\Throwable $exception) {
-				throw new ControllerHandlingException($controllerClass, $this, null, $exception);
+				throw new ControllerHandlingException(
+				    $controllerClass,
+                    $this,
+                    null,
+                    $exception
+                );
 			}
 		}
 		return new NotFoundResponse();
