@@ -21,6 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use CodeInc\ServiceManager\ServiceInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -32,7 +33,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends RequestHandlerInterface
+interface RouterInterface extends RequestHandlerInterface, ServiceInterface
 {
 	/**
 	 * Verifies if the router can handle a request.

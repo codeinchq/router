@@ -21,12 +21,11 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Instantiator\Instantiator;
 use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
-use CodeInc\Router\Instantiators\InstantiatorInterface;
+use CodeInc\ServiceManager\ServiceManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -50,18 +49,23 @@ class Router implements RouterInterface
 	private $notFoundControllerClass;
 
     /**
-     * @var Instantiator
+     * @var ServiceManager
      */
-    private $instantiator;
+    private $serviceManager;
 
     /**
      * Router constructor.
      *
-     * @param Instantiator $instantiator
+     * @param ServiceManager $serviceManager
+     * @throws \CodeInc\ServiceManager\Exceptions\NotAnObjectException
+     * @throws \ReflectionException
      */
-	public function __construct(Instantiator $instantiator)
+	public function __construct(ServiceManager $serviceManager)
 	{
-	    $this->instantiator = $instantiator;
+	    $this->serviceManager = $serviceManager;
+	    if (!$this->serviceManager->hasServiceInstance($this)) {
+            $this->serviceManager->addService($this);
+        }
 	}
 
 	/**
@@ -135,12 +139,14 @@ class Router implements RouterInterface
 	{
 		if ($controllerClass = $this->getControllerClass($request)) {
 			try {
-			    if (!$this->instantiator->hasInstance(ServerRequestInterface::class)) {
-                    $this->instantiator->addInstance($request);
-                }
-				return $this->instantiator
-                    ->getInstance($controllerClass)
-                    ->getResponse();
+			    // instantiating the controller
+			    $instantiator = $this->serviceManager->getInstantiator();
+			    $instantiator->addDependency($request);
+			    /** @var ControllerInterface $controller */
+			    $controller = $instantiator->instantiate($controllerClass);
+
+			    // processing
+                return $controller->getResponse();
 			}
 			catch (\Throwable $exception) {
 				throw new ControllerHandlingException(
