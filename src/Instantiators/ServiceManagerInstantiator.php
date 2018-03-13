@@ -15,55 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     12:10
+// Date:     13/03/2018
+// Time:     14:43
 // Project:  lib-router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Instantiators;
 use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\RouterInterface;
-use Throwable;
+use CodeInc\ServiceManager\ServiceManager;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class ControllerProcessingException
+ * Class ServiceManagerInstantiator
  *
- * @package CodeInc\Router\Exception
+ * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerHandlingException extends RouterException
+class ServiceManagerInstantiator implements InstantiatorInterface
 {
-	/**
-	 * @var string
-	 */
-	private $controllerClass;
+    /**
+     * @var
+     */
+    private $serviceManager;
 
-	/**
-	 * ControllerProcessingException constructor.
-	 *
-	 * @param string|ControllerInterface $controllerClass
-	 * @param RouterInterface $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(?string $controllerClass,
-        RouterInterface $router, ?int $code = null,
-		?Throwable $previous = null)
-	{
-		$this->controllerClass = $controllerClass;
-		parent::__construct(
-			sprintf("Error while handling the controller %s",
-				$this->controllerClass),
-			$router, $code, $previous
-		);
-	}
+    /**
+     * ServiceManagerInstantiator constructor.
+     *
+     * @param ServiceManager $serviceManager
+     */
+    public function __construct(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getControllerClass():string
-	{
-		return $this->controllerClass;
-	}
+    /**
+     * @inheritdoc
+     * @throws \CodeInc\ServiceManager\Exceptions\ClassNotFoundException
+     * @throws \CodeInc\ServiceManager\Exceptions\NewInstanceException
+     * @throws \CodeInc\ServiceManager\Exceptions\NotAnObjectException
+     */
+    public function instantiate(string $controllerClass,
+        ServerRequestInterface $request):ControllerInterface
+    {
+        $instantiator = $this->serviceManager->getInstantiator();
+        $instantiator->addDependency($request);
+        return $instantiator->instantiate($controllerClass);
+    }
 }

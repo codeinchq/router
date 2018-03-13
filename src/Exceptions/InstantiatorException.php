@@ -15,55 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     12:10
+// Date:     13/03/2018
+// Time:     14:44
 // Project:  lib-router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Instantiators\InstantiatorInterface;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class ControllerProcessingException
+ * Class InstantiatorException
  *
- * @package CodeInc\Router\Exception
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerHandlingException extends RouterException
+class InstantiatorException extends RouterException
 {
-	/**
-	 * @var string
-	 */
-	private $controllerClass;
+    /**
+     * @var InstantiatorInterface|null
+     */
+    private $instantiator;
 
-	/**
-	 * ControllerProcessingException constructor.
-	 *
-	 * @param string|ControllerInterface $controllerClass
-	 * @param RouterInterface $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(?string $controllerClass,
-        RouterInterface $router, ?int $code = null,
-		?Throwable $previous = null)
-	{
-		$this->controllerClass = $controllerClass;
-		parent::__construct(
-			sprintf("Error while handling the controller %s",
-				$this->controllerClass),
-			$router, $code, $previous
-		);
-	}
+    /**
+     * InstantiatorException constructor.
+     *
+     * @param string $message
+     * @param InstantiatorInterface|null $instantiator
+     * @param int|null $code
+     * @param null|Throwable $previous
+     */
+    public function __construct(string $message,
+        ?InstantiatorInterface $instantiator = null,
+        ?int $code = null, ?Throwable $previous = null)
+    {
+        $this->instantiator = $instantiator;
+        parent::__construct($message, null, $code, $previous);
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getControllerClass():string
-	{
-		return $this->controllerClass;
-	}
+    /**
+     * @return InstantiatorInterface|null
+     */
+    public function getInstantiator():?InstantiatorInterface
+    {
+        return $this->instantiator;
+    }
 }
