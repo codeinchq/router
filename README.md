@@ -156,10 +156,10 @@ $sender->send($response);
 
 ## Installation
 
-This library is available through [Packagist](https://packagist.org/packages/codeinc/lib-router) and can be installed using [Composer](https://getcomposer.org/): 
+This library is available through [Packagist](https://packagist.org/packages/codeinc/router) and can be installed using [Composer](https://getcomposer.org/): 
 
 ```bash
-composer require codeinc/lib-router
+composer require codeinc/router
 ```
 
 ## Recommended libraries
