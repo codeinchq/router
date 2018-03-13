@@ -143,51 +143,42 @@ class Router implements RouterInterface
 		return null;
 	}
 
-    /**
-     * Returns the response for a given request.
-     *
-     * @param ServerRequestInterface $request
-     * @return NotFoundResponse|ResponseInterface
-     * @throws ControllerHandlingException
-     */
-    private function getResponse(ServerRequestInterface $request)
-    {
-        try {
-            if ($controllerClass = $this->getControllerClass($request)) {
-                return $this->instantiator
-                    ->instantiate($controllerClass, $request)
-                    ->getResponse();
-            }
-            return new NotFoundResponse();
-        }
-        catch (\Throwable $exception) {
-            throw new ControllerHandlingException(
-                $controllerClass ?? null,
-                $this,
-                null,
-                $exception
-            );
-        }
-	}
-
 	/**
 	 * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @param bool $bypassMiddlewares
      * @throws NotAControllerException
 	 */
-	public function handle(ServerRequestInterface $request):ResponseInterface
+	public function handle(ServerRequestInterface $request,
+        bool $bypassMiddlewares = false):ResponseInterface
 	{
         // if some middlewares are set
-        if ($this->middlewares) {
+        if (!$bypassMiddlewares && $this->middlewares) {
             $middlewares = $this->middlewares;
             $middlewares[] = function(ServerRequestInterface $request):ResponseInterface {
-                return $this->getResponse($request);
+                return $this->handle($request, true);
             };
             return (new Relay($middlewares))->handle($request);
         }
 
         // else returne the controller's response
         else {
-            return $this->getResponse($request);
+            try {
+                if ($controllerClass = $this->getControllerClass($request)) {
+                    return $this->instantiator
+                        ->instantiate($controllerClass, $request)
+                        ->getResponse();
+                }
+                return new NotFoundResponse();
+            }
+            catch (\Throwable $exception) {
+                throw new ControllerHandlingException(
+                    $controllerClass ?? null,
+                    $this,
+                    null,
+                    $exception
+                );
+            }
         }
 	}
 }

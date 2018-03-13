@@ -56,7 +56,7 @@ use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Router;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MyInstantiator implements ControllerInstantiatorInterface {
+class MyInstantiator implements InstantiatorInterface {
     public function instanciate(string $controllerClass, ServerRequestInterface $request):ControllerInterface {
     	// for instance your could pass Doctrine's EntityManager to your controllers
         return new $controllerClass($request, $this->doctrineEntityManager);        
@@ -68,7 +68,7 @@ $router = new Router(new MyInstantiator);
 
 ### Using the router with PSR-15 middlewares
 
-A router being a PSR-15 request handler, you can use it with any PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) in order to modify the PSR-7 request or response. 
+You can add PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) to the router in order to modify the PSR-7 request or response. 
 
 ```php
 <?php 
@@ -80,19 +80,20 @@ use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\ServerRequest;
 use CodeInc\Psr7ResponseSender\ResponseSender; 
 
-class MyMiddleware implements MiddlewareInterface {
+class MyFirstMiddleware implements MiddlewareInterface {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface 
 	{
 		$response = $handler->handle($request);
 		return $response->withHeader("X-Powered-By", "This example");
     }
 }
+class MySecondMiddleware implements MiddlewareInterface {}
 
 $myRouter = new Router();
-$myMiddleware = new MyMiddleware();
+$myRouter->addMiddleware(new MyFirstMiddleware());
+$myRouter->addMiddleware(new MySecondMiddleware());
 
 $request = ServerRequest::fromGlobals();
-$response = $myMiddleware->process($request, $myRouter);
 (new ResponseSender())->send($response);
 ```
 
@@ -123,7 +124,11 @@ $aggregator1->addRouter($router2);
 // creating a second aggregate
 $aggregator2 = new RouterAggregator();
 $aggregator2->addRouter($router3);
-$aggregator2->addRouter($aggregator1);
+$aggregator2->addRouter($aggregator1); // you can aggregate an aggregator 
+
+// you also can add middlewares to RouterAggregator
+$aggregator2->addMiddleware(new MyFirstMiddleware());
+$aggregator2->addMiddleware(new MySecondMiddleware());
 
 // handling a request 
 $request = ServerRequest::fromGlobals();
