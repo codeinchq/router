@@ -40,15 +40,15 @@ use Relay\Relay;
  */
 class Router implements RouterInterface
 {
-	/**
-	 * @var string[]
-	 */
-	private $routes = [];
+    /**
+     * @var string[]
+     */
+    private $routes = [];
 
-	/**
-	 * @var string
-	 */
-	private $notFoundControllerClass;
+    /**
+     * @var string
+     */
+    private $notFoundControllerClass;
 
     /**
      * @var InstantiatorInterface
@@ -65,93 +65,93 @@ class Router implements RouterInterface
      *
      * @param InstantiatorInterface $instantiator
      */
-	public function __construct(InstantiatorInterface $instantiator)
-	{
-	    $this->instantiator = $instantiator;
-	}
+    public function __construct(InstantiatorInterface $instantiator)
+    {
+        $this->instantiator = $instantiator;
+    }
 
     /**
      * Add a middleware
      *
      * @param MiddlewareInterface $middleware
      */
-	public function addMiddleware(MiddlewareInterface $middleware):void
+    public function addMiddleware(MiddlewareInterface $middleware):void
     {
         $this->middlewares[] = $middleware;
     }
 
-	/**
-	 * Sets the not found controller class.
-	 *
-	 * @param string $notFoundControllerClass
-	 */
-	public function setNotFoundController(string $notFoundControllerClass):void
-	{
-		$this->notFoundControllerClass = $notFoundControllerClass;
-	}
+    /**
+     * Sets the not found controller class.
+     *
+     * @param string $notFoundControllerClass
+     */
+    public function setNotFoundController(string $notFoundControllerClass):void
+    {
+        $this->notFoundControllerClass = $notFoundControllerClass;
+    }
 
-	/**
-	 * Adds a route to a controller.
-	 *
-	 * @param string $route
-	 * @param string $controllerClass
-	 * @throws DuplicateRouteException
-	 */
-	public function addRoute(string $route, string $controllerClass):void
-	{
-		if (isset($this->routes[$route])) {
-			throw new DuplicateRouteException($route, $this);
-		}
-		$this->routes[$route] = $controllerClass;
-	}
+    /**
+     * Adds a route to a controller.
+     *
+     * @param string $route
+     * @param string $controllerClass
+     * @throws DuplicateRouteException
+     */
+    public function addRoute(string $route, string $controllerClass):void
+    {
+        if (isset($this->routes[$route])) {
+            throw new DuplicateRouteException($route, $this);
+        }
+        $this->routes[strtolower($route)] = $controllerClass;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function canHandle(ServerRequestInterface $request):bool
-	{
-		return $this->getControllerClass($request) !== null;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function canHandle(ServerRequestInterface $request):bool
+    {
+        return $this->getControllerClass($request) !== null;
+    }
 
-	/**
-	 * Processes a controller
-	 *
-	 * @param ServerRequestInterface $request
-	 * @return null|string
-	 */
+    /**
+     * Processes a controller
+     *
+     * @param ServerRequestInterface $request
+     * @return null|string
+     */
     private function getControllerClass(ServerRequestInterface $request):?string
-	{
-		$requestRoute = $request->getUri()->getPath();
+    {
+        $requestRoute = strtolower($request->getUri()->getPath());
 
-		// if there is a direct route matching the request
-		if (isset($this->routes[$requestRoute])) {
-			return $this->routes[$requestRoute];
-		}
+        // if there is a direct route matching the request
+        if (isset($this->routes[$requestRoute])) {
+            return $this->routes[$requestRoute];
+        }
 
-		// if there is a pattern route matching the request
-		foreach ($this->routes as $route => $controller) {
-			if (fnmatch($route, $requestRoute)) {
-				return $controller;
-			}
-		}
+        // if there is a pattern route matching the request
+        foreach ($this->routes as $route => $controller) {
+            if (fnmatch($route, $requestRoute)) {
+                return $controller;
+            }
+        }
 
-		// not found controller
-		if ($this->notFoundControllerClass) {
-			return $this->notFoundControllerClass;
-		}
+        // not found controller
+        if ($this->notFoundControllerClass) {
+            return $this->notFoundControllerClass;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @inheritdoc
+    /**
+     * @inheritdoc
      * @param ServerRequestInterface $request
      * @param bool $bypassMiddlewares
      * @throws NotAControllerException
-	 */
-	public function handle(ServerRequestInterface $request,
+     */
+    public function handle(ServerRequestInterface $request,
         bool $bypassMiddlewares = false):ResponseInterface
-	{
+    {
         // if some middlewares are set
         if (!$bypassMiddlewares && $this->middlewares) {
             $middlewares = $this->middlewares;
@@ -180,5 +180,5 @@ class Router implements RouterInterface
                 );
             }
         }
-	}
+    }
 }
