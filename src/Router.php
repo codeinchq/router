@@ -25,9 +25,11 @@ use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
-use CodeInc\ServiceManager\ServiceManager;
+use CodeInc\Router\Instantiators\InstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Relay\Relay;
 
 
 /**
@@ -49,24 +51,34 @@ class Router implements RouterInterface
 	private $notFoundControllerClass;
 
     /**
-     * @var ServiceManager
+     * @var InstantiatorInterface
      */
-    private $serviceManager;
+    private $instantiator;
+
+    /**
+     * @var MiddlewareInterface[]
+     */
+    private $middlewares = [];
 
     /**
      * Router constructor.
      *
-     * @param ServiceManager $serviceManager
-     * @throws \CodeInc\ServiceManager\Exceptions\NotAnObjectException
-     * @throws \ReflectionException
+     * @param InstantiatorInterface $instantiator
      */
-	public function __construct(ServiceManager $serviceManager)
+	public function __construct(InstantiatorInterface $instantiator)
 	{
-	    $this->serviceManager = $serviceManager;
-	    if (!$this->serviceManager->hasServiceInstance($this)) {
-            $this->serviceManager->addService($this);
-        }
+	    $this->instantiator = $instantiator;
 	}
+
+    /**
+     * Add a middleware
+     *
+     * @param MiddlewareInterface $middleware
+     */
+	public function addMiddleware(MiddlewareInterface $middleware):void
+    {
+        $this->middlewares[] = $middleware;
+    }
 
 	/**
 	 * Sets the not found controller class.
@@ -107,7 +119,7 @@ class Router implements RouterInterface
 	 * @param ServerRequestInterface $request
 	 * @return null|string
 	 */
-	protected function getControllerClass(ServerRequestInterface $request):?string
+    private function getControllerClass(ServerRequestInterface $request):?string
 	{
 		$requestRoute = $request->getUri()->getPath();
 
@@ -131,32 +143,51 @@ class Router implements RouterInterface
 		return null;
 	}
 
+    /**
+     * Returns the response for a given request.
+     *
+     * @param ServerRequestInterface $request
+     * @return NotFoundResponse|ResponseInterface
+     * @throws ControllerHandlingException
+     */
+    private function getResponse(ServerRequestInterface $request)
+    {
+        try {
+            if ($controllerClass = $this->getControllerClass($request)) {
+                return $this->instantiator
+                    ->instantiate($controllerClass, $request)
+                    ->getResponse();
+            }
+            return new NotFoundResponse();
+        }
+        catch (\Throwable $exception) {
+            throw new ControllerHandlingException(
+                $controllerClass ?? null,
+                $this,
+                null,
+                $exception
+            );
+        }
+	}
+
 	/**
 	 * @inheritdoc
      * @throws NotAControllerException
 	 */
 	public function handle(ServerRequestInterface $request):ResponseInterface
 	{
-		if ($controllerClass = $this->getControllerClass($request)) {
-			try {
-			    // instantiating the controller
-			    $instantiator = $this->serviceManager->getInstantiator();
-			    $instantiator->addDependency($request);
-			    /** @var ControllerInterface $controller */
-			    $controller = $instantiator->instantiate($controllerClass);
+        // if some middlewares are set
+        if ($this->middlewares) {
+            $middlewares = $this->middlewares;
+            $middlewares[] = function(ServerRequestInterface $request):ResponseInterface {
+                return $this->getResponse($request);
+            };
+            return (new Relay($middlewares))->handle($request);
+        }
 
-			    // processing
-                return $controller->getResponse();
-			}
-			catch (\Throwable $exception) {
-				throw new ControllerHandlingException(
-				    $controllerClass,
-                    $this,
-                    null,
-                    $exception
-                );
-			}
-		}
-		return new NotFoundResponse();
+        // else returne the controller's response
+        else {
+            return $this->getResponse($request);
+        }
 	}
 }

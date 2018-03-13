@@ -1,6 +1,6 @@
 {
   "name": "codeinc/lib-router",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/CodeIncHQ/lib-router",
   "type": "library",
@@ -12,15 +12,17 @@
     "psr/http-server-handler": "^1.0",
     "psr/http-server-middleware": "^1.0",
     "codeinc/lib-psr7responses": "^1.0",
-    "codeinc/lib-servicemanager": "dev-master"
+    "relay/relay": "2.x@dev"
   },
   "require-dev": {
     "phpunit/phpunit": "^7",
     "hansott/psr7-cookies": "^1.0",
-    "codeinc/lib-psr7responsesender": "^1.0"
+    "codeinc/lib-psr7responsesender": "^1.0",
+    "codeinc/lib-servicemanager": "dev-master"
   },
   "suggest": {
-    "codeinc/lib-psr7responsesender": "Required to send responses",
+    "codeinc/lib-servicemanager": "Required to use ServiceManagerInstantiator",
+    "codeinc/lib-psr7responsesender": "A PSR-7 response sender",
     "codeinc/lib-psr15middlewares": "Provides a collection of PSR15 middlewares",
     "middlewares/psr15-middlewares": "Provides another collection of PSR15 middlewares"
   },
