@@ -58,8 +58,6 @@ class ServiceManagerInstantiator implements InstantiatorInterface
     public function instantiate(string $controllerClass,
         ServerRequestInterface $request):ControllerInterface
     {
-        $instantiator = $this->serviceManager->getInstantiator();
-        $instantiator->addDependency($request);
-        return $instantiator->instantiate($controllerClass);
+        return $this->serviceManager->instantiate($controllerClass, [$request]);
     }
 }
