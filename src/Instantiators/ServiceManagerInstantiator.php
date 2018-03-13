@@ -22,7 +22,6 @@
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
 use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\Exceptions\InstantiatorException;
 use CodeInc\ServicesManager\ServicesManager;
 use Psr\Http\Message\ServerRequestInterface;
 
