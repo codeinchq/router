@@ -24,6 +24,8 @@ namespace CodeInc\Router;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Relay\Relay;
 
 
 /**
@@ -39,7 +41,12 @@ class RouterAggregator implements RouterInterface
 	 */
 	private $routers = [];
 
-	/**
+    /**
+     * @var MiddlewareInterface[]
+     */
+    private $middlewares = [];
+
+    /**
 	 * Adds a router
 	 *
 	 * @param RouterInterface $router
@@ -48,6 +55,16 @@ class RouterAggregator implements RouterInterface
 	{
 		$this->routers[] = $router;
 	}
+
+    /**
+     * Add a middleware
+     *
+     * @param MiddlewareInterface $middleware
+     */
+    public function addMiddleware(MiddlewareInterface $middleware):void
+    {
+        $this->middlewares[] = $middleware;
+    }
 
 	/**
 	 * @inheritdoc
@@ -73,15 +90,31 @@ class RouterAggregator implements RouterInterface
 		return null;
 	}
 
-	/**
-	 * @param ServerRequestInterface $request
-	 * @return ResponseInterface
-	 */
-	public function handle(ServerRequestInterface $request):ResponseInterface
+    /**
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @param bool $bypassMiddlewares
+     * @return ResponseInterface
+     * @throws \TypeError
+     */
+	public function handle(ServerRequestInterface $request,
+        bool $bypassMiddlewares = false):ResponseInterface
 	{
-		if ($router = $this->getRouter($request)) {
-			return $router->handle($request);
-		}
-		return new Response(404);
+        // if some middlewares are set
+        if (!$bypassMiddlewares && $this->middlewares) {
+            $middlewares = $this->middlewares;
+            $middlewares[] = function(ServerRequestInterface $request):ResponseInterface {
+                return $this->handle($request, true);
+            };
+            return (new Relay($middlewares))->handle($request);
+        }
+
+        // else returne the controller's response
+        else {
+            if ($router = $this->getRouter($request)) {
+                return $router->handle($request);
+            }
+            return new Response(404);
+        }
 	}
 }
