@@ -1,6 +1,6 @@
 {
   "name": "codeinc/router",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/CodeIncHQ/Router",
   "type": "library",
@@ -11,19 +11,20 @@
     "guzzlehttp/psr7": "^1.4",
     "psr/http-server-handler": "^1.0",
     "psr/http-server-middleware": "^1.0",
-    "codeinc/psr7-responses": "^1.0",
-    "relay/relay": "2.x@dev"
+    "codeinc/psr7-responses": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^7",
     "hansott/psr7-cookies": "^1.0",
     "codeinc/psr7-response-sender": "dev-master",
-    "codeinc/services-manager": "dev-master"
+    "codeinc/services-manager": "dev-master",
+    "codeinc/psr15-middlewares": "dev-master",
+    "codeinc/error-renderer": "1.2.1"
   },
   "suggest": {
-    "codeinc/lib-servicemanager": "Required to use ServiceManagerInstantiator",
-    "codeinc/lib-psr7responsesender": "A PSR-7 response sender",
-    "codeinc/lib-psr15middlewares": "Provides a collection of PSR15 middlewares",
+    "codeinc/service-manager": "Required to use ServiceManagerInstantiator",
+    "codeinc/psr7-response-sender": "A PSR-7 response sender",
+    "codeinc/psr15-middlewares": "Provides a collection of PSR15 middlewares",
     "middlewares/psr15-middlewares": "Provides another collection of PSR15 middlewares"
   },
   "autoload": {

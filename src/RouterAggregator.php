@@ -21,11 +21,10 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use GuzzleHttp\Psr7\Response;
+use CodeInc\Psr7Responses\NotFoundResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Relay\Relay;
 
 
 /**
@@ -36,6 +35,8 @@ use Relay\Relay;
  */
 class RouterAggregator implements RouterInterface
 {
+    use MiddlewaresTrait;
+
 	/**
 	 * @var RouterInterface[]
 	 */
@@ -101,20 +102,19 @@ class RouterAggregator implements RouterInterface
         bool $bypassMiddlewares = false):ResponseInterface
 	{
         // if some middlewares are set
-        if (!$bypassMiddlewares && $this->middlewares) {
-            $middlewares = $this->middlewares;
-            $middlewares[] = function(ServerRequestInterface $request):ResponseInterface {
-                return $this->handle($request, true);
-            };
-            return (new Relay($middlewares))->handle($request);
+        if (!$bypassMiddlewares && isset($this->middlewares[$this->middlewaresIndex])) {
+            return $this->middlewares[$this->middlewaresIndex++]->process($request, $this);
         }
 
         // else returne the controller's response
         else {
+            if ($this->middlewaresIndex) {
+                $this->middlewaresIndex = 0;
+            }
             if ($router = $this->getRouter($request)) {
                 return $router->handle($request);
             }
-            return new Response(404);
+            return new NotFoundResponse();
         }
 	}
 }
