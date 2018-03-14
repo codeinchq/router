@@ -24,7 +24,6 @@ namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
@@ -43,11 +42,6 @@ class RouterAggregator implements RouterInterface
 	private $routers = [];
 
     /**
-     * @var MiddlewareInterface[]
-     */
-    private $middlewares = [];
-
-    /**
 	 * Adds a router
 	 *
 	 * @param RouterInterface $router
@@ -56,16 +50,6 @@ class RouterAggregator implements RouterInterface
 	{
 		$this->routers[] = $router;
 	}
-
-    /**
-     * Add a middleware
-     *
-     * @param MiddlewareInterface $middleware
-     */
-    public function addMiddleware(MiddlewareInterface $middleware):void
-    {
-        $this->middlewares[] = $middleware;
-    }
 
 	/**
 	 * @inheritdoc

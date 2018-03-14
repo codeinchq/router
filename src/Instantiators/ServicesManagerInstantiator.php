@@ -27,12 +27,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class ServiceManagerInstantiator
+ * Class ServicesManagerInstantiator
  *
  * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ServiceManagerInstantiator implements InstantiatorInterface
+class ServicesManagerInstantiator implements InstantiatorInterface
 {
     /**
      * @var
