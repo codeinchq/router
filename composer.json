@@ -22,7 +22,7 @@
     "codeinc/error-renderer": "1.2.1"
   },
   "suggest": {
-    "codeinc/service-manager": "Required to use ServiceManagerInstantiator",
+    "codeinc/services-manager": "Required to use ServiceManagerInstantiator",
     "codeinc/psr7-response-sender": "A PSR-7 response sender",
     "codeinc/psr15-middlewares": "Provides a collection of PSR15 middlewares",
     "middlewares/psr15-middlewares": "Provides another collection of PSR15 middlewares"
