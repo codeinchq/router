@@ -1,6 +1,6 @@
 # PSR-7 & PSR-15 router library
 
-`lib-PSR-15router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which controller to call to answer a request, to call the selected controller and then to returns the PSR-7 response. It knowns a list of routes and their matching controllers. A controller is defined by the `ControllerInterface` interface. 
+`codeinc/router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a component in charge of determining which controller to call to answer a request, to call the selected controller and then to returns the PSR-7 response. It knowns a list of routes and their matching controllers. A controller is defined by the `ControllerInterface` interface. 
 
 A router is technically a PSR-15 request handler (it implements [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface)) and can be used with any [PSR-15 middlewares](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface). 
 
@@ -17,7 +17,7 @@ A router is technically a PSR-15 request handler (it implements [`RequestHandler
 ```php
 <?php
 use CodeInc\Router\Router;
-use CodeInc\PSR7ResponseSender\ResponseSender; // from the lib-psr7responsesender package
+use CodeInc\PSR7ResponseSender\ResponseSender; // from the codeinc/psr7-response-sender package
 use GuzzleHttp\Psr7\ServerRequest;
 use CodeInc\Router\ControllerInterface; 
 
@@ -42,7 +42,7 @@ $myRouter->setNotFoundController("/error404.html");
 $request = ServerRequest::fromGlobals();
 $response = $myRouter->handle($request);
 
-// sending the response to the web browser using codeinchq/lib-psr7responsesender
+// sending the response to the web browser using codeinc/psr7-response-sender
 (new ResponseSender())->send($response);
 ```
 
@@ -137,7 +137,7 @@ $response = $aggregator2->handle($request);
 
 ### Streaming responses
 
-A companion library [`lib-psr7responsesender`](https://github.com/CodeIncHQ/lib-psr7responsesender) is available to stream PSR-7 response to the web browser. The library also provides a standard interface `ResponseSenderInterface` for PSR-7 response senders.
+A companion library [codeinc/psr7-response-sender](https://github.com/CodeIncHQ/Psr7ResponseSender) is available to stream PSR-7 response to the web browser. The library also provides a standard interface `ResponseSenderInterface` for PSR-7 response senders.
 ```php
 <?php 
 use CodeInc\PSR7ResponseSender\ResponseSender;
@@ -163,12 +163,10 @@ composer require codeinc/router
 ```
 
 ## Recommended libraries
-* [`codeinchq/lib-psr7responsesender`](https://packagist.org/packages/codeinchq/lib-psr7responsesender) recommended to stream the PSR-7 responses to the web browser ;
-* [`codeinchq/lib-psr15middlewares`](https://packagist.org/packages/codeinchq/lib-psr15middlewares) provides a collection PSR-15 middlewares ;
-* [`middlewares/psr15-middlewares`](https://github.com/middlewares/psr15-middlewares) provides an even bigger collection PSR-15 middlewares ;
+* [codeinc/psr7-response-sender](https://packagist.org/packages/codeinc/psr7-response-sender) recommended to stream the PSR-7 responses to the web browser ;
+* [codeinc/psr15-middlewares](https://packagist.org/packages/codeinc/psr15-middlewares) provides a collection PSR-15 middlewares ;
+* [middlewares/psr15-middlewares](https://github.com/middlewares/psr15-middlewares) provides an even bigger collection PSR-15 middlewares ;
 
 
 ## License 
 This library is published under the MIT license (see the [`LICENSE`](LICENSE) file).
-
-
