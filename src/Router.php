@@ -25,6 +25,7 @@ use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\Router\Instantiators\DefaultInstantiator;
 use CodeInc\Router\Instantiators\InstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -63,11 +64,11 @@ class Router implements RouterInterface
     /**
      * Router constructor.
      *
-     * @param InstantiatorInterface $instantiator
+     * @param InstantiatorInterface|null $instantiator
      */
-    public function __construct(InstantiatorInterface $instantiator)
+    public function __construct(?InstantiatorInterface $instantiator = null)
     {
-        $this->instantiator = $instantiator;
+        $this->instantiator = $instantiator ?? new DefaultInstantiator();
     }
 
     /**
