@@ -107,6 +107,19 @@ class Router implements RouterInterface
     }
 
     /**
+     * Adds multiple routes using an iterable.
+     *
+     * @param iterable $routes
+     * @throws DuplicateRouteException
+     */
+    public function addRoutes(iterable $routes):void
+    {
+        foreach ($routes as $route => $controllerClass) {
+            $this->addRoute($route, $controllerClass);
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function canHandle(ServerRequestInterface $request):bool
