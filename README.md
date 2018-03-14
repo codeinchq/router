@@ -36,7 +36,7 @@ $myRouter->addRoute("/license.txt", LicenseController::class);
 $myRouter->addRoute("/article-[0-9]/*", ArticleController::class); 
 
 // is is possible to define where not found request should be routed
-$myRouter->setNotFoundController("/error404.html");
+$myRouter->setNotFoundController(Error404Controller::class);
 
 // processing and the response
 $request = ServerRequest::fromGlobals();
