@@ -30,7 +30,6 @@ use CodeInc\Router\Instantiators\InstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Relay\Relay;
 
 
 /**
@@ -41,6 +40,8 @@ use Relay\Relay;
  */
 class Router implements RouterInterface
 {
+    use MiddlewaresTrait;
+
     /**
      * @var string[]
      */
@@ -57,11 +58,6 @@ class Router implements RouterInterface
     private $instantiator;
 
     /**
-     * @var MiddlewareInterface[]
-     */
-    private $middlewares = [];
-
-    /**
      * Router constructor.
      *
      * @param InstantiatorInterface|null $instantiator
@@ -69,16 +65,6 @@ class Router implements RouterInterface
     public function __construct(?InstantiatorInterface $instantiator = null)
     {
         $this->instantiator = $instantiator ?? new DefaultInstantiator();
-    }
-
-    /**
-     * Add a middleware
-     *
-     * @param MiddlewareInterface $middleware
-     */
-    public function addMiddleware(MiddlewareInterface $middleware):void
-    {
-        $this->middlewares[] = $middleware;
     }
 
     /**
@@ -167,16 +153,15 @@ class Router implements RouterInterface
         bool $bypassMiddlewares = false):ResponseInterface
     {
         // if some middlewares are set
-        if (!$bypassMiddlewares && $this->middlewares) {
-            $middlewares = $this->middlewares;
-            $middlewares[] = function(ServerRequestInterface $request):ResponseInterface {
-                return $this->handle($request, true);
-            };
-            return (new Relay($middlewares))->handle($request);
+        if (!$bypassMiddlewares && isset($this->middlewares[$this->middlewaresIndex])) {
+            return $this->middlewares[$this->middlewaresIndex++]->process($request, $this);
         }
 
-        // else returne the controller's response
+        // else returns the controller's response
         else {
+            if ($this->middlewaresIndex) {
+                $this->middlewaresIndex = 0;
+            }
             try {
                 if ($controllerClass = $this->getControllerClass($request)) {
                     return $this->instantiator
