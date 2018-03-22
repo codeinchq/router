@@ -63,7 +63,7 @@ class DefaultInstantiator implements InstantiatorInterface
             foreach ($construct->getParameters() as $i => $parameter) {
                 if (!$parameter->getType()->isBuiltin()
                     && ($parameter->getClass()->isSubclassOf(ServerRequestInterface::class) ||
-                        $parameter->getClass()->getName() == ServerRequestInterface:: class)) {
+                        $parameter->getClass()->getName() == ServerRequestInterface::class)) {
                     $args[] = $request;
                 }
                 else if ($parameter->isDefaultValueAvailable()) {
