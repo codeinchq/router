@@ -1,6 +1,6 @@
 {
   "name": "codeinc/router",
-  "version": "1.3.9",
+  "version": "1.3.10",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/CodeIncHQ/Router",
   "type": "library",
