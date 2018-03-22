@@ -66,8 +66,8 @@ class DefaultInstantiator implements InstantiatorInterface
                         $parameter->getClass()->getName() == ServerRequestInterface::class)) {
                     $args[] = $request;
                 }
-                else if ($parameter->isDefaultValueAvailable()) {
-                    $args[] = $parameter->getDefaultValue();
+                else if ($parameter->isOptional()) {
+                    $args[] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
                 }
                 else {
                     throw new DefaultInstantiatorException(
