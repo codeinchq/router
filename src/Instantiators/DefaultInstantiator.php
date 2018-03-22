@@ -23,7 +23,6 @@ declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
 use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Exceptions\DefaultInstantiatorException;
-use CodeInc\Router\Exceptions\RouterException;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -60,8 +59,8 @@ class DefaultInstantiator implements InstantiatorInterface
         else if ($class->hasMethod("__construct")) {
             $construct = $class->getMethod("__construct");
             $args = [];
-            foreach ($construct->getParameters() as $i => $parameter) {
-                if (!$parameter->getType()->isBuiltin()
+            foreach ($construct->getParameters() as $parameter) {
+                if ($parameter->hasType() && !$parameter->getType()->isBuiltin()
                     && ($parameter->getClass()->isSubclassOf(ServerRequestInterface::class) ||
                         $parameter->getClass()->getName() == ServerRequestInterface::class)) {
                     $args[] = $request;
@@ -71,11 +70,12 @@ class DefaultInstantiator implements InstantiatorInterface
                 }
                 else {
                     throw new DefaultInstantiatorException(
-                        sprintf("The parameter \$%s (#%s) of %s::__construct() "
+                        sprintf("The parameter \$%s (#%s, type %s) of %s::__construct() "
                             ."is not of type %s and does not have a default value, "
                             ."unable to instantiate the controller %s",
-                            $parameter->getName(), $i + 1, $class->getName(),
-                            ServerRequestInterface::class, $class->getName())
+                            $parameter->getName(), $parameter->getPosition() + 1,
+                            ($parameter->hasType() ? $parameter->getType() : "unknown"),
+                            $class->getName(), ServerRequestInterface::class, $class->getName())
                     );
                 }
             }
