@@ -24,7 +24,6 @@ namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
-use CodeInc\Router\Exceptions\NotAControllerException;
 use CodeInc\Router\Instantiators\DefaultInstantiator;
 use CodeInc\Router\Instantiators\InstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -146,7 +145,7 @@ class Router implements RouterInterface
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @param bool $bypassMiddlewares
-     * @throws NotAControllerException
+     * @throws ControllerHandlingException
      */
     public function handle(ServerRequestInterface $request,
         bool $bypassMiddlewares = false):ResponseInterface
