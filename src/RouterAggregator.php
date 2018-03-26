@@ -22,6 +22,7 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
+use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -101,4 +102,16 @@ class RouterAggregator implements RouterInterface
             return new NotFoundResponse();
         }
 	}
+
+    /**
+     * Alias of handle() for the current request. The current request is built using
+     * Guzzle PSR-7 implementation (ServerRequest::fromGlobals()).
+     *
+     * @param bool $bypassMiddlewares
+     * @return ResponseInterface
+     */
+    public function handleCurrentRequest(bool $bypassMiddlewares = false):ResponseInterface
+    {
+        return $this->handle(ServerRequest::fromGlobals(), $bypassMiddlewares);
+    }
 }
