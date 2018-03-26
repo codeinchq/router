@@ -24,9 +24,9 @@ namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
-use CodeInc\Router\Exceptions\NotAControllerException;
 use CodeInc\Router\Instantiators\DefaultInstantiator;
 use CodeInc\Router\Instantiators\InstantiatorInterface;
+use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -146,7 +146,7 @@ class Router implements RouterInterface
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @param bool $bypassMiddlewares
-     * @throws NotAControllerException
+     * @throws ControllerHandlingException
      */
     public function handle(ServerRequestInterface $request,
         bool $bypassMiddlewares = false):ResponseInterface
@@ -178,5 +178,18 @@ class Router implements RouterInterface
                 );
             }
         }
+    }
+
+    /**
+     * Alias of handle() for the current request. The current request is built using
+     * Guzzle PSR-7 implementation (ServerRequest::fromGlobals()).
+     *
+     * @param bool $bypassMiddlewares
+     * @return ResponseInterface
+     * @throws ControllerHandlingException
+     */
+    public function handleCurrentRequest(bool $bypassMiddlewares = false):ResponseInterface
+    {
+        return $this->handle(ServerRequest::fromGlobals(), $bypassMiddlewares);
     }
 }
