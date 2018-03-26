@@ -21,8 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
-use CodeInc\Router\Exceptions\DefaultInstantiatorException;
-use Psr\Http\Message\ServerRequestInterface;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
@@ -35,54 +34,14 @@ class DefaultInstantiator implements InstantiatorInterface
 {
     /**
      * @inheritdoc
-     * @throws DefaultInstantiatorException
-     * @throws \ReflectionException
+     * @throws NotAControllerException
      */
     public function instantiate(string $controllerClass):RequestHandlerInterface
     {
-        $refClass = new \ReflectionClass($controllerClass);
-        return $refClass->newInstanceArgs($this->getConstructorArgs($refClass));
-    }
-
-    /**
-     * @param \ReflectionClass $class
-     * @param ServerRequestInterface $request
-     * @return array
-     * @throws DefaultInstantiatorException
-     */
-    private function getConstructorArgs(\ReflectionClass $class,
-        ServerRequestInterface $request):array
-    {
-        if ($class->isSubclassOf(DefaultInstantiatorControllerInterface::class)) {
-            return [$request];
+        $controller = new $controllerClass();
+        if (!$controller instanceof RequestHandlerInterface) {
+            throw new NotAControllerException($controllerClass);
         }
-        else if ($class->hasMethod("__construct")) {
-            $construct = $class->getMethod("__construct");
-            $args = [];
-            foreach ($construct->getParameters() as $parameter) {
-                if ($parameter->hasType() && !$parameter->getType()->isBuiltin()
-                    && ($parameter->getClass()->isSubclassOf(ServerRequestInterface::class) ||
-                        $parameter->getClass()->getName() == ServerRequestInterface::class)) {
-                    $args[] = $request;
-                }
-                else if ($parameter->isOptional()) {
-                    $args[] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
-                }
-                else {
-                    throw new DefaultInstantiatorException(
-                        sprintf("The parameter \$%s (#%s, type %s) of %s::__construct() "
-                            ."is not of type %s and does not have a default value, "
-                            ."unable to instantiate the controller %s",
-                            $parameter->getName(), $parameter->getPosition() + 1,
-                            ($parameter->hasType() ? $parameter->getType() : "unknown"),
-                            $class->getName(), ServerRequestInterface::class, $class->getName())
-                    );
-                }
-            }
-            return $args;
-        }
-        else {
-            return [];
-        }
+        return $controller;
     }
 }
