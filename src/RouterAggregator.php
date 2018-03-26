@@ -17,7 +17,7 @@
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     05/03/2018
 // Time:     12:13
-// Project:  lib-router
+// Project:  Router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;

@@ -17,7 +17,7 @@
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     05/03/2018
 // Time:     11:53
-// Project:  lib-router
+// Project:  Router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
@@ -164,8 +164,8 @@ class Router implements RouterInterface
             try {
                 if ($controllerClass = $this->getControllerClass($request)) {
                     return $this->instantiator
-                        ->instantiate($controllerClass, $request)
-                        ->getResponse();
+                        ->instantiate($controllerClass)
+                        ->handle($request);
                 }
                 return new NotFoundResponse();
             }

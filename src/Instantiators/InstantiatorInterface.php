@@ -17,13 +17,11 @@
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     13/03/2018
 // Time:     14:42
-// Project:  lib-router
+// Project:  Router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
-use CodeInc\Router\ControllerInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Interface InstantiatorInterface
@@ -37,9 +35,7 @@ interface InstantiatorInterface
      * Returns a controller instance.
      *
      * @param string $controllerClass
-     * @param ServerRequestInterface $request
-     * @return ControllerInterface
+     * @return RequestHandlerInterface
      */
-    public function instantiate(string $controllerClass,
-        ServerRequestInterface $request):ControllerInterface;
+    public function instantiate(string $controllerClass):RequestHandlerInterface;
 }
