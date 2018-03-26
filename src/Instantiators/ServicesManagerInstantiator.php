@@ -21,10 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
-use CodeInc\Router\ControllerInterface;
 use CodeInc\ServicesManager\ServicesManager;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Class ServicesManagerInstantiator
@@ -54,9 +52,8 @@ class ServicesManagerInstantiator implements InstantiatorInterface
      * @throws \CodeInc\ServicesManager\Exceptions\ClassNotFoundException
      * @throws \CodeInc\ServicesManager\Exceptions\NewInstanceException
      */
-    public function instantiate(string $controllerClass,
-        ServerRequestInterface $request):ControllerInterface
+    public function instantiate(string $controllerClass):RequestHandlerInterface
     {
-        return $this->serviceManager->instantiate($controllerClass, [$request]);
+        return $this->serviceManager->instantiate($controllerClass);
     }
 }

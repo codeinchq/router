@@ -21,8 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\RouterInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
 
@@ -42,7 +42,7 @@ class ControllerHandlingException extends RouterException
 	/**
 	 * ControllerProcessingException constructor.
 	 *
-	 * @param string|ControllerInterface $controllerClass
+	 * @param string|RequestHandlerInterface $controllerClass
 	 * @param RouterInterface $router
 	 * @param int|null $code
 	 * @param null|Throwable $previous

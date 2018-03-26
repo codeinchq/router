@@ -21,10 +21,9 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
-use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Exceptions\DefaultInstantiatorException;
 use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Class DefaultInstantiator
@@ -36,12 +35,13 @@ class DefaultInstantiator implements InstantiatorInterface
 {
     /**
      * @inheritdoc
+     * @throws DefaultInstantiatorException
+     * @throws \ReflectionException
      */
-    public function instantiate(string $controllerClass,
-        ServerRequestInterface $request):ControllerInterface
+    public function instantiate(string $controllerClass):RequestHandlerInterface
     {
         $refClass = new \ReflectionClass($controllerClass);
-        return $refClass->newInstanceArgs($this->getConstructorArgs($refClass, $request));
+        return $refClass->newInstanceArgs($this->getConstructorArgs($refClass));
     }
 
     /**

@@ -21,21 +21,12 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
-
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * Interface ControllerInterface
+ * Interface ControllerInterface, alias of RequestHandlerInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInterface
-{
-	/**
-	 * Processes the page en returns the response.
-	 *
-	 * @return ResponseInterface
-	 */
-	public function getResponse():ResponseInterface;
-}
+interface ControllerInterface extends RequestHandlerInterface { }

@@ -164,8 +164,8 @@ class Router implements RouterInterface
             try {
                 if ($controllerClass = $this->getControllerClass($request)) {
                     return $this->instantiator
-                        ->instantiate($controllerClass, $request)
-                        ->getResponse();
+                        ->instantiate($controllerClass)
+                        ->handle($request);
                 }
                 return new NotFoundResponse();
             }

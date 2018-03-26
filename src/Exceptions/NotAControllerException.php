@@ -21,8 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\RouterInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
 
@@ -54,7 +54,7 @@ class NotAControllerException extends RouterException
 		$this->controllerClass = $controllerClass;
 		parent::__construct(
 			sprintf("The class %s is not a controller. All controller must implement %s.",
-				$this->controllerClass, ControllerInterface::class),
+				$this->controllerClass, RequestHandlerInterface::class),
 			$router, $code, $previous);
 	}
 
