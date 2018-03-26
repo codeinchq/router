@@ -17,7 +17,7 @@
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     13/03/2018
 // Time:     14:43
-// Project:  lib-router
+// Project:  Router
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
