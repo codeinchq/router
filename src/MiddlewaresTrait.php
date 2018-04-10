@@ -40,7 +40,7 @@ trait MiddlewaresTrait
     /**
      * @var int
      */
-    private $middlewaresIndex = 0;
+    private $middlewaresPointer = 0;
 
     /**
      * Add a middleware
@@ -58,5 +58,26 @@ trait MiddlewaresTrait
     public function getMiddlewares():array
     {
         return $this->middlewares;
+    }
+
+    /**
+     * Returns the next middleware from withing the internal stack.
+     *
+     * @return null|MiddlewareInterface
+     */
+    private function getNextMiddleware():?MiddlewareInterface
+    {
+        if (isset($this->middlewares[$this->middlewaresPointer])) {
+            return $this->middlewares[$this->middlewaresPointer++];
+        }
+        return null;
+    }
+
+    /**
+     * Resets the internal middlewares stack's pointer.
+     */
+    private function resetMiddlewarePointer():void
+    {
+        $this->middlewaresPointer = 0;
     }
 }
