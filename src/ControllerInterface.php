@@ -22,7 +22,6 @@
 declare(strict_types=1);
 namespace CodeInc\Router;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
@@ -33,13 +32,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 interface ControllerInterface
 {
-    /**
-     * ControllerInterface constructor.
-     *
-     * @param ServerRequestInterface $request
-     */
-    public function __construct(ServerRequestInterface $request);
-
     /**
      * Processes the response.
      *
