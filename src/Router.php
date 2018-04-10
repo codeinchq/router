@@ -166,15 +166,13 @@ class Router implements RouterInterface
         bool $bypassMiddlewares = false):ResponseInterface
     {
         // if some middlewares are set
-        if (!$bypassMiddlewares && isset($this->middlewares[$this->middlewaresIndex])) {
-            return $this->middlewares[$this->middlewaresIndex++]->process($request, $this);
+        if (!$bypassMiddlewares && ($middleware = $this->getNextMiddleware())) {
+            return $middleware->process($request, $this);
         }
 
         // else returns the controller's response
         else {
-            if ($this->middlewaresIndex) {
-                $this->middlewaresIndex = 0;
-            }
+            $this->resetMiddlewarePointer();
             try {
                 if ($controller = $this->getController($request)) {
                     // instantiating the controller if not instantiated
