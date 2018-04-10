@@ -187,10 +187,10 @@ class Router implements RouterInterface
             }
             catch (\Throwable $exception) {
                 throw new ControllerHandlingException(
-                    $controller ?? null,
-                    $this,
-                    null,
-                    $exception
+                    isset($controller)
+                        ? (is_object($controller) ? get_class($controller) : $controller)
+                        : null,
+                    $this, 0, $exception
                 );
             }
         }
