@@ -15,69 +15,35 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     14/03/2018
-// Time:     12:16
+// Date:     10/04/2018
+// Time:     19:19
 // Project:  Router
 //
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace CodeInc\Router;
-use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Trait MiddlewaresTrait
+ * Interface ControllerInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-trait MiddlewaresTrait
+interface ControllerInterface
 {
     /**
-     * @var MiddlewareInterface[]
-     */
-    private $middlewares = [];
-
-    /**
-     * @var int
-     */
-    private $middlewaresPointer = 0;
-
-    /**
-     * Add a middleware
+     * ControllerInterface constructor.
      *
-     * @param MiddlewareInterface $middleware
+     * @param ServerRequestInterface $request
      */
-    public function addMiddleware(MiddlewareInterface $middleware):void
-    {
-        $this->middlewares[] = $middleware;
-    }
+    public function __construct(ServerRequestInterface $request);
 
     /**
-     * @return MiddlewareInterface[]
-     */
-    public function getMiddlewares():array
-    {
-        return $this->middlewares;
-    }
-
-    /**
-     * Returns the next middleware from withing the internal stack.
+     * Processes the response.
      *
-     * @return null|MiddlewareInterface
+     * @return ResponseInterface
      */
-    private function getNextMiddleware():?MiddlewareInterface
-    {
-        if (isset($this->middlewares[$this->middlewaresPointer])) {
-            return $this->middlewares[$this->middlewaresPointer++];
-        }
-        return null;
-    }
-
-    /**
-     * Resets the internal middlewares stack's pointer.
-     */
-    private function resetMiddlewarePointer():void
-    {
-        $this->middlewaresPointer = 0;
-    }
+    public function process():ResponseInterface;
 }

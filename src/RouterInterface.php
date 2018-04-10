@@ -21,7 +21,6 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -41,11 +40,4 @@ interface RouterInterface extends RequestHandlerInterface
 	 * @return bool
 	 */
 	public function canHandle(ServerRequestInterface $request):bool;
-
-	/**
-	 * @inheritdoc
-	 * @param ServerRequestInterface $request
-	 * @return ResponseInterface
-	 */
-	public function handle(ServerRequestInterface $request):ResponseInterface;
 }

@@ -26,7 +26,6 @@ use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Instantiators\DefaultInstantiator;
 use CodeInc\Router\Instantiators\InstantiatorInterface;
-use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -40,8 +39,6 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class Router implements RouterInterface
 {
-    use MiddlewaresTrait;
-
     /**
      * @var string[]
      */
@@ -159,53 +156,29 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @param bool $bypassMiddlewares
      * @throws ControllerHandlingException
      */
-    public function handle(ServerRequestInterface $request,
-        bool $bypassMiddlewares = false):ResponseInterface
+    public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        // if some middlewares are set
-        if (!$bypassMiddlewares && ($middleware = $this->getNextMiddleware())) {
-            return $middleware->process($request, $this);
-        }
-
-        // else returns the controller's response
-        else {
-            $this->resetMiddlewarePointer();
-            try {
-                if ($controller = $this->getController($request)) {
-                    // instantiating the controller if not instantiated
-                    if (!$controller instanceof RequestHandlerInterface) {
-                        $controller = $this->getInstantiator()->instantiate($controller);
-                    }
-
-                    // handles the request with the controller
-                    return $controller->handle($request);
+        try {
+            if ($controller = $this->getController($request)) {
+                // instantiating the controller if not instantiated
+                if (!$controller instanceof ControllerInterface) {
+                    $controller = $this->getInstantiator()->instantiate($controller);
                 }
-                return new NotFoundResponse();
-            }
-            catch (\Throwable $exception) {
-                throw new ControllerHandlingException(
-                    isset($controller)
-                        ? (is_object($controller) ? get_class($controller) : $controller)
-                        : null,
-                    $this, 0, $exception
-                );
-            }
-        }
-    }
 
-    /**
-     * Alias of handle() for the current request. The current request is built using
-     * Guzzle PSR-7 implementation (ServerRequest::fromGlobals()).
-     *
-     * @param bool $bypassMiddlewares
-     * @return ResponseInterface
-     * @throws ControllerHandlingException
-     */
-    public function handleCurrentRequest(bool $bypassMiddlewares = false):ResponseInterface
-    {
-        return $this->handle(ServerRequest::fromGlobals(), $bypassMiddlewares);
+                // processes the request with the controller
+                return $controller->process();
+            }
+            return new NotFoundResponse();
+        }
+        catch (\Throwable $exception) {
+            throw new ControllerHandlingException(
+                isset($controller)
+                    ? (is_object($controller) ? get_class($controller) : $controller)
+                    : null,
+                $this, 0, $exception
+            );
+        }
     }
 }

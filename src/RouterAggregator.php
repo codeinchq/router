@@ -22,7 +22,6 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Psr7Responses\NotFoundResponse;
-use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -35,8 +34,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouterAggregator implements RouterInterface
 {
-    use MiddlewaresTrait;
-
 	/**
 	 * @var RouterInterface[]
 	 */
@@ -86,30 +83,9 @@ class RouterAggregator implements RouterInterface
 	public function handle(ServerRequestInterface $request,
         bool $bypassMiddlewares = false):ResponseInterface
 	{
-        // if some middlewares are set
-        if (!$bypassMiddlewares && ($middleware = $this->getNextMiddleware())) {
-            return $middleware->process($request, $this);
+        if ($router = $this->getRouter($request)) {
+            return $router->handle($request);
         }
-
-        // else returne the controller's response
-        else {
-            $this->resetMiddlewarePointer();
-            if ($router = $this->getRouter($request)) {
-                return $router->handle($request);
-            }
-            return new NotFoundResponse();
-        }
+        return new NotFoundResponse();
 	}
-
-    /**
-     * Alias of handle() for the current request. The current request is built using
-     * Guzzle PSR-7 implementation (ServerRequest::fromGlobals()).
-     *
-     * @param bool $bypassMiddlewares
-     * @return ResponseInterface
-     */
-    public function handleCurrentRequest(bool $bypassMiddlewares = false):ResponseInterface
-    {
-        return $this->handle(ServerRequest::fromGlobals(), $bypassMiddlewares);
-    }
 }
