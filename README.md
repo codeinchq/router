@@ -7,7 +7,7 @@ A router is technically a PSR-15 request handler (it implements [`RequestHandler
 **Here is how the router works :**
 1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface))
 2. The router searches for a controller in its internal routes stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
-4. The router instantiate the controller using an instantiator (implementing [`InstantiatorInterface`](src/Instantiators/InstantiatorInterface.php) and calls the controller `handle()` method. The controller returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
+4. The router instantiate the controller using an instantiator (implementing [`InstantiatorInterface`](src/Instantiators/InstantiatorInterface.php) and calls the controller `process()` method. The controller returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
 
 
 
@@ -68,11 +68,12 @@ $router = new Router(new MyInstantiator);
 
 ### Using the router with PSR-15 middlewares
 
-You can add PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)) to the router in order to modify the PSR-7 request or response. 
+A companion library [codeinc/middleware-dispatcher](https://packagist.org/packages/codeinc/middleware-dispatcher) allows your to use the router with PSR-15 middlewares (anything implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface)). 
 
 ```php
 <?php 
 use CodeInc\Router\Router;
+use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -89,17 +90,26 @@ class MyFirstMiddleware implements MiddlewareInterface {
 }
 class MySecondMiddleware implements MiddlewareInterface {}
 
-$myRouter = new Router();
-$myRouter->addMiddleware(new MyFirstMiddleware());
-$myRouter->addMiddleware(new MySecondMiddleware());
+// adding the middlewares
+$dispatcher = new MiddlewareDispatcher();
+$dispatcher->addMiddleware(new MyFirstMiddleware());
+$dispatcher->addMiddleware(new MySecondMiddleware());
 
+// adding the router
+$myRouter = new Router();
+$dispatcher->setBaseRequestHandler($myRouter);
+
+// handling
 $request = ServerRequest::fromGlobals();
+$response = $dispatcher->handle($request);
+
+// sending the response
 (new ResponseSender())->send($response);
 ```
 
 ### Aggregating routers
 
-You can aggregate multiple router usign the `RouterAggregate` class. This can come handy for large projects with independent modules having their own internal router or to mix different router types, for instance a web page router and a web asset router.
+You can aggregate multiple router using the `RouterAggregate` class. This can come handy for large projects with independent modules having their own internal router or to mix different router types, for instance a web page router and a web asset router.
 
 The order in which you aggregate routers matters. When asked to process a request, `RouterAggregate` will call the first router capable of processing the request (the first returning `true` for `canHandle($request)`).  
 
@@ -161,12 +171,6 @@ This library is available through [Packagist](https://packagist.org/packages/cod
 ```bash
 composer require codeinc/router
 ```
-
-## Recommended libraries
-* [codeinc/psr7-response-sender](https://packagist.org/packages/codeinc/psr7-response-sender) recommended to stream the PSR-7 responses to the web browser ;
-* [codeinc/psr15-middlewares](https://packagist.org/packages/codeinc/psr15-middlewares) provides a collection PSR-15 middlewares ;
-* [middlewares/psr15-middlewares](https://github.com/middlewares/psr15-middlewares) provides an even bigger collection PSR-15 middlewares ;
-
 
 ## License 
 This library is published under the MIT license (see the [`LICENSE`](LICENSE) file).
