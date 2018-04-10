@@ -164,7 +164,7 @@ class Router implements RouterInterface
             if ($controller = $this->getController($request)) {
                 // instantiating the controller if not instantiated
                 if (!$controller instanceof ControllerInterface) {
-                    $controller = $this->getInstantiator()->instantiate($controller);
+                    $controller = $this->getInstantiator()->instantiate($controller, $request);
                 }
 
                 // processes the request with the controller
