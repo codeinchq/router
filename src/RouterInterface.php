@@ -22,7 +22,7 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
@@ -31,7 +31,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Interfaces
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends RequestHandlerInterface
+interface RouterInterface extends MiddlewareInterface
 {
 	/**
 	 * Verifies if the router can handle a request.
@@ -39,5 +39,5 @@ interface RouterInterface extends RequestHandlerInterface
 	 * @param ServerRequestInterface $request
 	 * @return bool
 	 */
-	public function canHandle(ServerRequestInterface $request):bool;
+	public function canProcess(ServerRequestInterface $request):bool;
 }

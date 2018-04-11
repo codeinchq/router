@@ -21,9 +21,9 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Psr7Responses\NotFoundResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -52,7 +52,7 @@ class RouterAggregator implements RouterInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function canHandle(ServerRequestInterface $request):bool
+	public function canProcess(ServerRequestInterface $request):bool
 	{
 		return $this->getRouter($request) !== null;
 	}
@@ -66,7 +66,7 @@ class RouterAggregator implements RouterInterface
 	public function getRouter(ServerRequestInterface $request):?RouterInterface
 	{
 		foreach ($this->routers as $router) {
-			if ($router->canHandle($request)) {
+			if ($router->canProcess($request)) {
 				return $router;
 			}
 		}
@@ -80,12 +80,16 @@ class RouterAggregator implements RouterInterface
      * @return ResponseInterface
      * @throws \TypeError
      */
-	public function handle(ServerRequestInterface $request,
-        bool $bypassMiddlewares = false):ResponseInterface
+	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
 	{
+	    // if a router is capable of processing the given request
         if ($router = $this->getRouter($request)) {
-            return $router->handle($request);
+            return $router->process($request, $handler);
         }
-        return new NotFoundResponse();
+
+        // else using the given handler
+        else {
+            return $handler->handle($request);
+        }
 	}
 }

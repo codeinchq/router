@@ -21,7 +21,6 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Psr7Responses\NotFoundResponse;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
 use CodeInc\Router\Instantiators\DefaultInstantiator;
@@ -45,9 +44,9 @@ class Router implements RouterInterface
     private $routes = [];
 
     /**
-     * @var string|RequestHandlerInterface
+     * @var string
      */
-    private $notFoundController;
+    private $notFoundControllerClass;
 
     /**
      * @var InstantiatorInterface
@@ -80,26 +79,26 @@ class Router implements RouterInterface
     /**
      * Sets the not found controller class.
      *
-     * @param string|RequestHandlerInterface $notFoundController
+     * @param string $notFoundControllerClass
      */
-    public function setNotFoundController($notFoundController):void
+    public function setNotFoundController(string $notFoundControllerClass):void
     {
-        $this->notFoundController = $notFoundController;
+        $this->notFoundControllerClass = $notFoundControllerClass;
     }
 
     /**
      * Adds a route to a controller.
      *
      * @param string $route
-     * @param string|RequestHandlerInterface $controller
+     * @param string $controllerClass
      * @throws DuplicateRouteException
      */
-    public function addRoute(string $route, $controller):void
+    public function addRoute(string $route, string $controllerClass):void
     {
         if (isset($this->routes[$route])) {
             throw new DuplicateRouteException($route, $this);
         }
-        $this->routes[strtolower($route)] = $controller;
+        $this->routes[strtolower($route)] = $controllerClass;
     }
 
     /**
@@ -118,7 +117,7 @@ class Router implements RouterInterface
     /**
      * @inheritdoc
      */
-    public function canHandle(ServerRequestInterface $request):bool
+    public function canProcess(ServerRequestInterface $request):bool
     {
         return $this->getController($request) !== null;
     }
@@ -127,9 +126,9 @@ class Router implements RouterInterface
      * Processes a controller
      *
      * @param ServerRequestInterface $request
-     * @return null|string|RequestHandlerInterface
+     * @return null|string
      */
-    private function getController(ServerRequestInterface $request)
+    private function getController(ServerRequestInterface $request):?string
     {
         $requestRoute = strtolower($request->getUri()->getPath());
 
@@ -139,15 +138,15 @@ class Router implements RouterInterface
         }
 
         // if there is a pattern route matching the request
-        foreach ($this->routes as $route => $controller) {
+        foreach ($this->routes as $route => $controllerClass) {
             if (fnmatch($route, $requestRoute)) {
-                return $controller;
+                return $controllerClass;
             }
         }
 
         // not found controller
-        if ($this->notFoundController) {
-            return $this->notFoundController;
+        if ($this->notFoundControllerClass) {
+            return $this->notFoundControllerClass;
         }
 
         return null;
@@ -158,27 +157,25 @@ class Router implements RouterInterface
      * @param ServerRequestInterface $request
      * @throws ControllerHandlingException
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
         try {
-            if ($controller = $this->getController($request)) {
-                // instantiating the controller if not instantiated
-                if (!$controller instanceof ControllerInterface) {
-                    $controller = $this->getInstantiator()->instantiate($controller, $request);
-                }
-
-                // processes the request with the controller
-                return $controller->process();
+            // if a controller is available for the given request
+            if ($controllerClass = $this->getController($request)) {
+                // instantiating the controller & processing the request
+                return $this->getInstantiator()->instantiate($controllerClass, $request)->process();
             }
-            return new NotFoundResponse();
         }
         catch (\Throwable $exception) {
             throw new ControllerHandlingException(
-                isset($controller)
-                    ? (is_object($controller) ? get_class($controller) : $controller)
+                isset($controllerClass)
+                    ? (is_object($controllerClass) ? get_class($controllerClass) : $controllerClass)
                     : null,
                 $this, 0, $exception
             );
         }
+
+        // else using the given handler
+        return $handler->handle($request);
     }
 }
