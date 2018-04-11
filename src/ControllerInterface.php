@@ -15,21 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     22/03/2018
-// Time:     10:28
+// Date:     10/04/2018
+// Time:     19:19
 // Project:  Router
 //
-declare(strict_types = 1);
-namespace CodeInc\Router\Exceptions;
+declare(strict_types=1);
+namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
 
 
 /**
- * Class DefaultInstantiatorException
+ * Interface ControllerInterface
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DefaultInstantiatorException extends RouterException
+interface ControllerInterface
 {
-
+    /**
+     * Processes the response.
+     *
+     * @return ResponseInterface
+     */
+    public function process():ResponseInterface;
 }

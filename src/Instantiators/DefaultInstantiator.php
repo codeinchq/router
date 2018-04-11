@@ -21,8 +21,10 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
+use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Exceptions\NotAControllerException;
-use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 
 /**
  * Class DefaultInstantiator
@@ -36,10 +38,10 @@ class DefaultInstantiator implements InstantiatorInterface
      * @inheritdoc
      * @throws NotAControllerException
      */
-    public function instantiate(string $controllerClass):RequestHandlerInterface
+    public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface
     {
-        $controller = new $controllerClass();
-        if (!$controller instanceof RequestHandlerInterface) {
+        $controller = new $controllerClass($serverRequest);
+        if (!$controller instanceof ControllerInterface) {
             throw new NotAControllerException($controllerClass);
         }
         return $controller;

@@ -22,7 +22,6 @@
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\Instantiators\InstantiatorInterface;
-use CodeInc\Router\RouterInterface;
 use Throwable;
 
 

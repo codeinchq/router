@@ -21,7 +21,9 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
-use Psr\Http\Server\RequestHandlerInterface;
+use CodeInc\Router\ControllerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 
 /**
  * Interface InstantiatorInterface
@@ -35,7 +37,8 @@ interface InstantiatorInterface
      * Returns a controller instance.
      *
      * @param string $controllerClass
-     * @return RequestHandlerInterface
+     * @param ServerRequestInterface $serverRequest
+     * @return ControllerInterface
      */
-    public function instantiate(string $controllerClass):RequestHandlerInterface;
+    public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface;
 }
