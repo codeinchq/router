@@ -15,35 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/03/2018
-// Time:     14:43
+// Date:     10/04/2018
+// Time:     19:19
 // Project:  Router
 //
-declare(strict_types = 1);
-namespace CodeInc\Router\Instantiators;
-use CodeInc\Router\Controllers\ControllerInterface;
-use CodeInc\Router\Exceptions\NotAControllerException;
-use Psr\Http\Message\ServerRequestInterface;
+declare(strict_types=1);
+namespace CodeInc\Router\Controllers;
+use Psr\Http\Message\ResponseInterface;
 
 
 /**
- * Class DefaultInstantiator
+ * Interface ControllerInterface
  *
- * @package CodeInc\Router\Instantiators
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DefaultInstantiator implements InstantiatorInterface
+interface ControllerInterface
 {
     /**
-     * @inheritdoc
-     * @throws NotAControllerException
+     * Processes the response.
+     *
+     * @return ResponseInterface
      */
-    public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface
-    {
-        $controller = new $controllerClass($serverRequest);
-        if (!$controller instanceof ControllerInterface) {
-            throw new NotAControllerException($controllerClass);
-        }
-        return $controller;
-    }
+    public function process():ResponseInterface;
 }

@@ -20,7 +20,7 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Controllers;
 use CodeInc\Router\Instantiators\DefaultInstantiator;
 use CodeInc\Router\Instantiators\InstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;

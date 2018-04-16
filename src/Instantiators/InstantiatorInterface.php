@@ -21,7 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Controllers\ControllerInterface;
 use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -39,7 +39,7 @@ interface InstantiatorInterface
      *
      * @param string $controllerClass
      * @param ServerRequestInterface $serverRequest
-     * @return ControllerInterface
+     * @return \CodeInc\Router\Controllers\ControllerInterface
      * @throws NotAControllerException
      */
     public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface;
