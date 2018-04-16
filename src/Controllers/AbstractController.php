@@ -15,27 +15,47 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     10/04/2018
-// Time:     19:19
+// Date:     16/04/2018
+// Time:     16:44
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router\Controllers;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface ControllerInterface
+ * Class AbstractController
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Controllers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInterface
+abstract class AbstractController implements ControllerInterface
 {
     /**
-     * Processes the response.
+     * Parent server request
      *
-     * @return ResponseInterface
+     * @var ServerRequestInterface
      */
-    public function process():ResponseInterface;
+    private $request;
+
+    /**
+     * AbstractController constructor.
+     *
+     * @param ServerRequestInterface $request Parent server request
+     */
+    public function __construct(ServerRequestInterface $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * Returns the parent server request.
+     *
+     * @return ServerRequestInterface
+     */
+    public function getRequest():ServerRequestInterface
+    {
+        return $this->request;
+    }
 }
