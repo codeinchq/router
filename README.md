@@ -7,7 +7,7 @@ A router is technically a PSR-15 request handler (it implements [`RequestHandler
 **Here is how the router works :**
 1. The router receives a PSR-7 request (implementing [`ServerRequestInterface`](https://www.php-fig.org/psr/psr-7/#321-psrhttpmessageserverrequestinterface))
 2. The router searches for a controller in its internal routes stack to process the request, in order to do so the path of the request's URI is compared with the known routes using [`fnmatch()`](http://php.net/manual/fr/function.fnmatch.php);
-4. The router instantiate the controller using an instantiator (implementing [`InstantiatorInterface`](src/Instantiators/InstantiatorInterface.php) and calls the controller `process()` method. The controller returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
+4. The router instantiate the controller using an instantiator (implementing [`InstantiatorInterface`](src/Instantiators/ControllerInstantiatorInterface.php) and calls the controller `process()` method. The controller returns a PSR-7 response (implementing [`ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface)).
 
 
 
