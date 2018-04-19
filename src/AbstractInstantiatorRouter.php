@@ -56,7 +56,7 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
     }
 
     /**
-     * Returns the controller class for a given request or null if the controller can not be processed
+     * Returns the controller class for a given request or null if no controller is available.
      *
      * @param ServerRequestInterface $request
      * @return null|string
