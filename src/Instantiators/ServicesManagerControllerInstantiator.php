@@ -28,15 +28,18 @@ use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class ServicesManagerInstantiator
+ * Class ServicesManagerControllerInstantiator
  *
+ * @link https://github.com/CodeIncHQ/ServicesManager
+ * @link https://packagist.org/packages/codeinc/services-manager
+ * @see ServicesManager
  * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ServicesManagerInstantiator implements InstantiatorInterface
+class ServicesManagerControllerInstantiator implements ControllerInstantiatorInterface
 {
     /**
-     * @var
+     * @var ServicesManager
      */
     private $serviceManager;
 
