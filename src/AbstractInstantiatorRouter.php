@@ -38,7 +38,7 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
     /**
      * @var ControllerInstantiatorInterface
      */
-    private $instantiator;
+    private $controllerInstantiator;
 
     /**
      * @var string
@@ -48,11 +48,11 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
     /**
      * Router constructor.
      *
-     * @param ControllerInstantiatorInterface|null $instantiator
+     * @param ControllerInstantiatorInterface|null $controllerInstantiator
      */
-    public function __construct(?ControllerInstantiatorInterface $instantiator = null)
+    public function __construct(?ControllerInstantiatorInterface $controllerInstantiator = null)
     {
-        $this->instantiator = $instantiator;
+        $this->controllerInstantiator = $controllerInstantiator;
     }
 
     /**
@@ -68,12 +68,12 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
      *
      * @return ControllerInstantiatorInterface
      */
-    private function getInstantiator():ControllerInstantiatorInterface
+    private function getControllerInstantiator():ControllerInstantiatorInterface
     {
-        if (!$this->instantiator instanceof ControllerInstantiatorInterface) {
-            $this->instantiator = new ControllerInstantiator();
+        if (!$this->controllerInstantiator instanceof ControllerInstantiatorInterface) {
+            $this->controllerInstantiator = new ControllerInstantiator();
         }
-        return $this->instantiator;
+        return $this->controllerInstantiator;
     }
 
     /**
@@ -95,10 +95,10 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
     protected function getController(ServerRequestInterface $request):?ControllerInterface
     {
         if ($controllerClass = $this->getControllerClass($request)) {
-            return $this->getInstantiator()->instantiate($controllerClass, $request);
+            return $this->getControllerInstantiator()->instantiate($controllerClass, $request);
         }
         if ($this->notFoundControllerClass !== null) {
-            return $this->getInstantiator()->instantiate($this->notFoundControllerClass, $request);
+            return $this->getControllerInstantiator()->instantiate($this->notFoundControllerClass, $request);
         }
         return null;
     }
