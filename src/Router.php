@@ -67,8 +67,7 @@ class Router extends AbstractInstantiatorRouter
     }
 
     /**
-     * Processes a controller
-     *
+     * @inheritdoc
      * @param ServerRequestInterface $request
      * @return null|string
      */

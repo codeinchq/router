@@ -21,8 +21,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Controllers;
-use CodeInc\Router\Instantiators\DefaultInstantiator;
-use CodeInc\Router\Instantiators\InstantiatorInterface;
+use CodeInc\Router\Instantiators\ControllerInstantiator;
+use CodeInc\Router\Instantiators\ControllerInstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -42,7 +42,7 @@ class ControllerRequestHandler implements RequestHandlerInterface
     private $controllerClass;
 
     /**
-     * @var DefaultInstantiator|InstantiatorInterface
+     * @var ControllerInstantiator|ControllerInstantiatorInterface
      */
     private $instantiator;
 
@@ -50,12 +50,12 @@ class ControllerRequestHandler implements RequestHandlerInterface
      * ControllerRequestHandler constructor.
      *
      * @param string $controllerClass
-     * @param InstantiatorInterface|null $instantiator
+     * @param ControllerInstantiatorInterface|null $instantiator
      */
-    public function __construct(string $controllerClass, InstantiatorInterface $instantiator = null)
+    public function __construct(string $controllerClass, ControllerInstantiatorInterface $instantiator = null)
     {
         $this->controllerClass = $controllerClass;
-        $this->instantiator = $instantiator ?? new DefaultInstantiator();
+        $this->instantiator = $instantiator ?? new ControllerInstantiator();
     }
 
     /**

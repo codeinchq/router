@@ -23,42 +23,24 @@ declare(strict_types = 1);
 namespace CodeInc\Router\Instantiators;
 use CodeInc\Router\Controllers\ControllerInterface;
 use CodeInc\Router\Exceptions\NotAControllerException;
-use CodeInc\ServicesManager\ServicesManager;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class ServicesManagerInstantiator
+ * Class ControllerInstantiator
  *
  * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ServicesManagerInstantiator implements InstantiatorInterface
+class ControllerInstantiator implements ControllerInstantiatorInterface
 {
-    /**
-     * @var
-     */
-    private $serviceManager;
-
-    /**
-     * ServiceManagerInstantiator constructor.
-     *
-     * @param ServicesManager $serviceManager
-     */
-    public function __construct(ServicesManager $serviceManager)
-    {
-        $this->serviceManager = $serviceManager;
-    }
-
     /**
      * @inheritdoc
      * @throws NotAControllerException
-     * @throws \CodeInc\ServicesManager\Exceptions\ClassNotFoundException
-     * @throws \CodeInc\ServicesManager\Exceptions\NewInstanceException
      */
     public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface
     {
-        $controller = $this->serviceManager->instantiate($controllerClass, [$serverRequest]);
+        $controller = new $controllerClass($serverRequest);
         if (!$controller instanceof ControllerInterface) {
             throw new NotAControllerException($controllerClass);
         }

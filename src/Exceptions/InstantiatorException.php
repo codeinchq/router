@@ -21,7 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Instantiators\InstantiatorInterface;
+use CodeInc\Router\Instantiators\ControllerInstantiatorInterface;
 use Throwable;
 
 
@@ -34,7 +34,7 @@ use Throwable;
 class InstantiatorException extends RouterException
 {
     /**
-     * @var InstantiatorInterface|null
+     * @var ControllerInstantiatorInterface|null
      */
     private $instantiator;
 
@@ -42,12 +42,12 @@ class InstantiatorException extends RouterException
      * InstantiatorException constructor.
      *
      * @param string $message
-     * @param InstantiatorInterface|null $instantiator
+     * @param ControllerInstantiatorInterface|null $instantiator
      * @param int|null $code
      * @param null|Throwable $previous
      */
     public function __construct(string $message,
-        ?InstantiatorInterface $instantiator = null,
+        ?ControllerInstantiatorInterface $instantiator = null,
         ?int $code = null, ?Throwable $previous = null)
     {
         $this->instantiator = $instantiator;
@@ -55,9 +55,9 @@ class InstantiatorException extends RouterException
     }
 
     /**
-     * @return InstantiatorInterface|null
+     * @return ControllerInstantiatorInterface|null
      */
-    public function getInstantiator():?InstantiatorInterface
+    public function getInstantiator():?ControllerInstantiatorInterface
     {
         return $this->instantiator;
     }

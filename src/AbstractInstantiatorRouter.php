@@ -22,8 +22,8 @@
 declare(strict_types = 1);
 namespace CodeInc\Router;
 use CodeInc\Router\Controllers\ControllerInterface;
-use CodeInc\Router\Instantiators\DefaultInstantiator;
-use CodeInc\Router\Instantiators\InstantiatorInterface;
+use CodeInc\Router\Instantiators\ControllerInstantiator;
+use CodeInc\Router\Instantiators\ControllerInstantiatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -36,7 +36,7 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class AbstractInstantiatorRouter extends AbstractRouter
 {
     /**
-     * @var InstantiatorInterface
+     * @var ControllerInstantiatorInterface
      */
     private $instantiator;
 
@@ -48,15 +48,15 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
     /**
      * Router constructor.
      *
-     * @param InstantiatorInterface|null $instantiator
+     * @param ControllerInstantiatorInterface|null $instantiator
      */
-    public function __construct(?InstantiatorInterface $instantiator = null)
+    public function __construct(?ControllerInstantiatorInterface $instantiator = null)
     {
         $this->instantiator = $instantiator;
     }
 
     /**
-     * Returns the controller class for a given request or null if the controller can not be processed
+     * Returns the controller class for a given request or null if no controller is available.
      *
      * @param ServerRequestInterface $request
      * @return null|string
@@ -66,12 +66,12 @@ abstract class AbstractInstantiatorRouter extends AbstractRouter
     /**
      * Returns the instantiator.
      *
-     * @return InstantiatorInterface
+     * @return ControllerInstantiatorInterface
      */
-    private function getInstantiator():InstantiatorInterface
+    private function getInstantiator():ControllerInstantiatorInterface
     {
-        if (!$this->instantiator instanceof InstantiatorInterface) {
-            $this->instantiator = new DefaultInstantiator();
+        if (!$this->instantiator instanceof ControllerInstantiatorInterface) {
+            $this->instantiator = new ControllerInstantiator();
         }
         return $this->instantiator;
     }

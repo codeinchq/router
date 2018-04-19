@@ -32,7 +32,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface InstantiatorInterface
+interface ControllerInstantiatorInterface
 {
     /**
      * Returns a controller instance.
