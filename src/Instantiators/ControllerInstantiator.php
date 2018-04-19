@@ -27,12 +27,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class DefaultInstantiator
+ * Class ControllerInstantiator
  *
  * @package CodeInc\Router\Instantiators
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DefaultInstantiator implements InstantiatorInterface
+class ControllerInstantiator implements ControllerInstantiatorInterface
 {
     /**
      * @inheritdoc
