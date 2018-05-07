@@ -38,9 +38,9 @@ class ControllerInstantiator implements ControllerInstantiatorInterface
      * @inheritdoc
      * @throws NotAControllerException
      */
-    public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface
+    public function instantiate(string $controllerClass, ServerRequestInterface $request):ControllerInterface
     {
-        $controller = new $controllerClass($serverRequest);
+        $controller = new $controllerClass($request);
         if (!$controller instanceof ControllerInterface) {
             throw new NotAControllerException($controllerClass);
         }

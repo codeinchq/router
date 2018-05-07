@@ -60,10 +60,10 @@ abstract class AbstractRouter implements RouterInterface
         }
         catch (\Throwable $exception) {
             throw new ControllerHandlingException(
-                isset($controllerClass)
-                    ? (is_object($controllerClass) ? get_class($controllerClass) : $controllerClass)
-                    : null,
-                $this, 0, $exception
+                (isset($controller) && is_object($controller)) ? get_class($controller) : null,
+                $this,
+                0,
+                $exception
             );
         }
 

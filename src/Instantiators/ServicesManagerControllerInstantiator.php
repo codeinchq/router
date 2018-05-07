@@ -59,9 +59,9 @@ class ServicesManagerControllerInstantiator implements ControllerInstantiatorInt
      * @throws \CodeInc\ServicesManager\Exceptions\ClassNotFoundException
      * @throws \CodeInc\ServicesManager\Exceptions\NewInstanceException
      */
-    public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface
+    public function instantiate(string $controllerClass, ServerRequestInterface $request):ControllerInterface
     {
-        $controller = $this->serviceManager->instantiate($controllerClass, [$serverRequest]);
+        $controller = $this->serviceManager->instantiate($controllerClass, [$request]);
         if (!$controller instanceof ControllerInterface) {
             throw new NotAControllerException($controllerClass);
         }

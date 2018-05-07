@@ -38,9 +38,9 @@ interface ControllerInstantiatorInterface
      * Returns a controller instance.
      *
      * @param string $controllerClass
-     * @param ServerRequestInterface $serverRequest
+     * @param ServerRequestInterface $request
      * @return \CodeInc\Router\Controllers\ControllerInterface
      * @throws NotAControllerException
      */
-    public function instantiate(string $controllerClass, ServerRequestInterface $serverRequest):ControllerInterface;
+    public function instantiate(string $controllerClass, ServerRequestInterface $request):ControllerInterface;
 }
