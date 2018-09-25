@@ -70,16 +70,15 @@ abstract class AbstractStaticRouter implements RouterInterface
     /**
      * @inheritdoc
      * @param string $requestHandlerClass
-     * @return string
-     * @throws RouterException
+     * @return string|null
      */
-    public function getHandlerUri(string $requestHandlerClass):string
+    public function getHandlerUri(string $requestHandlerClass):?string
     {
         foreach ($this->getHandlers() as $route => $handlerClass) {
             if ($requestHandlerClass == $handlerClass) {
                 return $route;
             }
         }
-        throw RouterException::noRouteFound($requestHandlerClass);
+        return null;
     }
 }

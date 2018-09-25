@@ -32,10 +32,10 @@ use Psr\Http\Server\MiddlewareInterface;
 interface RouterInterface extends MiddlewareInterface
 {
     /**
-     * Returns the URI of a given request handler.
+     * Returns the URI of a given request handler or NULL if the URI can not be computed.
      *
      * @param string $requestHandlerClass
-     * @return string
+     * @return string|null
      */
-    public function getHandlerUri(string $requestHandlerClass):string;
+    public function getHandlerUri(string $requestHandlerClass):?string;
 }
