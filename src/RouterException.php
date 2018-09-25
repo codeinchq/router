@@ -21,7 +21,6 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
