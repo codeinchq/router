@@ -21,6 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -39,6 +40,7 @@ class RouterException extends \Exception
     public const CODE_NOT_WITHIN_NAMESPACE = 5;
     public const CODE_NO_ROUTE_FOUND = 6;
     public const CODE_NOT_A_ROUTER = 7;
+    public const CODE_NOT_A_MIDDLEWARE = 8;
 
     /**
      * @param string $route
@@ -109,5 +111,16 @@ class RouterException extends \Exception
         return new self(sprintf("The item '%s' is not a router. All routers must implement '%s'.",
             is_object($item) ? get_class($item) : (string)$item, RouterInterface::class),
             self::CODE_NOT_A_ROUTER);
+    }
+
+    /**
+     * @param mixed|object|string $item
+     * @return RouterException
+     */
+    public static function notAMiddleware($item):self
+    {
+        return new self(sprintf("The item '%s' is not a middleware. All middleware must implement '%s'.",
+            is_object($item) ? get_class($item) : (string)$item, MiddlewareInterface::class),
+            self::CODE_NOT_A_MIDDLEWARE);
     }
 }

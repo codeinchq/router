@@ -20,8 +20,10 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use CodeInc\MiddlewareDispatcher\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -34,13 +36,37 @@ use Psr\Http\Server\RequestHandlerInterface;
 abstract class AbstractRouter implements RouterInterface
 {
     /**
+     * @var MiddlewareInterface[]
+     */
+    private $middlewareRegistry = [];
+
+    /**
+     * @inheritdoc
+     * @param MiddlewareInterface $middleware
+     */
+    public function addMiddleware(MiddlewareInterface $middleware):void
+    {
+        $this->middlewareRegistry[] = $middleware;
+    }
+
+    /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
+     * @throws \CodeInc\MiddlewareDispatcher\DispatcherException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        return ($this->getHandler($request) ?? $handler)->handle($request);
+        if (($routerHandler = $this->getHandler($request)) !== null) {
+            if ($this->middlewareRegistry) {
+                return (new Dispatcher($this->middlewareRegistry))->process($request, $routerHandler);
+            }
+            else {
+                return $routerHandler->handle($request);
+            }
+        }
+
+        return $handler->handle($request);
     }
 }

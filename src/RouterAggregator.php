@@ -20,7 +20,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\AbstractRouterAggregator;
 
 
 /**
