@@ -15,30 +15,36 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     11:53
+// Date:     24/09/2018
 // Project:  Router
 //
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractStaticRouter
+ * Class AbstractDynamicRouter
  *
- * @package CodeInc\Router\StaticRouter
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractStaticRouter implements RouterInterface
+abstract class AbstractDynamicRouter implements RouterInterface
 {
     /**
-     * Returns all the requests handler and their associated routes.
+     * Returns the router's URI prefix.
      *
-     * @return iterable|string[]
+     * @return string
      */
-    abstract public function getHandlers():iterable;
+    abstract public function getUriPrefix():string;
+
+    /**
+     * Returns the requests handler's base namespace.
+     *
+     * @return string
+     */
+    abstract public function getRequestHandlersNamespace():string;
 
     /**
      * Instantiates a request handler.
@@ -51,13 +57,20 @@ abstract class AbstractStaticRouter implements RouterInterface
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|string
+     * @return null|RequestHandlerInterface
+     * @throws RouterException
      */
     public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
     {
         $requestRoute = $request->getUri()->getPath();
-        foreach ($this->getHandlers() as $route => $handlerClass) {
-            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
+        $uriPrefix = $this->getUriPrefix();
+        if (substr($requestRoute, 0, strlen($uriPrefix)) == $uriPrefix) {
+            $handlerClass = $this->getRequestHandlersNamespace()
+                .str_replace('/', '\\', substr($requestRoute, strlen($uriPrefix)));
+            if (class_exists($handlerClass)) {
+                if (is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
+                    throw RouterException::notARequestHandler($handlerClass);
+                }
                 return $this->instantiateHandler($handlerClass);
             }
         }
@@ -67,18 +80,22 @@ abstract class AbstractStaticRouter implements RouterInterface
     /**
      * @inheritdoc
      * @param RequestHandlerInterface|string $requestHandler
-     * @return null|string
+     * @return string
+     * @throws RouterException
      */
-    public function getUri($requestHandler):?string
+    public function getUri($requestHandler):string
     {
+        $requestHandlersNamespace = $this->getRequestHandlersNamespace();
         if ($requestHandler instanceof RequestHandlerInterface) {
             $requestHandler = get_class($requestHandler);
         }
-        foreach ($this->getHandlers() as $uri => $handlerClass) {
-            if ($requestHandler === $handlerClass) {
-                return $uri;
-            }
+        else if (!is_subclass_of($requestHandler, RequestHandlerInterface::class)) {
+            throw RouterException::notARequestHandler($requestHandler);
         }
-        return null;
+        if (!substr($requestHandler, 0, strlen($requestHandlersNamespace)) == $requestHandler) {
+            throw RouterException::notWithinNamespace($requestHandler, $requestHandlersNamespace);
+        }
+        return $this->getUriPrefix()
+            .str_replace('\\', '/', substr($requestHandler, strlen($requestHandlersNamespace)));
     }
 }

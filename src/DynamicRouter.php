@@ -20,7 +20,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -30,7 +29,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class DynamicRouter implements RouterInterface
+class DynamicRouter extends AbstractDynamicRouter
 {
     /**
      * @var string
@@ -43,13 +42,20 @@ abstract class DynamicRouter implements RouterInterface
     private $uriPrefix;
 
     /**
+     * @var RequestHandlerFactoryInterface
+     */
+    private $requestHandlerFactory;
+
+    /**
      * DynamicRouter constructor.
      *
      * @param string $requestHandlersNamespace
      * @param string $uriPrefix
+     * @param RequestHandlerFactoryInterface|null $requestHandlerFactory
      * @throws RouterException
      */
-    public function __construct(string $requestHandlersNamespace, string $uriPrefix)
+    public function __construct(string $requestHandlersNamespace, string $uriPrefix,
+        ?RequestHandlerFactoryInterface $requestHandlerFactory = null)
     {
         if (empty($uriPrefix)) {
             throw RouterException::emptyUriPrefix();
@@ -59,6 +65,7 @@ abstract class DynamicRouter implements RouterInterface
         }
         $this->requestHandlersNamespace = $requestHandlersNamespace;
         $this->uriPrefix = $uriPrefix;
+        $this->requestHandlerFactory = $requestHandlerFactory ?? new RequestHandlerFactory();
     }
 
     /**
@@ -83,48 +90,12 @@ abstract class DynamicRouter implements RouterInterface
 
     /**
      * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @return null|string
+     * @param string $handlerClass
+     * @return RequestHandlerInterface
      * @throws RouterException
      */
-    public function getHandlerClass(ServerRequestInterface $request):?string
+    protected function instantiateHandler(string $handlerClass):RequestHandlerInterface
     {
-        $requestRoute = $request->getUri()->getPath();
-        $uriPrefix = $this->getUriPrefix();
-        if (substr($requestRoute, 0, strlen($uriPrefix)) == $uriPrefix) {
-            $handlerClass = $this->getRequestHandlersNamespace()
-                .str_replace('/', '\\', substr($requestRoute, strlen($uriPrefix)));
-            if (class_exists($handlerClass)) {
-                if (is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
-                    throw RouterException::notARequestHandler($handlerClass);
-                }
-                return $handlerClass;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     * @param RequestHandlerInterface|string $requestHandler
-     * @return string
-     * @throws RouterException
-     */
-    public function getUri($requestHandler):string
-    {
-        $requestHandlersNamespace = $this->getRequestHandlersNamespace();
-
-        if ($requestHandler instanceof RequestHandlerInterface) {
-            $requestHandler = get_class($requestHandler);
-        }
-        else if (!is_subclass_of($requestHandler, RequestHandlerInterface::class)) {
-            throw RouterException::notARequestHandler($requestHandler);
-        }
-        if (!substr($requestHandler, 0, strlen($requestHandlersNamespace)) == $requestHandler) {
-            throw RouterException::notWithinNamespace($requestHandler, $requestHandlersNamespace);
-        }
-
-        return $this->getUriPrefix()
-            .str_replace('\\', '/', substr($requestHandler, strlen($requestHandlersNamespace)));
+        return $this->requestHandlerFactory->factory($handlerClass);
     }
 }

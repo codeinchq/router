@@ -38,6 +38,21 @@ class StaticRouter extends AbstractStaticRouter
     private $handlers = [];
 
     /**
+     * @var RequestHandlerFactoryInterface
+     */
+    private $requestHandlerFactory;
+
+    /**
+     * StaticRouter constructor.
+     *
+     * @param RequestHandlerFactoryInterface $requestHandlerFactory
+     */
+    public function __construct(?RequestHandlerFactoryInterface $requestHandlerFactory = null)
+    {
+        $this->requestHandlerFactory = $requestHandlerFactory ?? new RequestHandlerFactory();
+    }
+
+    /**
      * Adds a request handler.
      *
      * @param string $route URI path (supports shell patterns)
@@ -66,19 +81,13 @@ class StaticRouter extends AbstractStaticRouter
     }
 
     /**
+     * @inheritdoc
      * @param string $handlerClass
      * @return RequestHandlerInterface
      * @throws RouterException
      */
     protected function instantiateHandler(string $handlerClass):RequestHandlerInterface
     {
-        if (!class_exists($handlerClass)) {
-            throw RouterException::handlerClassNotFound($handlerClass);
-        }
-        $handler = new $handlerClass;
-        if ($handler instanceof RequestHandlerInterface) {
-            throw RouterException::notARequestHandler($handlerClass);
-        }
-        return $handler;
+        return $this->requestHandlerFactory->factory($handlerClass);
     }
 }
