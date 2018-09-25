@@ -1,6 +1,6 @@
 {
   "name": "codeinc/router",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.3",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/CodeIncHQ/Router",
   "type": "library",
@@ -16,7 +16,8 @@
     "guzzlehttp/psr7": "^1.4",
     "codeinc/psr7-response-sender": "^1.1",
     "codeinc/services-manager": "^1.0",
-    "codeinc/error-renderer": "^1.2"
+    "codeinc/error-renderer": "^1.2",
+    "codeinc/middleware-dispatcher": "2.x@dev"
   },
   "suggest": {
     "codeinc/middleware-dispatcher": "A PSR-15 middleware dispatcher",
@@ -41,5 +42,8 @@
     "preferred-install": {
       "*": "dist"
     }
-  }
+  },
+  "repositories": [
+    { "type": "vcs", "url": "https://github.com/CodeIncHQ/MiddlewareDispatcher" }
+  ]
 }
