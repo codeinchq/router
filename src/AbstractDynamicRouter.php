@@ -20,7 +20,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -31,7 +30,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractDynamicRouter implements RouterInterface
+abstract class AbstractDynamicRouter extends AbstractRouter
 {
     /**
      * @var string
@@ -110,30 +109,6 @@ abstract class AbstractDynamicRouter implements RouterInterface
             }
         }
         return null;
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     * @throws RouterException
-     */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
-    {
-        $requestRoute = $request->getUri()->getPath();
-        $uriPrefix = $this->getUriPrefix();
-        if (substr($requestRoute, 0, strlen($uriPrefix)) == $uriPrefix) {
-            $handlerClass = $this->getRequestHandlersNamespace()
-                .str_replace('/', '\\', substr($requestRoute, strlen($uriPrefix)));
-            if (class_exists($handlerClass)) {
-                if (is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
-                    throw RouterException::notARequestHandler($handlerClass);
-                }
-                $handler = $this->instantiate($handlerClass);
-            }
-        }
-
-        return $handler->handle($request);
     }
 
     /**

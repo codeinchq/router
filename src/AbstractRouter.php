@@ -20,32 +20,27 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RouterInterface
+ * Class AbstractRouter
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends MiddlewareInterface
+abstract class AbstractRouter implements RouterInterface
 {
     /**
-     * Returns the URI of a given request handler or NULL if the URI can not be computed.
-     *
-     * @param string $requestHandlerClass
-     * @return string|null
-     */
-    public function getHandlerUri(string $requestHandlerClass):?string;
-
-    /**
-     * Returns the request handler interface for a given request.
-     *
+     * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|RequestHandlerInterface
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface;
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    {
+        return ($this->getHandler($request) ?? $handler)->handle($request);
+    }
 }

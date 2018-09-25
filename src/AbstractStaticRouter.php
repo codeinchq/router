@@ -32,7 +32,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractStaticRouter implements RouterInterface
+abstract class AbstractStaticRouter extends AbstractRouter
 {
     /**
      * Returns all the requests handler and their associated routes.
@@ -50,21 +50,19 @@ abstract class AbstractStaticRouter implements RouterInterface
     abstract protected function instantiate(string $requestHandlerClass):RequestHandlerInterface;
 
     /**
+     * @inheritdoc
      * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * @return null|RequestHandlerInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
     {
         $requestRoute = $request->getUri()->getPath();
         foreach ($this->getHandlers() as $route => $handlerClass) {
             if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                $handler = $this->instantiate($handlerClass);
-                break;
+                return $this->instantiate($handlerClass);
             }
         }
-
-        return $handler->handle($request);
+        return null;
     }
 
     /**

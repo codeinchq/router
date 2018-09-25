@@ -16,8 +16,7 @@
     "guzzlehttp/psr7": "^1.4",
     "codeinc/psr7-response-sender": "^1.1",
     "codeinc/services-manager": "^1.0",
-    "codeinc/error-renderer": "^1.2",
-    "codeinc/middleware-dispatcher": "2.x@dev"
+    "codeinc/error-renderer": "^1.2"
   },
   "suggest": {
     "codeinc/middleware-dispatcher": "A PSR-15 middleware dispatcher",
@@ -42,8 +41,5 @@
     "preferred-install": {
       "*": "dist"
     }
-  },
-  "repositories": [
-    { "type": "vcs", "url": "https://github.com/CodeIncHQ/MiddlewareDispatcher" }
-  ]
+  }
 }

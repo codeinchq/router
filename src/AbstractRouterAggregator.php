@@ -19,22 +19,18 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Aggregator;
-use CodeInc\MiddlewareDispatcher\Dispatcher;
-use CodeInc\MiddlewareDispatcher\DispatcherMiddlewareWrapper;
-use CodeInc\Router\RouterInterface;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterAggregator
+ * Class AbstractRouterAggregator
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractRouterAggregator implements RouterInterface
+abstract class AbstractRouterAggregator extends AbstractRouter
 {
     /**
      * Returns the routers iterator.
@@ -44,18 +40,18 @@ abstract class AbstractRouterAggregator implements RouterInterface
     abstract protected function getRouters():iterable;
 
     /**
+     * @inheritdoc
      * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     * @throws \CodeInc\MiddlewareDispatcher\DispatcherException
+     * @return null|RequestHandlerInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
     {
-        return (new DispatcherMiddlewareWrapper(
-            new Dispatcher(
-                $this->getRouters()
-            )
-        ))->process($request, $handler);
+        foreach ($this->getRouters() as $router) {
+            if (($handler = $router->getHandler($request))) {
+                return $handler;
+            }
+        }
+        return null;
     }
 
     /**

@@ -19,9 +19,8 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Aggregator;
-use CodeInc\Router\RouterException;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router;
+use CodeInc\Router\AbstractRouterAggregator;
 
 
 /**
