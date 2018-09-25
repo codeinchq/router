@@ -37,6 +37,7 @@ class RouterException extends \Exception
     public const CODE_NOT_A_REQUEST_HANDLER = 3;
     public const CODE_NOT_A_ROUTABLE_REQUEST_HANDLER = 4;
     public const CODE_NOT_WITHIN_NAMESPACE = 5;
+    public const CODE_NO_ROUTE_FOUND = 6;
 
     /**
      * @param string $route
@@ -51,9 +52,18 @@ class RouterException extends \Exception
     /**
      * @return RouterException
      */
-    public static function emptyBaseUri():self
+    public static function emptyUriPrefix():self
     {
-        return new self("The router's base URI can not be empty.",
+        return new self("The dynamic router's URI prefix can not be empty.",
+            self::CODE_EMPTY_URI);
+    }
+
+    /**
+     * @return RouterException
+     */
+    public static function emptyRequestHandlersNamespace():self
+    {
+        return new self("The dynamic router's request handler namespace can not be empty.",
             self::CODE_EMPTY_URI);
     }
 
@@ -69,18 +79,6 @@ class RouterException extends \Exception
     }
 
     /**
-     * @param string $controllerClass
-     * @return RouterException
-     */
-    public static function notARoutableRequestHandler(string $controllerClass):self
-    {
-        return new self(sprintf("The class %s is not a routable PSR-7 request handler. "
-            ."All routable PSR-7 request handlers must implement %s.",
-            $controllerClass, RoutableRequestHandlerInterface::class),
-            self::CODE_NOT_A_ROUTABLE_REQUEST_HANDLER);
-    }
-
-    /**
      * @param string $requestHandlerClass
      * @param string $controllersBaseNamespace
      * @return RouterException
@@ -89,5 +87,15 @@ class RouterException extends \Exception
     {
         return new self(sprintf("The PSR-7 request handler %s is not within the base namespace '%s'.",
             $requestHandlerClass, $controllersBaseNamespace), self::CODE_NOT_WITHIN_NAMESPACE);
+    }
+
+    /**
+     * @param string $requestHandlerClass
+     * @return RouterException
+     */
+    public static function noRouteFound(string $requestHandlerClass):self
+    {
+        return new self(sprintf("No route is available for the request handler '%s'.", $requestHandlerClass),
+            self::CODE_NO_ROUTE_FOUND);
     }
 }

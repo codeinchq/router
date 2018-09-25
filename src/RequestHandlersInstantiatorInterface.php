@@ -15,26 +15,28 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     13/03/2018
+// Time:     14:42
 // Project:  Router
 //
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace CodeInc\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RoutableRequestHandlerInterface
+ * Interface RequestHandlersInstantiatorInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RoutableRequestHandlerInterface extends RequestHandlerInterface
+interface RequestHandlersInstantiatorInterface
 {
     /**
-     * Returns the request handler's route (URI path).
+     * Returns a request handler instance.
      *
-     * @return string
+     * @param string $requestHandlerClass
+     * @return RequestHandlerInterface
      */
-    public static function getRoute():string;
+    public function instantiate(string $requestHandlerClass):RequestHandlerInterface;
 }

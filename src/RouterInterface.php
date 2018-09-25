@@ -15,34 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/03/2018
-// Time:     14:43
+// Date:     25/09/2018
 // Project:  Router
 //
-declare(strict_types = 1);
-namespace CodeInc\Router\RequestHandlersInstantiator;
-use CodeInc\Router\RouterException;
-use Psr\Http\Server\RequestHandlerInterface;
+declare(strict_types=1);
+namespace CodeInc\Router;
+use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
- * Class SimpleRequestHandlersInstantiator
+ * Interface RouterInterface
  *
- * @package CodeInc\Router\RequestHandlersInstantiator
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class SimpleRequestHandlersInstantiator implements RequestHandlersInstantiatorInterface
+interface RouterInterface extends MiddlewareInterface
 {
     /**
-     * @inheritdoc
-     * @throws RouterException
+     * Returns the URI of a given request handler.
+     *
+     * @param string $requestHandlerClass
+     * @return string
      */
-    public function instantiate(string $requestHandlerClass):RequestHandlerInterface
-    {
-        $controller = new $requestHandlerClass();
-        if (!$controller instanceof RequestHandlerInterface) {
-            throw RouterException::notARequestHandler($requestHandlerClass);
-        }
-        return $controller;
-    }
+    public function getHandlerUri(string $requestHandlerClass):string;
 }

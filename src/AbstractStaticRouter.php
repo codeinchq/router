@@ -21,72 +21,65 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class StaticRouter
+ * Class AbstractStaticRouter
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class StaticRouter extends AbstractStaticRouter
+abstract class AbstractStaticRouter implements RouterInterface
 {
     /**
-     * @var string[]
-     */
-    private $handlers = [];
-
-    /**
-     * @var RequestHandlersInstantiatorInterface
-     */
-    private $requestHandlersInstantiator;
-
-    /**
-     * StaticInstantiatorRouter constructor.
+     * Returns all the requests handler and their associated routes.
      *
-     * @param RequestHandlersInstantiatorInterface $requestHandlersInstantiator
-     */
-    public function __construct(RequestHandlersInstantiatorInterface $requestHandlersInstantiator)
-    {
-        $this->requestHandlersInstantiator = $requestHandlersInstantiator;
-    }
-
-    /**
-     * Adds a request handler.
-     *
-     * @param string $route
-     * @param string $requestHandlerClass
-     * @throws RouterException
-     */
-    public function addRequestHandler(string $route, string $requestHandlerClass):void
-    {
-        if (!is_subclass_of($requestHandlerClass, RequestHandlerInterface::class)) {
-            throw RouterException::notARequestHandler($requestHandlerClass);
-        }
-        $realRoute = strtolower($route);
-        if (isset($this->handlers[$realRoute])) {
-            throw RouterException::duplicateRoute($route);
-        }
-        $this->handlers[$realRoute] = $requestHandlerClass;
-    }
-
-    /**
-     * @inheritdoc
      * @return iterable|string[]
      */
-    public function getHandlers():iterable
-    {
-        return $this->handlers;
-    }
+    abstract public function getHandlers():iterable;
 
     /**
-     * @inheritdoc
+     * Instantiates a request handler.
+     *
      * @param string $requestHandlerClass
      * @return RequestHandlerInterface
      */
-    protected function instantiate(string $requestHandlerClass):RequestHandlerInterface
+    abstract protected function instantiate(string $requestHandlerClass):RequestHandlerInterface;
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        return $this->requestHandlersInstantiator->instantiate($requestHandlerClass);
+        $requestRoute = $request->getUri()->getPath();
+        foreach ($this->getHandlers() as $route => $handlerClass) {
+            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
+                $handler = $this->instantiate($handlerClass);
+                break;
+            }
+        }
+
+        return $handler->handle($request);
+    }
+
+    /**
+     * @inheritdoc
+     * @param string $requestHandlerClass
+     * @return string
+     * @throws RouterException
+     */
+    public function getHandlerUri(string $requestHandlerClass):string
+    {
+        foreach ($this->getHandlers() as $route => $handlerClass) {
+            if ($requestHandlerClass == $handlerClass) {
+                return $route;
+            }
+        }
+        throw RouterException::noRouteFound($requestHandlerClass);
     }
 }
