@@ -6,10 +6,11 @@ Two types of routers are supplied in the current package: a static router which 
 
 ## Usage
 
+### Static router
 ```php
 <?php
 use CodeInc\Router\StaticRouter\StaticRouter;
-use CodeInc\PSR7ResponseSender\ResponseSender; // from the codeinc/psr7-response-sender package
+use CodeInc\PSR7ResponseSender\ResponseSender; 
 use Psr\Http\Server\RequestHandlerInterface;
 
 // some request handlers...
@@ -24,16 +25,58 @@ $myRouter->addRequestHandler("/license.txt", LicenseController::class);
 $myRouter->addRequestHandler("/article-[0-9]/*", ArticleController::class); 
 
 // processing and the response
-// $aPsr7ServerRequest must implement ServerRequestInterface 
-// $notFoundRequestHandler must implement RequestHandlerInterface 
+// --> $aPsr7ServerRequest must implement ServerRequestInterface 
+// --> $notFoundRequestHandler must implement RequestHandlerInterface 
 $response = $myRouter->process($aPsr7ServerRequest, $notFoundRequestHandler);
 
 // sending the response using codeinc/psr7-response-sender
-// -> https://packagist.org/packages/codeinc/psr7-response-sender
+// --> see https://packagist.org/packages/codeinc/psr7-response-sender
 (new ResponseSender())->send($response);
 ```
 
 In order to instantiate the request handlers, you can pass an object implementing [`RequestHandlerInstantiatorInterface`](src/RequestHandlerInstantiator/RequestHandlerInstantiatorInterface.php) to the `StaticRouter` constructor.
+
+
+### Dynamic router 
+
+```php
+<?php
+use CodeInc\Router\DynamicRouter\DynamicRouter;
+use CodeInc\PSR7ResponseSender\ResponseSender; 
+
+// in the current example a class named MyApp\Controllers\User\MyAccount
+// will be available at /User/MyAccount
+$myRouter = new DynamicRouter(
+    'MyApp\\Controllers', // <-- namespace to the request handler
+    '/' // <-- base URI of the request handlers
+);
+
+// processing and the response
+// --> $aPsr7ServerRequest must implement ServerRequestInterface 
+// --> $notFoundRequestHandler must implement RequestHandlerInterface 
+$response = $myRouter->process($aPsr7ServerRequest, $notFoundRequestHandler);
+
+// sending the response using codeinc/psr7-response-sender
+// --> see https://packagist.org/packages/codeinc/psr7-response-sender
+(new ResponseSender())->send($response);
+```
+
+### As a PSR-15 request handler
+
+The router can behave as a PSR-15 request handler (implementing `RequestHandlerInterface`) using [`RouterRequestHandlerWrapper`](src/RouterRequestHandlerWrapper.php):
+ ```php
+ <?php
+ use CodeInc\Router\DynamicRouter\DynamicRouter;
+ use CodeInc\Router\RouterRequestHandlerWrapper;
+ 
+ // in the current example a class named MyApp\Controllers\User\MyAccount
+ // will be available at /User/MyAccount
+ $myRouter = new DynamicRouter('MyApp\\Controllers', '/');
+ 
+ // the router is now a PSR-15 request handler implementing RequestHandlerInterface
+ // --> $notFoundRequestHandler must implement RequestHandlerInterface 
+ $myRouterAsARequestHandler = new RouterRequestHandlerWrapper($myRouter, $notFoundRequestHandler);
+```
 
 ## Installation
 
