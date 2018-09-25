@@ -16,33 +16,27 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     13/03/2018
-// Time:     14:43
+// Time:     14:42
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router;
-use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
-use CodeInc\Router\Interfaces\ControllerInterface;
+namespace CodeInc\Router\RequestHandlersInstantiator;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class SimpleControllerInstantiator
+ * Interface RequestHandlersInstantiatorInterface
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\RequestHandlersInstantiator
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class SimpleControllerInstantiator implements ControllerInstantiatorInterface
+interface RequestHandlersInstantiatorInterface
 {
     /**
-     * @inheritdoc
-     * @throws RouterException
+     * Returns a request handler instance.
+     *
+     * @param string $requestHandlerClass
+     * @return RequestHandlerInterface
      */
-    public function instantiate(string $controllerClass):ControllerInterface
-    {
-        $controller = new $controllerClass();
-        if (!$controller instanceof ControllerInterface) {
-            throw RouterException::notAController($controllerClass);
-        }
-        return $controller;
-    }
+    public function instantiate(string $requestHandlerClass):RequestHandlerInterface;
 }

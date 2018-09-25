@@ -21,6 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use CodeInc\Router\RequestHandlersInstantiator\RequestHandlersInstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -28,43 +29,66 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractStaticRouter
+ * Class StaticInstantiatorRouter
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class StaticRouter implements MiddlewareInterface
+class StaticInstantiatorRouter implements MiddlewareInterface
 {
     /**
-     * @var RequestHandlerInterface[]
+     * @var string[]
      */
-    protected $handlers = [];
+    private $routes = [];
+
+    /**
+     * @var RequestHandlersInstantiatorInterface
+     */
+    private $requestHandlersInstantiator;
+
+    /**
+     * StaticInstantiatorRouter constructor.
+     *
+     * @param RequestHandlersInstantiatorInterface $requestHandlersInstantiator
+     */
+    public function __construct(RequestHandlersInstantiatorInterface $requestHandlersInstantiator)
+    {
+        $this->requestHandlersInstantiator = $requestHandlersInstantiator;
+    }
 
     /**
      * Adds a request handler.
      *
      * @param string $route
-     * @param RequestHandlerInterface $requestHandler
+     * @param string $requestHandlerClass
      * @throws RouterException
      */
-    public function addRequestHandler(string $route, RequestHandlerInterface $requestHandler):void
+    public function addRequestHandler(string $route, string $requestHandlerClass):void
     {
+        if (!is_subclass_of($requestHandlerClass, RoutableRequestHandlerInterface::class)) {
+            throw RouterException::notARequestHandler($requestHandlerClass);
+        }
         $realRoute = strtolower($route);
-        if (isset($this->handlers[$realRoute])) {
+        if (isset($this->routes[$realRoute])) {
             throw RouterException::duplicateRoute($route);
         }
-        $this->handlers[$realRoute] = $requestHandler;
+        $this->routes[$realRoute] = $requestHandlerClass;
     }
 
     /**
      * Adds a routable request handler.
      *
-     * @param \CodeInc\Router\RoutableRequestHandlerInterface $routableRequestHandler
+     * @param string $routableRequestHandlerClass
      * @throws RouterException
      */
-    public function addRoutableRequestHandler(RoutableRequestHandlerInterface $routableRequestHandler):void
+    public function addRoutableRequestHandler(string $routableRequestHandlerClass):void
     {
-        $this->addRequestHandler($routableRequestHandler::getRoute(), $routableRequestHandler);
+        if (!is_subclass_of($routableRequestHandlerClass, RoutableRequestHandlerInterface::class)) {
+            throw RouterException::notARoutableRequestHandler($routableRequestHandlerClass);
+        }
+        /** @var RoutableRequestHandlerInterface $routableRequestHandlerClass */
+        /** @noinspection PhpStrictTypeCheckingInspection */
+        $this->addRequestHandler($routableRequestHandlerClass::getRoute(), $routableRequestHandlerClass);
     }
 
     /**
@@ -75,18 +99,18 @@ abstract class StaticRouter implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        $uriPath = strtolower($request->getUri()->getPath());
+        $requestRoute = strtolower($request->getUri()->getPath());
 
         // if there is a direct route matching the request
-        if (isset($this->handlers[$uriPath])) {
-            $handler = $this->handlers[$uriPath];
+        if (isset($this->routes[$requestRoute])) {
+            $handler = $this->requestHandlersInstantiator->instantiate($this->routes[$requestRoute]);
         }
 
         // if there is a pattern route matching the request
         else {
-            foreach ($this->handlers as $route => $requestHandler) {
-                if (fnmatch($route, $uriPath)) {
-                    $handler = $requestHandler;
+            foreach ($this->routes as $route => $requestHandlerClass) {
+                if (fnmatch($route, $requestRoute)) {
+                    $handler = $this->requestHandlersInstantiator->instantiate($requestHandlerClass);
                     break;
                 }
             }

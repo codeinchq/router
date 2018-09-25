@@ -34,8 +34,9 @@ class RouterException extends \Exception
 {
     public const CODE_DUPLICATE_ROUTE = 1;
     public const CODE_EMPTY_URI = 2;
-    public const CODE_NOT_A_CONTROLLER = 3;
-    public const CODE_NOT_WITHIN_NAMESPACE = 4;
+    public const CODE_NOT_A_REQUEST_HANDLER = 3;
+    public const CODE_NOT_A_ROUTABLE_REQUEST_HANDLER = 4;
+    public const CODE_NOT_WITHIN_NAMESPACE = 5;
 
     /**
      * @param string $route
@@ -60,20 +61,33 @@ class RouterException extends \Exception
      * @param string $controllerClass
      * @return RouterException
      */
-    public static function notAController(string $controllerClass):self
+    public static function notARequestHandler(string $controllerClass):self
     {
-        return new self(sprintf("The class %s is not a controller. All controller must implement %s.",
-            $controllerClass, RequestHandlerInterface::class), self::CODE_NOT_A_CONTROLLER);
+        return new self(sprintf("The class %s is not a PSR-7 request handler. "
+            ."All PSR-7 request handlers must implement %s.", $controllerClass, RequestHandlerInterface::class),
+            self::CODE_NOT_A_REQUEST_HANDLER);
     }
 
     /**
      * @param string $controllerClass
+     * @return RouterException
+     */
+    public static function notARoutableRequestHandler(string $controllerClass):self
+    {
+        return new self(sprintf("The class %s is not a routable PSR-7 request handler. "
+            ."All routable PSR-7 request handlers must implement %s.",
+            $controllerClass, RoutableRequestHandlerInterface::class),
+            self::CODE_NOT_A_ROUTABLE_REQUEST_HANDLER);
+    }
+
+    /**
+     * @param string $requestHandlerClass
      * @param string $controllersBaseNamespace
      * @return RouterException
      */
-    public static function notWithinNamespace(string $controllerClass, string $controllersBaseNamespace):self
+    public static function notWithinNamespace(string $requestHandlerClass, string $controllersBaseNamespace):self
     {
-        return new self(sprintf("The controller %s is not within the controllers base namespace '%s'.",
-            $controllerClass, $controllersBaseNamespace), self::CODE_NOT_WITHIN_NAMESPACE);
+        return new self(sprintf("The PSR-7 request handler %s is not within the base namespace '%s'.",
+            $requestHandlerClass, $controllersBaseNamespace), self::CODE_NOT_WITHIN_NAMESPACE);
     }
 }

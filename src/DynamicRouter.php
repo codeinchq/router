@@ -20,11 +20,10 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Interfaces\ControllerInterface;
-use CodeInc\Router\Interfaces\RouterInterface;
-use CodeInc\Router\Interfaces\ControllerInstantiatorInterface;
+use CodeInc\Router\RequestHandlersInstantiator\RequestHandlersInstantiatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -34,40 +33,48 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicRouter implements RouterInterface
+class DynamicRouter implements MiddlewareInterface
 {
     /**
      * @var string
      */
-    private $controllersBaseNamespace;
+    private $requestHandlersBaseNamespace;
 
     /**
      * @var string
      */
-    private $baseUri;
+    private $uriPrefix;
 
     /**
-     * @var ControllerInstantiatorInterface
+     * @var RequestHandlersInstantiatorInterface
      */
     private $controllerInstantiator;
 
     /**
      * DynamicRouter constructor.
      *
-     * @param string $controllersBaseNamespace
-     * @param ControllerInstantiatorInterface $controllerInstantiator
-     * @param string $baseUri
+     * @param string $requestHandlersBaseNamespace
+     * @param RequestHandlersInstantiatorInterface $requestHandlersInstantiator
+     * @param string $uriPrefix
      * @throws RouterException
      */
-    public function __construct(string $controllersBaseNamespace,
-        ControllerInstantiatorInterface $controllerInstantiator, string $baseUri = '/')
+    public function __construct(string $requestHandlersBaseNamespace,
+        RequestHandlersInstantiatorInterface $requestHandlersInstantiator, string $uriPrefix = '/')
     {
-        if (empty($baseUri)) {
+        if (empty($uriPrefix)) {
             throw RouterException::emptyBaseUri();
         }
-        $this->controllersBaseNamespace = $controllersBaseNamespace;
-        $this->controllerInstantiator = $controllerInstantiator;
-        $this->baseUri = $baseUri;
+        $this->requestHandlersBaseNamespace = $requestHandlersBaseNamespace;
+        $this->controllerInstantiator = $requestHandlersInstantiator;
+        $this->uriPrefix = $uriPrefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUriPrefix():string
+    {
+        return $this->uriPrefix;
     }
 
     /**
@@ -80,12 +87,12 @@ class DynamicRouter implements RouterInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
         $requestUri = $request->getUri()->getPath();
-        if (substr($requestUri, 0, strlen($this->baseUri)) == $this->baseUri) {
-            $controllerClass = $this->controllersBaseNamespace
-                .str_replace('/', '\\', substr($requestUri, strlen($this->baseUri)));
+        if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
+            $controllerClass = $this->requestHandlersBaseNamespace
+                .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
             if (class_exists($controllerClass)) {
-                if (is_subclass_of($controllerClass, ControllerInterface::class)) {
-                    throw RouterException::notAController($controllerClass);
+                if (is_subclass_of($controllerClass, RequestHandlerInterface::class)) {
+                    throw RouterException::notARequestHandler($controllerClass);
                 }
                 $handler = $this->controllerInstantiator->instantiate($controllerClass);
             }
@@ -97,22 +104,22 @@ class DynamicRouter implements RouterInterface
     /**
      * Returns the URI for a given controller within the current namespace.
      *
-     * @param string|ControllerInterface $controller
+     * @param string|RequestHandlerInterface $requestHandler
      * @return string
      * @throws RouterException
      */
-    public function getControllerUri($controller):string
+    public function getControllerUri($requestHandler):string
     {
-        if ($controller instanceof ControllerInterface) {
-            $controller = get_class($controller);
+        if ($requestHandler instanceof RequestHandlerInterface) {
+            $requestHandler = get_class($requestHandler);
         }
-        if (!is_subclass_of($controller, ControllerInterface::class)) {
-            throw RouterException::notAController($controller);
+        else if (!is_subclass_of($requestHandler, RequestHandlerInterface::class)) {
+            throw RouterException::notARequestHandler($requestHandler);
         }
-        if (!substr($controller, 0, strlen($this->controllersBaseNamespace)) == $this->controllersBaseNamespace) {
-            throw RouterException::notWithinNamespace($controller, $this->controllersBaseNamespace);
+        if (!substr($requestHandler, 0, strlen($this->requestHandlersBaseNamespace)) == $this->requestHandlersBaseNamespace) {
+            throw RouterException::notWithinNamespace($requestHandler, $this->requestHandlersBaseNamespace);
         }
-        return $this->baseUri
-            .str_replace('\\', '/', substr($controller, strlen($this->controllersBaseNamespace)));
+        return $this->uriPrefix
+            .str_replace('\\', '/', substr($requestHandler, strlen($this->requestHandlersBaseNamespace)));
     }
 }
