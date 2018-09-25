@@ -49,7 +49,7 @@ class RouterRequestHandlerWrapper implements RequestHandlerInterface
      * @param RouterInterface $router
      * @param null|RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(RouterInterface $router, ?RequestHandlerInterface $notFoundRequestHandler = null)
+    public function __construct(RouterInterface $router, RequestHandlerInterface $notFoundRequestHandler)
     {
         $this->router = $router;
         $this->notFoundRequestHandler = $notFoundRequestHandler;
@@ -64,7 +64,7 @@ class RouterRequestHandlerWrapper implements RequestHandlerInterface
     {
         return $this->router->process(
             $request,
-            $this->notFoundRequestHandler ?? new NotFoundRequestHandler()
+            $this->notFoundRequestHandler
         );
     }
 }
