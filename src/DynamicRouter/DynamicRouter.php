@@ -15,43 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     24/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+namespace CodeInc\Router\DynamicRouter;
+use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiatorInterface;
+use CodeInc\Router\RouterException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractRouter
+ * Class DynamicRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\DynamicRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractRouter implements RouterInterface
+class DynamicRouter extends AbstractDynamicRouter
 {
     /**
-     * Instantiates a request handler.
-     *
-     * @param string $requestHandlerClass
-     * @return RequestHandlerInterface
+     * @var RequestHandlerInstantiatorInterface
      */
-    abstract protected function instantiate(string $requestHandlerClass):RequestHandlerInterface;
+    private $requestHandlersInstantiator;
+
+    /**
+     * DynamicRouter constructor.
+     *
+     * @param string $requestHandlersNamespace
+     * @param string $uriPrefix
+     * @param RequestHandlerInstantiatorInterface $requestHandlersInstantiator
+     * @throws RouterException
+     */
+    public function __construct(string $requestHandlersNamespace, string $uriPrefix,
+        RequestHandlerInstantiatorInterface $requestHandlersInstantiator)
+    {
+        parent::__construct($requestHandlersNamespace, $uriPrefix);
+        $this->requestHandlersInstantiator = $requestHandlersInstantiator;
+    }
 
     /**
      * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * @param string $handlerClass
+     * @return RequestHandlerInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    protected function instantiate(string $handlerClass):RequestHandlerInterface
     {
-        if ($handlerClass = $this->getHandlerClass($request)) {
-            $handler = $this->instantiate($handlerClass);
-        }
-        return $handler->handle($request);
+        return $this->requestHandlersInstantiator->instantiate($handlerClass);
     }
 }

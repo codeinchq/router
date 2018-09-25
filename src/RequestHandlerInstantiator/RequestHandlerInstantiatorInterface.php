@@ -15,49 +15,28 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     24/09/2018
+// Date:     13/03/2018
+// Time:     14:42
 // Project:  Router
 //
-declare(strict_types=1);
-namespace CodeInc\Router;
+declare(strict_types = 1);
+namespace CodeInc\Router\RequestHandlerInstantiator;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class DynamicRouter
+ * Interface RequestHandlerInstantiatorInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicRouter extends AbstractDynamicRouter
+interface RequestHandlerInstantiatorInterface
 {
     /**
-     * @var RequestHandlersInstantiatorInterface
-     */
-    private $requestHandlersInstantiator;
-
-    /**
-     * DynamicRouter constructor.
+     * Returns a request handler instance.
      *
-     * @param string $requestHandlersNamespace
-     * @param string $uriPrefix
-     * @param RequestHandlersInstantiatorInterface $requestHandlersInstantiator
-     * @throws RouterException
-     */
-    public function __construct(string $requestHandlersNamespace, string $uriPrefix,
-        RequestHandlersInstantiatorInterface $requestHandlersInstantiator)
-    {
-        parent::__construct($requestHandlersNamespace, $uriPrefix);
-        $this->requestHandlersInstantiator = $requestHandlersInstantiator;
-    }
-
-    /**
-     * @inheritdoc
-     * @param string $handlerClass
+     * @param string $requestHandlerClass
      * @return RequestHandlerInterface
      */
-    protected function instantiate(string $handlerClass):RequestHandlerInterface
-    {
-        return $this->requestHandlersInstantiator->instantiate($handlerClass);
-    }
+    public function instantiate(string $requestHandlerClass):RequestHandlerInterface;
 }

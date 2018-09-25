@@ -20,14 +20,17 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\StaticRouter;
+use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiator;
+use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiatorInterface;
+use CodeInc\Router\RouterException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
  * Class StaticRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\StaticRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class StaticRouter extends AbstractStaticRouter
@@ -38,24 +41,24 @@ class StaticRouter extends AbstractStaticRouter
     private $handlers = [];
 
     /**
-     * @var RequestHandlersInstantiatorInterface
+     * @var RequestHandlerInstantiatorInterface
      */
     private $requestHandlersInstantiator;
 
     /**
      * StaticInstantiatorRouter constructor.
      *
-     * @param RequestHandlersInstantiatorInterface $requestHandlersInstantiator
+     * @param RequestHandlerInstantiatorInterface $requestHandlersInstantiator
      */
-    public function __construct(RequestHandlersInstantiatorInterface $requestHandlersInstantiator)
+    public function __construct(?RequestHandlerInstantiatorInterface $requestHandlersInstantiator = null)
     {
-        $this->requestHandlersInstantiator = $requestHandlersInstantiator;
+        $this->requestHandlersInstantiator = $requestHandlersInstantiator ?? new RequestHandlerInstantiator();
     }
 
     /**
      * Adds a request handler.
      *
-     * @param string $route
+     * @param string $route URI path (supports shell patterns)
      * @param string $requestHandlerClass
      * @throws RouterException
      */
@@ -84,6 +87,7 @@ class StaticRouter extends AbstractStaticRouter
      * @inheritdoc
      * @param string $requestHandlerClass
      * @return RequestHandlerInterface
+     * @throws RouterException
      */
     protected function instantiate(string $requestHandlerClass):RequestHandlerInterface
     {

@@ -15,40 +15,42 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     05/03/2018
+// Time:     11:53
 // Project:  Router
 //
-declare(strict_types=1);
-namespace CodeInc\Router;
+declare(strict_types = 1);
+namespace CodeInc\Router\StaticRouter;
+use CodeInc\Router\AbstractRouter;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractRouterAggregator
+ * Class AbstractStaticRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\StaticRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractRouterAggregator extends AbstractRouter
+abstract class AbstractStaticRouter extends AbstractRouter
 {
     /**
-     * Returns the routers iterator.
+     * Returns all the requests handler and their associated routes.
      *
-     * @return iterable|RouterInterface[]
+     * @return iterable|string[]
      */
-    abstract protected function getRouters():iterable;
+    abstract public function getHandlers():iterable;
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|RequestHandlerInterface
+     * @return null|string
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
+    public function getHandlerClass(ServerRequestInterface $request):?string
     {
-        foreach ($this->getRouters() as $router) {
-            if (($handler = $router->getHandler($request))) {
-                return $handler;
+        $requestRoute = $request->getUri()->getPath();
+        foreach ($this->getHandlers() as $route => $handlerClass) {
+            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
+                return $handlerClass;
             }
         }
         return null;
@@ -57,13 +59,13 @@ abstract class AbstractRouterAggregator extends AbstractRouter
     /**
      * @inheritdoc
      * @param string $requestHandlerClass
-     * @return null|string
+     * @return string|null
      */
     public function getHandlerUri(string $requestHandlerClass):?string
     {
-        foreach ($this->getRouters() as $router) {
-            if ($handlerUri = $router->getHandlerUri($requestHandlerClass)) {
-                return $handlerUri;
+        foreach ($this->getHandlers() as $route => $handlerClass) {
+            if ($requestHandlerClass == $handlerClass) {
+                return $route;
             }
         }
         return null;

@@ -19,15 +19,17 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\DynamicRouter;
+use CodeInc\Router\AbstractRouter;
+use CodeInc\Router\RouterException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class DynamicRouter
+ * Class AbstractDynamicRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\DynamicRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 abstract class AbstractDynamicRouter extends AbstractRouter
@@ -82,19 +84,12 @@ abstract class AbstractDynamicRouter extends AbstractRouter
     }
 
     /**
-     * Instantiates a controller.
-     *
-     * @param string $handlerClass
-     * @return RequestHandlerInterface
-     */
-    abstract protected function instantiate(string $handlerClass):RequestHandlerInterface;
-
-    /**
+     * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|RequestHandlerInterface
+     * @return null|string
      * @throws RouterException
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
+    public function getHandlerClass(ServerRequestInterface $request):?string
     {
         $requestRoute = $request->getUri()->getPath();
         $uriPrefix = $this->getUriPrefix();
@@ -105,7 +100,7 @@ abstract class AbstractDynamicRouter extends AbstractRouter
                 if (is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
                     throw RouterException::notARequestHandler($handlerClass);
                 }
-                return $this->instantiate($handlerClass);
+                return $handlerClass;
             }
         }
         return null;

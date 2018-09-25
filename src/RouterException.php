@@ -41,6 +41,8 @@ class RouterException extends \Exception
     public const CODE_NO_ROUTE_FOUND = 6;
     public const CODE_NOT_A_ROUTER = 7;
     public const CODE_NOT_A_MIDDLEWARE = 8;
+    public const CODE_EMPTY_ROUTE = 9;
+    public const CODE_INVALID_ROUTE = 9;
 
     /**
      * @param string $route
@@ -71,13 +73,13 @@ class RouterException extends \Exception
     }
 
     /**
-     * @param string $controllerClass
+     * @param string $requestHandlerClass
      * @return RouterException
      */
-    public static function notARequestHandler(string $controllerClass):self
+    public static function notARequestHandler(string $requestHandlerClass):self
     {
         return new self(sprintf("The class %s is not a PSR-7 request handler. "
-            ."All PSR-7 request handlers must implement %s.", $controllerClass, RequestHandlerInterface::class),
+            ."All PSR-7 request handlers must implement %s.", $requestHandlerClass, RequestHandlerInterface::class),
             self::CODE_NOT_A_REQUEST_HANDLER);
     }
 
@@ -122,5 +124,26 @@ class RouterException extends \Exception
         return new self(sprintf("The item '%s' is not a middleware. All middleware must implement '%s'.",
             is_object($item) ? get_class($item) : (string)$item, MiddlewareInterface::class),
             self::CODE_NOT_A_MIDDLEWARE);
+    }
+
+    /**
+     * @param string $requestHandlerClass
+     * @return RouterException
+     */
+    public static function emptyRoute(string $requestHandlerClass):self
+    {
+        return new self(sprintf("The route to the request handler '%s' can not be empty.", $requestHandlerClass),
+            self::CODE_EMPTY_ROUTE);
+    }
+
+    /**
+     * @param mixed $route
+     * @param string $requestHandlerClass
+     * @return RouterException
+     */
+    public static function invalidRoute($route, string $requestHandlerClass):self
+    {
+        return new self(sprintf("The route '%s' to the request handler '%s' is not valid.",
+            (string)$route, $requestHandlerClass), self::CODE_INVALID_ROUTE);
     }
 }

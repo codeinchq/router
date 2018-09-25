@@ -15,68 +15,32 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     11:53
+// Date:     25/09/2018
 // Project:  Router
 //
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace CodeInc\Router;
+use CodeInc\Psr7Responses\NotFoundResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractStaticRouter
+ * Class DefaultNotFoundRequestHandler
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractStaticRouter extends AbstractRouter
+class NotFoundRequestHandler implements RequestHandlerInterface
 {
-    /**
-     * Returns all the requests handler and their associated routes.
-     *
-     * @return iterable|string[]
-     */
-    abstract public function getHandlers():iterable;
-
-    /**
-     * Instantiates a request handler.
-     *
-     * @param string $requestHandlerClass
-     * @return RequestHandlerInterface
-     */
-    abstract protected function instantiate(string $requestHandlerClass):RequestHandlerInterface;
-
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|RequestHandlerInterface
+     * @return ResponseInterface
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
+    public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        $requestRoute = $request->getUri()->getPath();
-        foreach ($this->getHandlers() as $route => $handlerClass) {
-            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                return $this->instantiate($handlerClass);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     * @param string $requestHandlerClass
-     * @return string|null
-     */
-    public function getHandlerUri(string $requestHandlerClass):?string
-    {
-        foreach ($this->getHandlers() as $route => $handlerClass) {
-            if ($requestHandlerClass == $handlerClass) {
-                return $route;
-            }
-        }
-        return null;
+        return new NotFoundResponse();
     }
 }

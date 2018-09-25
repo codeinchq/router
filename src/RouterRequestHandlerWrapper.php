@@ -15,28 +15,56 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     13/03/2018
-// Time:     14:42
+// Date:     25/09/2018
 // Project:  Router
 //
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RequestHandlersInstantiatorInterface
+ * Class RouterRequestHandlerWrapper
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RequestHandlersInstantiatorInterface
+class RouterRequestHandlerWrapper implements RequestHandlerInterface
 {
     /**
-     * Returns a request handler instance.
-     *
-     * @param string $requestHandlerClass
-     * @return RequestHandlerInterface
+     * @var RouterInterface
      */
-    public function instantiate(string $requestHandlerClass):RequestHandlerInterface;
+    private $router;
+
+    /**
+     * @var null|RequestHandlerInterface
+     */
+    private $notFoundRequestHandler;
+
+    /**
+     * RouterRequestHandlerWrapper constructor.
+     *
+     * @param RouterInterface $router
+     * @param null|RequestHandlerInterface $notFoundRequestHandler
+     */
+    public function __construct(RouterInterface $router, ?RequestHandlerInterface $notFoundRequestHandler = null)
+    {
+        $this->router = $router;
+        $this->notFoundRequestHandler = $notFoundRequestHandler;
+    }
+
+    /**
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function handle(ServerRequestInterface $request):ResponseInterface
+    {
+        return $this->router->process(
+            $request,
+            $this->notFoundRequestHandler ?? new NotFoundRequestHandler()
+        );
+    }
 }
