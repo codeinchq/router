@@ -20,6 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\DynamicRouter;
+use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiator;
 use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiatorInterface;
 use CodeInc\Router\RouterException;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -43,20 +44,21 @@ class DynamicRouter extends AbstractDynamicRouter
      *
      * @param string $requestHandlersNamespace
      * @param string $uriPrefix
-     * @param RequestHandlerInstantiatorInterface $requestHandlersInstantiator
+     * @param RequestHandlerInstantiatorInterface|null $requestHandlersInstantiator
      * @throws RouterException
      */
     public function __construct(string $requestHandlersNamespace, string $uriPrefix,
-        RequestHandlerInstantiatorInterface $requestHandlersInstantiator)
+        ?RequestHandlerInstantiatorInterface $requestHandlersInstantiator = null)
     {
         parent::__construct($requestHandlersNamespace, $uriPrefix);
-        $this->requestHandlersInstantiator = $requestHandlersInstantiator;
+        $this->requestHandlersInstantiator = $requestHandlersInstantiator ?? new RequestHandlerInstantiator();
     }
 
     /**
      * @inheritdoc
      * @param string $handlerClass
      * @return RequestHandlerInterface
+     * @throws RouterException
      */
     protected function instantiate(string $handlerClass):RequestHandlerInterface
     {
