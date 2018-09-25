@@ -21,8 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\AbstractRouter;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -31,7 +31,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router\StaticRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractStaticRouter extends AbstractRouter
+abstract class AbstractStaticRouter implements RouterInterface
 {
     /**
      * Returns all the requests handler and their associated routes.
@@ -41,16 +41,22 @@ abstract class AbstractStaticRouter extends AbstractRouter
     abstract public function getHandlers():iterable;
 
     /**
+     * @param string $handlerClass
+     * @return RequestHandlerInterface
+     */
+    abstract protected function instantiateHandler(string $handlerClass):RequestHandlerInterface;
+
+    /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return null|string
      */
-    public function getHandlerClass(ServerRequestInterface $request):?string
+    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
     {
         $requestRoute = $request->getUri()->getPath();
         foreach ($this->getHandlers() as $route => $handlerClass) {
             if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                return $handlerClass;
+                return $this->instantiateHandler($handlerClass);
             }
         }
         return null;
@@ -58,14 +64,17 @@ abstract class AbstractStaticRouter extends AbstractRouter
 
     /**
      * @inheritdoc
-     * @param string $requestHandlerClass
-     * @return string|null
+     * @param RequestHandlerInterface|string $requestHandler
+     * @return null|string
      */
-    public function getHandlerUri(string $requestHandlerClass):?string
+    public function getUri($requestHandler):?string
     {
-        foreach ($this->getHandlers() as $route => $handlerClass) {
-            if ($requestHandlerClass == $handlerClass) {
-                return $route;
+        if ($requestHandler instanceof RequestHandlerInterface) {
+            $requestHandler = get_class($requestHandler);
+        }
+        foreach ($this->getHandlers() as $uri => $handlerClass) {
+            if ($requestHandler === $handlerClass) {
+                return $uri;
             }
         }
         return null;

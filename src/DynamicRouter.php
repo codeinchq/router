@@ -105,25 +105,26 @@ abstract class DynamicRouter implements RouterInterface
     }
 
     /**
-     * Returns the URI for a given controller within the current namespace.
-     *
-     * @param string $requestHandlerClass
+     * @inheritdoc
+     * @param RequestHandlerInterface|string $requestHandler
      * @return string
      * @throws RouterException
      */
-    public function getHandlerUri(string $requestHandlerClass):string
+    public function getUri($requestHandler):string
     {
-        if (!is_subclass_of($requestHandlerClass, RequestHandlerInterface::class)) {
-            throw RouterException::notARequestHandler($requestHandlerClass);
-        }
         $requestHandlersNamespace = $this->getRequestHandlersNamespace();
-        if (!substr($requestHandlerClass, 0, strlen($this->getRequestHandlersNamespace())) == $requestHandlerClass) {
-            throw RouterException::notWithinNamespace($requestHandlerClass, $requestHandlerClass);
+
+        if ($requestHandler instanceof RequestHandlerInterface) {
+            $requestHandler = get_class($requestHandler);
         }
-        if (!class_exists($requestHandlerClass) || !is_subclass_of($requestHandlerClass, RequestHandlerInterface::class)) {
-            throw RouterException::notARequestHandler($requestHandlerClass);
+        else if (!is_subclass_of($requestHandler, RequestHandlerInterface::class)) {
+            throw RouterException::notARequestHandler($requestHandler);
         }
+        if (!substr($requestHandler, 0, strlen($requestHandlersNamespace)) == $requestHandler) {
+            throw RouterException::notWithinNamespace($requestHandler, $requestHandlersNamespace);
+        }
+
         return $this->getUriPrefix()
-            .str_replace('\\', '/', substr($requestHandlerClass, strlen($requestHandlersNamespace)));
+            .str_replace('\\', '/', substr($requestHandler, strlen($requestHandlersNamespace)));
     }
 }

@@ -39,6 +39,7 @@ class RouterException extends \Exception
     public const CODE_NOT_A_REQUEST_HANDLER = 4;
     public const CODE_NOT_WITHIN_NAMESPACE = 5;
     public const CODE_NO_REQUEST_HANDLER_FOUND = 6;
+    public const CODE_CLASS_NOT_FOUND = 7;
 
     /**
      * @param string $route
@@ -100,5 +101,15 @@ class RouterException extends \Exception
         return new self(sprintf("No request handler has been found to handler the request '%s'",
             $request->getUri()->getPath()),
             self::CODE_NO_REQUEST_HANDLER_FOUND);
+    }
+
+    /**
+     * @param string $class
+     * @return RouterException
+     */
+    public static function handlerClassNotFound(string $class):self
+    {
+        return new self(sprintf("The handler class '%s' does ot exist.", $class),
+            self::CODE_CLASS_NOT_FOUND);
     }
 }

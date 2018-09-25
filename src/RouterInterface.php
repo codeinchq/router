@@ -21,6 +21,7 @@
 declare(strict_types=1);
 namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -35,15 +36,15 @@ interface RouterInterface
      * Returns the request handler to handle the given HTTP request or NULL if no handler is available.
      *
      * @param ServerRequestInterface $request
-     * @return null|string
+     * @return null|RequestHandlerInterface
      */
-    public function getHandlerClass(ServerRequestInterface $request):?string;
+    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface;
 
     /**
      * Returns the URI of a request handler or NULL if the handler's URI can not be computed.
      *
-     * @param string $requestHandlerClass
+     * @param string|RequestHandlerInterface $requestHandler A request handler or a request handler's class
      * @return string|null
      */
-    public function getHandlerUri(string $requestHandlerClass):?string;
+    public function getUri($requestHandler):?string;
 }

@@ -20,7 +20,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\RequestHandlerFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -40,22 +39,15 @@ class RouterMiddlewareWrapper implements MiddlewareInterface
      */
     private $router;
 
-    /**
-     * @var RequestHandlerFactoryInterface
-     */
-    private $handlerFactory;
 
     /**
      * RouterRequestHandlerWrapper constructor.
      *
      * @param RouterInterface $router
-     * @param RequestHandlerFactoryInterface|null $handlerFactory
      */
-    public function __construct(RouterInterface $router,
-        ?RequestHandlerFactoryInterface $handlerFactory = null)
+    public function __construct(RouterInterface $router)
     {
         $this->router = $router;
-        $this->handlerFactory = $handlerFactory;
     }
 
     /**
@@ -66,8 +58,8 @@ class RouterMiddlewareWrapper implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($handlerClass = $this->router->getHandlerClass($request)) {
-            $handler = $this->handlerFactory->factory($handlerClass);
+        if ($routerHandler = $this->router->getHandler($request)) {
+            $handler = $routerHandler;
         }
         return $handler->handle($request);
     }
