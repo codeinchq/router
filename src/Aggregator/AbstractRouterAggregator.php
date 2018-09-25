@@ -20,10 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Aggregator;
-use CodeInc\MiddlewareDispatcher\AbstractDispatcher;
 use CodeInc\MiddlewareDispatcher\Dispatcher;
 use CodeInc\MiddlewareDispatcher\DispatcherMiddlewareWrapper;
-use CodeInc\MiddlewareDispatcher\MiddlewareWrapper\AbstractDispatcherMiddlewareWrapper;
 use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
