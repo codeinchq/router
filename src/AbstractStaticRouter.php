@@ -20,7 +20,7 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\StaticRouter;
+namespace CodeInc\Router;
 use CodeInc\Router\AbstractRouter;
 use Psr\Http\Message\ServerRequestInterface;
 

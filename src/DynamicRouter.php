@@ -19,20 +19,18 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\DynamicRouter;
-use CodeInc\Router\AbstractRouter;
-use CodeInc\Router\RouterException;
+namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractDynamicRouter
+ * Class DynamicRouter
  *
- * @package CodeInc\Router\DynamicRouter
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractDynamicRouter extends AbstractRouter
+abstract class DynamicRouter implements RouterInterface
 {
     /**
      * @var string

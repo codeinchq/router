@@ -20,30 +20,55 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use CodeInc\Router\RequestHandlerFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RouterInterface
+ * Class RouterMiddlewareWrapper
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface
+class RouterMiddlewareWrapper implements MiddlewareInterface
 {
     /**
-     * Returns the request handler to handle the given HTTP request or NULL if no handler is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return null|string
+     * @var RouterInterface
      */
-    public function getHandlerClass(ServerRequestInterface $request):?string;
+    private $router;
 
     /**
-     * Returns the URI of a request handler or NULL if the handler's URI can not be computed.
-     *
-     * @param string $requestHandlerClass
-     * @return string|null
+     * @var RequestHandlerFactoryInterface
      */
-    public function getHandlerUri(string $requestHandlerClass):?string;
+    private $handlerFactory;
+
+    /**
+     * RouterRequestHandlerWrapper constructor.
+     *
+     * @param RouterInterface $router
+     * @param RequestHandlerFactoryInterface|null $handlerFactory
+     */
+    public function __construct(RouterInterface $router,
+        ?RequestHandlerFactoryInterface $handlerFactory = null)
+    {
+        $this->router = $router;
+        $this->handlerFactory = $handlerFactory;
+    }
+
+    /**
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    {
+        if ($handlerClass = $this->router->getHandlerClass($request)) {
+            $handler = $this->handlerFactory->factory($handlerClass);
+        }
+        return $handler->handle($request);
+    }
 }

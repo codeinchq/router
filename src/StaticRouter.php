@@ -20,10 +20,7 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\StaticRouter;
-use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiator;
-use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiatorInterface;
-use CodeInc\Router\RouterException;
+namespace CodeInc\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -41,18 +38,18 @@ class StaticRouter extends AbstractStaticRouter
     private $handlers = [];
 
     /**
-     * @var RequestHandlerInstantiatorInterface
+     * @var RequestHandlerFactoryInterface
      */
     private $requestHandlersInstantiator;
 
     /**
      * StaticInstantiatorRouter constructor.
      *
-     * @param RequestHandlerInstantiatorInterface $requestHandlersInstantiator
+     * @param RequestHandlerFactoryInterface $requestHandlersInstantiator
      */
-    public function __construct(?RequestHandlerInstantiatorInterface $requestHandlersInstantiator = null)
+    public function __construct(?RequestHandlerFactoryInterface $requestHandlersInstantiator = null)
     {
-        $this->requestHandlersInstantiator = $requestHandlersInstantiator ?? new RequestHandlerInstantiator();
+        $this->requestHandlersInstantiator = $requestHandlersInstantiator ?? new RequestHandlerFactory();
     }
 
     /**
@@ -91,6 +88,6 @@ class StaticRouter extends AbstractStaticRouter
      */
     protected function instantiate(string $requestHandlerClass):RequestHandlerInterface
     {
-        return $this->requestHandlersInstantiator->instantiate($requestHandlerClass);
+        return $this->requestHandlersInstantiator->factory($requestHandlerClass);
     }
 }

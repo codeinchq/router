@@ -20,17 +20,17 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\RequestHandlerInstantiator;
+namespace CodeInc\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RequestHandlerInstantiatorInterface
+ * Interface RequestHandlerFactoryInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RequestHandlerInstantiatorInterface
+interface RequestHandlerFactoryInterface
 {
     /**
      * Returns a request handler instance.
@@ -38,5 +38,5 @@ interface RequestHandlerInstantiatorInterface
      * @param string $requestHandlerClass
      * @return RequestHandlerInterface
      */
-    public function instantiate(string $requestHandlerClass):RequestHandlerInterface;
+    public function factory(string $requestHandlerClass):RequestHandlerInterface;
 }

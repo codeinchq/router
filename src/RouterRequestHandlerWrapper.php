@@ -39,32 +39,34 @@ class RouterRequestHandlerWrapper implements RequestHandlerInterface
     private $router;
 
     /**
-     * @var null|RequestHandlerInterface
+     * @var RequestHandlerFactoryInterface
      */
-    private $notFoundRequestHandler;
+    private $handlerFactory;
 
     /**
      * RouterRequestHandlerWrapper constructor.
      *
      * @param RouterInterface $router
-     * @param null|RequestHandlerInterface $notFoundRequestHandler
+     * @param RequestHandlerFactoryInterface|null $handlerFactory
      */
-    public function __construct(RouterInterface $router, RequestHandlerInterface $notFoundRequestHandler)
+    public function __construct(RouterInterface $router,
+        ?RequestHandlerFactoryInterface $handlerFactory = null)
     {
         $this->router = $router;
-        $this->notFoundRequestHandler = $notFoundRequestHandler;
+        $this->handlerFactory = $handlerFactory;
     }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws RouterException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        return $this->router->process(
-            $request,
-            $this->notFoundRequestHandler
-        );
+        if ($handlerClass = $this->router->getHandlerClass($request)) {
+            return $this->handlerFactory->factory($handlerClass)->handle($request);
+        }
+        throw RouterException::noRequestHandlerFound($request);
     }
 }

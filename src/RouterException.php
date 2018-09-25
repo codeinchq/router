@@ -21,6 +21,7 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -37,6 +38,7 @@ class RouterException extends \Exception
     public const CODE_EMPTY_REQUEST_HANDLER_NAMESPACE = 3;
     public const CODE_NOT_A_REQUEST_HANDLER = 4;
     public const CODE_NOT_WITHIN_NAMESPACE = 5;
+    public const CODE_NO_REQUEST_HANDLER_FOUND = 6;
 
     /**
      * @param string $route
@@ -87,5 +89,16 @@ class RouterException extends \Exception
         return new self(sprintf("The PSR-7 request handler %s is not within the base namespace '%s'.",
             $requestHandlerClass, $controllersBaseNamespace),
             self::CODE_NOT_WITHIN_NAMESPACE);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return RouterException
+     */
+    public static function noRequestHandlerFound(ServerRequestInterface $request):self
+    {
+        return new self(sprintf("No request handler has been found to handler the request '%s'",
+            $request->getUri()->getPath()),
+            self::CODE_NO_REQUEST_HANDLER_FOUND);
     }
 }

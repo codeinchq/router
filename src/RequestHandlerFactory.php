@@ -15,53 +15,34 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     24/09/2018
+// Date:     25/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\DynamicRouter;
-use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiator;
-use CodeInc\Router\RequestHandlerInstantiator\RequestHandlerInstantiatorInterface;
-use CodeInc\Router\RouterException;
+namespace CodeInc\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class DynamicRouter
+ * Class RequestHandlerFactory
  *
- * @package CodeInc\Router\DynamicRouter
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicRouter extends AbstractDynamicRouter
+class RequestHandlerFactory implements RequestHandlerFactoryInterface
 {
     /**
-     * @var RequestHandlerInstantiatorInterface
-     */
-    private $requestHandlersInstantiator;
-
-    /**
-     * DynamicRouter constructor.
-     *
-     * @param string $requestHandlersNamespace
-     * @param string $uriPrefix
-     * @param RequestHandlerInstantiatorInterface|null $requestHandlersInstantiator
-     * @throws RouterException
-     */
-    public function __construct(string $requestHandlersNamespace, string $uriPrefix,
-        ?RequestHandlerInstantiatorInterface $requestHandlersInstantiator = null)
-    {
-        parent::__construct($requestHandlersNamespace, $uriPrefix);
-        $this->requestHandlersInstantiator = $requestHandlersInstantiator ?? new RequestHandlerInstantiator();
-    }
-
-    /**
      * @inheritdoc
-     * @param string $handlerClass
+     * @param string $requestHandlerClass
      * @return RequestHandlerInterface
      * @throws RouterException
      */
-    protected function instantiate(string $handlerClass):RequestHandlerInterface
+    public function factory(string $requestHandlerClass):RequestHandlerInterface
     {
-        return $this->requestHandlersInstantiator->instantiate($handlerClass);
+        $requestHandler = new $requestHandlerClass;
+        if (!$requestHandler instanceof RequestHandlerInterface) {
+            throw RouterException::notARequestHandler($requestHandlerClass);
+        }
+        return $requestHandler;
     }
 }
