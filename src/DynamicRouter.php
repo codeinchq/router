@@ -42,6 +42,11 @@ abstract class DynamicRouter implements RouterInterface
     protected $uriPrefix;
 
     /**
+     * @var string|null
+     */
+    protected $homeController;
+
+    /**
      * DynamicRouter constructor.
      *
      * @param string $controllersNamespace
@@ -58,6 +63,16 @@ abstract class DynamicRouter implements RouterInterface
         }
         $this->controllersNamespace = $controllersNamespace;
         $this->uriPrefix = $uriPrefix;
+    }
+
+    /**
+     * Sets the controller returned for the URI prefix.
+     *
+     * @param string $controllerClass
+     */
+    public function setHomeController(string $controllerClass):void
+    {
+        $this->homeController = $controllerClass;
     }
 
     /**
@@ -78,6 +93,9 @@ abstract class DynamicRouter implements RouterInterface
     public function getController(ServerRequestInterface $request):?ControllerInterface
     {
         $requestUri = $request->getUri()->getPath();
+        if ($requestUri == $this->uriPrefix) {
+            return $this->instantiate($request, $this->homeController);
+        }
         if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
             $controllerClass = $this->controllersNamespace
                 .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
