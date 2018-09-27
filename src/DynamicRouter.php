@@ -19,19 +19,17 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Resolvers;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\RouterException;
+namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class NamespaceResolver
+ * Class DynamicRouter
  *
- * @package CodeInc\Router\Resolvers
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NamespaceResolver implements ResolverInterface
+class DynamicRouter extends AbstractRouter
 {
     /**
      * @var string
@@ -44,13 +42,20 @@ class NamespaceResolver implements ResolverInterface
     private $uriPrefix;
 
     /**
-     * NamespaceResolver constructor.
+     * @var ControllerInstantiatorInterface
+     */
+    private $controllerInstantiator;
+
+    /**
+     * DynamicRouter constructor.
      *
      * @param string $controllersNamespace
      * @param string $uriPrefix
+     * @param ControllerInstantiatorInterface $controllerInstantiator
      * @throws RouterException
      */
-    public function __construct(string $controllersNamespace, string $uriPrefix)
+    public function __construct(string $controllersNamespace, string $uriPrefix,
+        ControllerInstantiatorInterface $controllerInstantiator)
     {
         if (empty($uriPrefix)) {
             throw RouterException::emptyUriPrefix();
@@ -60,15 +65,16 @@ class NamespaceResolver implements ResolverInterface
         }
         $this->controllersNamespace = $controllersNamespace;
         $this->uriPrefix = $uriPrefix;
+        $this->controllerInstantiator = $controllerInstantiator;
     }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|string
+     * @return ControllerInterface|null
      * @throws RouterException
      */
-    public function getControllerClass(ServerRequestInterface $request):?string
+    protected function getController(ServerRequestInterface $request):?ControllerInterface
     {
         $requestRoute = $request->getUri()->getPath();
         if (substr($requestRoute, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
@@ -78,7 +84,7 @@ class NamespaceResolver implements ResolverInterface
                 if (is_subclass_of($controllerClass, ControllerInterface::class)) {
                     throw RouterException::notAController($controllerClass);
                 }
-                return $controllerClass;
+                return $this->controllerInstantiator->instantiate($request, $controllerClass);
             }
         }
         return null;
@@ -90,7 +96,7 @@ class NamespaceResolver implements ResolverInterface
      * @return string
      * @throws RouterException
      */
-    public function getUri(string $controllerClass):string
+    public function getControllerUri(string $controllerClass):string
     {
         if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
             throw RouterException::notAController($controllerClass);

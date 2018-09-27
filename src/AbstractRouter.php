@@ -15,35 +15,44 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Resolvers;
+namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface ResolverInterface
+ * Class AbstractRouter
  *
- * @package CodeInc\Router\Resolvers
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ResolverInterface
+abstract class AbstractRouter implements RouterInterface
 {
     /**
-     * Returns the controller's class to handle the given HTTP request or NULL if no handler is available.
+     * Returns the controller to handle the given HTTP request or NULL if none is available.
      *
      * @param ServerRequestInterface $request
-     * @return null|string
+     * @return ControllerInterface|null
      */
-    public function getControllerClass(ServerRequestInterface $request):?string;
+    abstract protected function getController(ServerRequestInterface $request):?ControllerInterface;
 
     /**
-     * Returns the URI of a controller or NULL if the URI can not be computed.
-     *
-     * @param string $controllerClass
-     * @return string|null
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
      */
-    public function getUri(string $controllerClass):?string;
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    {
+        if ($controller = $this->getController($request)) {
+            return $controller->getResponse();
+        }
+        return $handler->handle($request);
+    }
+
 }

@@ -38,5 +38,6 @@ interface ControllerInstantiatorInterface
      * @param string $controllerClass
      * @return ControllerInterface
      */
-    public function instantiateController(ServerRequestInterface $request, string $controllerClass):ControllerInterface;
+    public function instantiate(ServerRequestInterface $request,
+        string $controllerClass):ControllerInterface;
 }

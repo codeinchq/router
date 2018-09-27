@@ -20,24 +20,37 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\Resolvers;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\RouterException;
+namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class ListResolver
+ * Class StaticRouter
  *
- * @package CodeInc\Router\Resolvers
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ListResolver implements ResolverInterface
+class StaticRouter extends AbstractRouter
 {
     /**
      * @var string[]
      */
     private $controllers = [];
+
+    /**
+     * @var ControllerInstantiatorInterface
+     */
+    private $controllerInstantiator;
+
+    /**
+     * ListRouter constructor.
+     *
+     * @param ControllerInstantiatorInterface $controllerInstantiator
+     */
+    public function __construct(ControllerInstantiatorInterface $controllerInstantiator)
+    {
+        $this->controllerInstantiator = $controllerInstantiator;
+    }
 
     /**
      * Adds a controller.
@@ -61,14 +74,14 @@ class ListResolver implements ResolverInterface
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|string
+     * @return ControllerInterface|null
      */
-    public function getControllerClass(ServerRequestInterface $request):?string
+    protected function getController(ServerRequestInterface $request):?ControllerInterface
     {
         $requestRoute = $request->getUri()->getPath();
         foreach ($this->controllers as $route => $controllerClass) {
             if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                return $controllerClass;
+                return $this->controllerInstantiator->instantiate($request, $controllerClass);
             }
         }
         return null;
@@ -79,7 +92,7 @@ class ListResolver implements ResolverInterface
      * @param string $controllerClass
      * @return null|string
      */
-    public function getUri(string $controllerClass):?string
+    public function getControllerUri(string $controllerClass):?string
     {
         foreach ($this->controllers as $route => $knownControllerClass) {
             if ($controllerClass == $knownControllerClass) {

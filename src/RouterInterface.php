@@ -15,7 +15,7 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     25/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
@@ -31,5 +31,11 @@ use Psr\Http\Server\MiddlewareInterface;
  */
 interface RouterInterface extends MiddlewareInterface
 {
-
+    /**
+     * Returns the URI of a controller or NULL if the URI can not be computed.
+     *
+     * @param string $controllerClass
+     * @return string|null
+     */
+    public function getControllerUri(string $controllerClass):?string;
 }
