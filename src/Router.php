@@ -19,41 +19,36 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Controllers;
-use CodeInc\Router\Controllers\ControllerInstantiatorInterface;
+namespace CodeInc\Router;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class ControllerRequestHandlerWrapper
+ * Class Router
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerRequestHandlerWrapper implements RequestHandlerInterface
+abstract class Router extends RouterMiddleware implements RequestHandlerInterface
 {
     /**
-     * @var ControllerInstantiatorInterface
+     * @var RequestHandlerInterface
      */
-    private $controllerInstantiator;
+    private $notFoundRequestHandler;
 
     /**
-     * @var string
-     */
-    private $controllerClass;
-
-    /**
-     * ControllerRequestHandlerWrapper constructor.
+     * Router constructor.
      *
-     * @param string $controllerClass
-     * @param ControllerInstantiatorInterface $controllerInstantiator
+     * @param ResolverInterface $resolver
+     * @param null|RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(string $controllerClass, ControllerInstantiatorInterface $controllerInstantiator)
+    public function __construct(ResolverInterface $resolver, ?RequestHandlerInterface $notFoundRequestHandler = null)
     {
-        $this->controllerClass = $controllerClass;
-        $this->controllerInstantiator = $controllerInstantiator;
+        parent::__construct($resolver);
+        $this->notFoundRequestHandler = $notFoundRequestHandler ?? new NotFoundRequestHandler();
     }
 
     /**
@@ -63,6 +58,6 @@ class ControllerRequestHandlerWrapper implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        return $this->controllerInstantiator->instantiate($this->controllerClass, $request)->getResponse();
+        $this->process($request, $this->notFoundRequestHandler);
     }
 }

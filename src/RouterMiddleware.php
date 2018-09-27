@@ -19,53 +19,60 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\DynamicRouter;
-
-use CodeInc\Router\Controllers\ControllerInstantiatorInterface;
-use CodeInc\Router\Controllers\ControllerInterface;
-use CodeInc\Router\InstantiatingRouterInterface;
+namespace CodeInc\Router;
+use CodeInc\Router\Resolvers\ResolverInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class InstantiatingDynamicRouter
+ * Class RouterMiddleware
  *
- * @package CodeInc\Router\DynamicRouter
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class InstantiatingDynamicRouter extends DynamicRouter implements InstantiatingRouterInterface
+abstract class RouterMiddleware implements MiddlewareInterface
 {
     /**
-     * @var ControllerInstantiatorInterface
+     * @var ResolverInterface
      */
-    private $controllerInstantiator;
+    private $resolver;
 
     /**
-     * InstantiatingDynamicRouter constructor.
+     * RouterMiddleware constructor.
      *
-     * @param string $controllersNamespace
-     * @param string $uriPrefix
-     * @param ControllerInstantiatorInterface $controllerInstantiator
-     * @throws \CodeInc\Router\RouterException
+     * @param ResolverInterface $resolver
      */
-    public function __construct(string $controllersNamespace, string $uriPrefix,
-        ControllerInstantiatorInterface $controllerInstantiator)
+    public function __construct(ResolverInterface $resolver)
     {
-        parent::__construct($controllersNamespace, $uriPrefix);
-        $this->controllerInstantiator = $controllerInstantiator;
+        $this->resolver = $resolver;
     }
+
+    /**
+     * Instantiates the controller.
+     *
+     * @param ServerRequestInterface $request
+     * @param string $controllerClass
+     * @return ControllerInterface
+     */
+    abstract protected function instantiateController(ServerRequestInterface $request,
+        string $controllerClass):ControllerInterface;
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|ControllerInterface
-     * @throws \CodeInc\Router\RouterException
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
      */
-    public function getController(ServerRequestInterface $request):?ControllerInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controllerClass = $this->getControllerClass($request)) {
-            return $this->controllerInstantiator->instantiate($controllerClass, $request);
+        if ($controllerClass = $this->resolver->getControllerClass($request)) {
+            return $this->instantiateController($request, $controllerClass)->getResponse();
         }
-        return null;
+        else {
+            return $handler->handle($request);
+        }
     }
 }

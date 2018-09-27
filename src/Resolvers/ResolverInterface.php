@@ -15,54 +15,35 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     11:53
+// Date:     25/09/2018
 // Project:  Router
 //
-declare(strict_types = 1);
-namespace CodeInc\Router\StaticRouter;
-use CodeInc\Router\Controllers\ControllerInterface;
-use CodeInc\Router\RouterException;
+declare(strict_types=1);
+namespace CodeInc\Router\Resolvers;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class StaticRouter
+ * Interface ResolverInterface
  *
- * @package CodeInc\Router\StaticRouter
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class StaticRouter extends AbstractStaticRouter
+interface ResolverInterface
 {
     /**
-     * @var string[]
-     */
-    private $controllers = [];
-
-    /**
-     * Adds a controller.
+     * Returns the controller's class to handle the given HTTP request or NULL if no handler is available.
      *
-     * @param string $route URI path (supports shell patterns)
-     * @param string $controllerClass
-     * @throws RouterException
+     * @param ServerRequestInterface $request
+     * @return null|string
      */
-    public function addController(string $route, string $controllerClass):void
-    {
-        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-            throw RouterException::notAController($controllerClass);
-        }
-        $realRoute = strtolower($route);
-        if (isset($this->controllers[$realRoute])) {
-            throw RouterException::duplicateRoute($route);
-        }
-        $this->controllers[$realRoute] = $controllerClass;
-    }
+    public function getControllerClass(ServerRequestInterface $request):?string;
 
     /**
-     * @inheritdoc
-     * @return iterable|string[]
+     * Returns the URI of a controller or NULL if the URI can not be computed.
+     *
+     * @param string $controllerClass
+     * @return string|null
      */
-    public function getControllers():iterable
-    {
-        return $this->controllers;
-    }
+    public function getUri(string $controllerClass):?string;
 }

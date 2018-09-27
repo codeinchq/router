@@ -19,20 +19,20 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\DynamicRouter;
-use CodeInc\Router\Controllers\ControllerInterface;
+namespace CodeInc\Router\Resolvers;
+use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\RouterException;
-use CodeInc\Router\RouterInterface;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class AbstractDynamicRouter
+ * Class AbstractDynamicResolver
  *
- * @package CodeInc\Router\DynamicRouter
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractDynamicRouter implements RouterInterface
+abstract class AbstractDynamicResolver implements ResolverInterface
 {
     /**
      * Returns the router's URI prefix.

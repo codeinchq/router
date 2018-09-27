@@ -15,50 +15,54 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     05/03/2018
+// Time:     11:53
 // Project:  Router
 //
-declare(strict_types=1);
-namespace CodeInc\Router\StaticRouter;
-use CodeInc\Router\Controllers\ControllerInstantiatorInterface;
-use CodeInc\Router\Controllers\ControllerInterface;
-use CodeInc\Router\InstantiatingRouterInterface;
-use Psr\Http\Message\ServerRequestInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\Resolvers;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\RouterException;
 
 
 /**
- * Class InstantiatingStaticRouter
+ * Class StaticResolver
  *
- * @package CodeInc\Router\StaticRouter
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class InstantiatingStaticRouter extends StaticRouter implements InstantiatingRouterInterface
+class StaticResolver extends AbstractStaticResolver
 {
     /**
-     * @var ControllerInstantiatorInterface
+     * @var string[]
      */
-    private $controllerInstantiator;
+    private $controllers = [];
 
     /**
-     * InstantiatingStaticRouter constructor.
+     * Adds a controller.
      *
-     * @param ControllerInstantiatorInterface $controllerInstantiator
+     * @param string $route URI path (supports shell patterns)
+     * @param string $controllerClass
+     * @throws RouterException
      */
-    public function __construct(ControllerInstantiatorInterface $controllerInstantiator)
+    public function addController(string $route, string $controllerClass):void
     {
-        $this->controllerInstantiator = $controllerInstantiator;
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw RouterException::notAController($controllerClass);
+        }
+        $realRoute = strtolower($route);
+        if (isset($this->controllers[$realRoute])) {
+            throw RouterException::duplicateRoute($route);
+        }
+        $this->controllers[$realRoute] = $controllerClass;
     }
 
     /**
      * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @return null|ControllerInterface
+     * @return iterable|string[]
      */
-    public function getController(ServerRequestInterface $request):?ControllerInterface
+    public function getControllers():iterable
     {
-        if ($controllerClass = $this->getControllerClass($request)) {
-            return $this->controllerInstantiator->instantiate($controllerClass, $request);
-        }
-        return null;
+        return $this->controllers;
     }
 }

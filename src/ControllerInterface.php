@@ -19,24 +19,30 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Controllers;
+namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface ControllerInstantiatorInterface
+ * Interface ControllerInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInstantiatorInterface
+interface ControllerInterface
 {
     /**
-     * Instantiates a controller.
+     * Returns the parent PSR-7 server request.
      *
-     * @param string $controllerClass
-     * @param ServerRequestInterface $request
-     * @return ControllerInterface
+     * @return ServerRequestInterface
      */
-    public function instantiate(string $controllerClass, ServerRequestInterface $request):ControllerInterface;
+    public function getRequest():ServerRequestInterface;
+
+    /**
+     * Returns the generated PSR-7 response.
+     *
+     * @return ResponseInterface
+     */
+    public function getResponse():ResponseInterface;
 }

@@ -20,19 +20,19 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router\StaticRouter;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router\Resolvers;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractStaticRouter
+ * Class AbstractStaticResolver
  *
- * @package CodeInc\Router\StaticRouter
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractStaticRouter implements RouterInterface
+abstract class AbstractStaticResolver implements ResolverInterface
 {
     /**
      * Returns all the requests handler and their associated routes.

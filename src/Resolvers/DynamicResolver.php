@@ -15,52 +15,68 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     24/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\InstantiatingRouterInterface;
+namespace CodeInc\Router\Resolvers;
 use CodeInc\Router\RouterException;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterRequestHandlerWrapper. Allows an instantiating router to behave as a PSR-15 request handler.
+ * Class DynamicResolver
  *
- * @package CodeInc\Router\Psr15Wrappers
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterRequestHandlerWrapper implements RequestHandlerInterface
+class DynamicResolver extends AbstractDynamicResolver
 {
     /**
-     * @var InstantiatingRouterInterface
+     * @var string
      */
-    private $router;
+    private $controllersNamespace;
 
     /**
-     * RouterRequestHandlerWrapper constructor.
-     *
-     * @param InstantiatingRouterInterface $router
+     * @var string
      */
-    public function __construct(InstantiatingRouterInterface $router)
+    private $uriPrefix;
+
+    /**
+     * DynamicResolver constructor.
+     *
+     * @param string $controllersNamespace
+     * @param string $uriPrefix
+     * @throws RouterException
+     */
+    public function __construct(string $controllersNamespace, string $uriPrefix)
     {
-        $this->router = $router;
+        if (empty($uriPrefix)) {
+            throw RouterException::emptyUriPrefix();
+        }
+        if (empty($controllersNamespace)) {
+            throw RouterException::emptyControllersNamespace();
+        }
+        $this->controllersNamespace = $controllersNamespace;
+        $this->uriPrefix = $uriPrefix;
     }
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     * @throws RouterException
+     * Returns the router's URI prefix.
+     *
+     * @return string
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function getUriPrefix():string
     {
-        if ($controller = $this->router->getController($request)) {
-            return $controller->getResponse();
-        }
-        throw RouterException::noRequestHandlerFound($request);
+        return $this->uriPrefix;
+    }
+
+    /**
+     * Returns the requests handler's base namespace.
+     *
+     * @return string
+     */
+    public function getControllersNamespace():string
+    {
+        return $this->controllersNamespace;
     }
 }

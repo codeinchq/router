@@ -20,7 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Controllers\ControllerInterface;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -30,7 +31,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface InstantiatingRouterInterface extends RouterInterface
+interface InstantiatingRouterInterface extends ResolverInterface
 {
     /**
      * Returns the controller to handle the given HTTP request or NULL if no handler is available.
