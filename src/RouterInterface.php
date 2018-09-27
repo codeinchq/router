@@ -29,7 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends ResolverInterface
+interface RouterInterface
 {
     /**
      * Returns the controller to handle the given HTTP request or NULL if none is available.
@@ -38,4 +38,12 @@ interface RouterInterface extends ResolverInterface
      * @return ControllerInterface|null
      */
     public function getController(ServerRequestInterface $request):?ControllerInterface;
+
+    /**
+     * Returns the URI of a controller or NULL if the URI can not be computed.
+     *
+     * @param string $controllerClass
+     * @return string|null
+     */
+    public function getControllerUri(string $controllerClass):?string;
 }
