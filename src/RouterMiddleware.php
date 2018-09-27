@@ -23,7 +23,6 @@ namespace CodeInc\Router;
 use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -33,7 +32,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class RouterMiddleware implements MiddlewareInterface
+abstract class RouterMiddleware implements RouterInterface
 {
     /**
      * @var ResolverInterface

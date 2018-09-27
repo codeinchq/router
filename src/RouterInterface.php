@@ -20,24 +20,16 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\Resolvers\ResolverInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
- * Interface InstantiatingRouterInterface
+ * Interface RouterInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface InstantiatingRouterInterface extends ResolverInterface
+interface RouterInterface extends MiddlewareInterface
 {
-    /**
-     * Returns the controller to handle the given HTTP request or NULL if no handler is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return null|ControllerInterface
-     */
-    public function getController(ServerRequestInterface $request):?ControllerInterface;
+
 }

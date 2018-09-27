@@ -15,56 +15,59 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     24/09/2018
+// Date:     05/03/2018
+// Time:     11:53
 // Project:  Router
 //
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace CodeInc\Router\Resolvers;
 use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\RouterException;
-use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class AbstractDynamicResolver
+ * Class ListResolver
  *
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractDynamicResolver implements ResolverInterface
+class ListResolver implements ResolverInterface
 {
     /**
-     * Returns the router's URI prefix.
-     *
-     * @return string
+     * @var string[]
      */
-    abstract public function getUriPrefix():string;
+    private $controllers = [];
 
     /**
-     * Returns the controllers' base namespace.
+     * Adds a controller.
      *
-     * @return string
+     * @param string $route URI path (supports shell patterns)
+     * @param string $controllerClass
+     * @throws RouterException
      */
-    abstract public function getControllersNamespace():string;
+    public function addController(string $route, string $controllerClass):void
+    {
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw RouterException::notAController($controllerClass);
+        }
+        $realRoute = strtolower($route);
+        if (isset($this->controllers[$realRoute])) {
+            throw RouterException::duplicateRoute($route);
+        }
+        $this->controllers[$realRoute] = $controllerClass;
+    }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return null|string
-     * @throws RouterException
      */
     public function getControllerClass(ServerRequestInterface $request):?string
     {
         $requestRoute = $request->getUri()->getPath();
-        $uriPrefix = $this->getUriPrefix();
-        if (substr($requestRoute, 0, strlen($uriPrefix)) == $uriPrefix) {
-            $controllerClass = $this->getControllersNamespace()
-                .str_replace('/', '\\', substr($requestRoute, strlen($uriPrefix)));
-            if (class_exists($controllerClass)) {
-                if (is_subclass_of($controllerClass, ControllerInterface::class)) {
-                    throw RouterException::notAController($controllerClass);
-                }
+        foreach ($this->controllers as $route => $controllerClass) {
+            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
                 return $controllerClass;
             }
         }
@@ -74,19 +77,15 @@ abstract class AbstractDynamicResolver implements ResolverInterface
     /**
      * @inheritdoc
      * @param string $controllerClass
-     * @return string
-     * @throws RouterException
+     * @return null|string
      */
-    public function getUri(string $controllerClass):string
+    public function getUri(string $controllerClass):?string
     {
-        $controllersNamespace = $this->getControllersNamespace();
-        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-            throw RouterException::notAController($controllerClass);
+        foreach ($this->controllers as $route => $knownControllerClass) {
+            if ($controllerClass == $knownControllerClass) {
+                return $route;
+            }
         }
-        if (!substr($controllerClass, 0, strlen($controllersNamespace)) == $controllerClass) {
-            throw RouterException::notWithinNamespace($controllerClass, $controllersNamespace);
-        }
-        return $this->getUriPrefix()
-            .str_replace('\\', '/', substr($controllerClass, strlen($controllersNamespace)));
+        return null;
     }
 }

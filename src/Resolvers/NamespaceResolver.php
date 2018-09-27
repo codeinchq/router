@@ -20,16 +20,18 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Resolvers;
+use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\RouterException;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class DynamicResolver
+ * Class NamespaceResolver
  *
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicResolver extends AbstractDynamicResolver
+class NamespaceResolver implements ResolverInterface
 {
     /**
      * @var string
@@ -42,7 +44,7 @@ class DynamicResolver extends AbstractDynamicResolver
     private $uriPrefix;
 
     /**
-     * DynamicResolver constructor.
+     * NamespaceResolver constructor.
      *
      * @param string $controllersNamespace
      * @param string $uriPrefix
@@ -61,22 +63,42 @@ class DynamicResolver extends AbstractDynamicResolver
     }
 
     /**
-     * Returns the router's URI prefix.
-     *
-     * @return string
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @return null|string
+     * @throws RouterException
      */
-    public function getUriPrefix():string
+    public function getControllerClass(ServerRequestInterface $request):?string
     {
-        return $this->uriPrefix;
+        $requestRoute = $request->getUri()->getPath();
+        if (substr($requestRoute, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
+            $controllerClass = $this->controllersNamespace
+                .str_replace('/', '\\', substr($requestRoute, strlen($this->uriPrefix)));
+            if (class_exists($controllerClass)) {
+                if (is_subclass_of($controllerClass, ControllerInterface::class)) {
+                    throw RouterException::notAController($controllerClass);
+                }
+                return $controllerClass;
+            }
+        }
+        return null;
     }
 
     /**
-     * Returns the requests handler's base namespace.
-     *
+     * @inheritdoc
+     * @param string $controllerClass
      * @return string
+     * @throws RouterException
      */
-    public function getControllersNamespace():string
+    public function getUri(string $controllerClass):string
     {
-        return $this->controllersNamespace;
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw RouterException::notAController($controllerClass);
+        }
+        if (!substr($controllerClass, 0, strlen($this->controllersNamespace)) == $controllerClass) {
+            throw RouterException::notWithinNamespace($controllerClass, $this->controllersNamespace);
+        }
+        return $this->uriPrefix
+            .str_replace('\\', '/', substr($controllerClass, strlen($this->controllersNamespace)));
     }
 }
