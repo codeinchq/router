@@ -15,52 +15,35 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     25/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\RouterInterface;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterMiddleware
+ * Interface RouterInterface
  *
- * @package CodeInc\Router\Psr15Wrappers
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterMiddleware implements MiddlewareInterface
+interface ResolverInterface
 {
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * RouterMiddleware constructor.
+     * Returns the controller's class to handle the given HTTP request or NULL if none is available.
      *
-     * @param RouterInterface $router
+     * @param ServerRequestInterface $request
+     * @return string|null
      */
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
-    }
+    public function getControllerClass(ServerRequestInterface $request):?string;
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * Returns the URI of a controller or NULL if the URI can not be computed.
+     *
+     * @param string $controllerClass
+     * @return string|null
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
-    {
-        if ($controller = $this->router->getController($request)) {
-            return $controller->getResponse();
-        }
-        return $handler->handle($request);
-    }
+    public function getControllerUri(string $controllerClass):?string;
 }

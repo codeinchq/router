@@ -24,23 +24,22 @@ use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class DynamicRouter
+ * Class DynamicResolver
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class DynamicRouter implements RouterInterface
+class DynamicResolver implements ResolverInterface
 {
     /**
      * @var string
      */
-    private $controllersNamespace;
+    protected $controllersNamespace;
 
     /**
      * @var string
      */
-    private $uriPrefix;
-
+    protected $uriPrefix;
 
     /**
      * DynamicRouter constructor.
@@ -62,28 +61,18 @@ abstract class DynamicRouter implements RouterInterface
     }
 
     /**
-     * Instantiates a controller.
-     *
-     * @param ServerRequestInterface $request
-     * @param string $controllerClass
-     * @return ControllerInterface
-     */
-    abstract protected function instantiate(ServerRequestInterface $request,
-        string $controllerClass):ControllerInterface;
-
-    /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return ControllerInterface|null
+     * @return string|null
      */
-    public function getController(ServerRequestInterface $request):?ControllerInterface
+    public function getControllerClass(ServerRequestInterface $request):?string
     {
         $requestUri = $request->getUri()->getPath();
         if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
             $controllerClass = $this->controllersNamespace
                 .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
             if (class_exists($controllerClass) && is_subclass_of($controllerClass, ControllerInterface::class)) {
-                return $this->instantiate($request, $controllerClass);
+                return $controllerClass;
             }
         }
         return null;

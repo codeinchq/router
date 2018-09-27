@@ -19,53 +19,69 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\RouterInterface;
+namespace CodeInc\Router;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterRequestHandler
+ * Class RouterMiddleware
  *
  * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterRequestHandler implements RequestHandlerInterface
+abstract class RouterMiddleware implements MiddlewareInterface
 {
     /**
-     * @var RouterInterface
+     * @var ResolverInterface
      */
-    private $router;
+    private $resolver;
 
     /**
-     * @var RequestHandlerInterface
-     */
-    private $notFoundRequestHandler;
-
-    /**
-     * RouterRequestHandler constructor.
+     * RouterMiddleware constructor.
      *
-     * @param RouterInterface $router
-     * @param RequestHandlerInterface $notFoundRequestHandler
+     * @param ResolverInterface $resolver
      */
-    public function __construct(RouterInterface $router, RequestHandlerInterface $notFoundRequestHandler)
+    public function __construct(ResolverInterface $resolver)
     {
-        $this->router = $router;
-        $this->notFoundRequestHandler = $notFoundRequestHandler;
+        $this->resolver = $resolver;
     }
+
+    /**
+     * Instantiates a controller.
+     *
+     * @param ServerRequestInterface $request
+     * @param string $controllerClass
+     * @return ControllerInterface
+     */
+    abstract protected function instantiate(ServerRequestInterface $request,
+        string $controllerClass):ControllerInterface;
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
+     * @throws RouterException
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controller = $this->router->getController($request)) {
-            return $controller->getResponse();
+        if ($controllerClass = $this->resolver->getControllerClass($request)) {
+            try {
+                $controller = $this->instantiate($request, $controllerClass);
+            }
+            catch (\Throwable $exception) {
+                throw RouterException::controllerInstantiatingError($controllerClass, $exception);
+            }
+            try {
+                return $controller->getResponse();
+            }
+            catch (\Throwable $exception) {
+                throw RouterException::controllerProcessingError($controllerClass, $exception);
+            }
         }
-        return $this->notFoundRequestHandler->handle($request);
+        return $handler->handle($request);
     }
 }

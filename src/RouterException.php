@@ -38,6 +38,8 @@ class RouterException extends \Exception
     public const CODE_NOT_WITHIN_NAMESPACE = 5;
     public const CODE_NO_REQUEST_HANDLER_FOUND = 6;
     public const CODE_CLASS_NOT_FOUND = 7;
+    public const CODE_CONTROLLER_INSTANTIATING_ERROR = 8;
+    public const CODE_CONTROLLER_PROCESSING_ERROR = 9;
 
     /**
      * @param string $route
@@ -88,5 +90,27 @@ class RouterException extends \Exception
         return new self(sprintf("The controller '%s' is not within the namespace '%s'.",
             $controllerClass, $controllersNamespace),
             self::CODE_NOT_WITHIN_NAMESPACE);
+    }
+
+    /**
+     * @param string $controllerClass
+     * @param \Throwable $previous
+     * @return RouterException
+     */
+    public static function controllerInstantiatingError(string $controllerClass, \Throwable $previous):self
+    {
+        return new self(sprintf("Error while instantiating the controller '%s'", $controllerClass),
+            self::CODE_CONTROLLER_INSTANTIATING_ERROR, $previous);
+    }
+
+    /**
+     * @param string $controllerClass
+     * @param \Throwable $previous
+     * @return RouterException
+     */
+    public static function controllerProcessingError(string $controllerClass, \Throwable $previous):self
+    {
+        return new self(sprintf("Error while processing the controller '%s'", $controllerClass),
+            self::CODE_CONTROLLER_PROCESSING_ERROR, $previous);
     }
 }
