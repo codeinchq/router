@@ -15,27 +15,28 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\Router\Controllers;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface RequestHandlerFactoryInterface
+ * Interface ControllerInstantiatorInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RequestHandlerFactoryInterface
+interface ControllerInstantiatorInterface
 {
     /**
-     * Returns an instance of the request handler interface.
+     * Instantiates a controller.
      *
-     * @param string $requestHandlerClass
-     * @return RequestHandlerInterface
+     * @param string $controllerClass
+     * @param ServerRequestInterface $request
+     * @return ControllerInterface
      */
-    public function factory(string $requestHandlerClass):RequestHandlerInterface;
+    public function instantiate(string $controllerClass, ServerRequestInterface $request):ControllerInterface;
 }

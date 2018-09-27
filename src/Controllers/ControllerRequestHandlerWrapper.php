@@ -15,35 +15,54 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Controllers;
+use CodeInc\Router\Controllers\ControllerInstantiatorInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RouterInterface
+ * Class ControllerRequestHandlerWrapper
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface
+class ControllerRequestHandlerWrapper implements RequestHandlerInterface
 {
     /**
-     * Returns the controller's class to handle the given HTTP request or NULL if no handler is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return null|string
+     * @var ControllerInstantiatorInterface
      */
-    public function getControllerClass(ServerRequestInterface $request):?string;
+    private $controllerInstantiator;
 
     /**
-     * Returns the URI of a controller or NULL if the URI can not be computed.
+     * @var string
+     */
+    private $controllerClass;
+
+    /**
+     * ControllerRequestHandlerWrapper constructor.
      *
      * @param string $controllerClass
-     * @return string|null
+     * @param ControllerInstantiatorInterface $controllerInstantiator
      */
-    public function getUri(string $controllerClass):?string;
+    public function __construct(string $controllerClass, ControllerInstantiatorInterface $controllerInstantiator)
+    {
+        $this->controllerClass = $controllerClass;
+        $this->controllerInstantiator = $controllerInstantiator;
+    }
+
+    /**
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function handle(ServerRequestInterface $request):ResponseInterface
+    {
+        return $this->controllerInstantiator->instantiate($this->controllerClass, $request)->getResponse();
+    }
 }

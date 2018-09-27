@@ -15,50 +15,50 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
+namespace CodeInc\Router\StaticRouter;
+use CodeInc\Router\Controllers\ControllerInstantiatorInterface;
+use CodeInc\Router\Controllers\ControllerInterface;
+use CodeInc\Router\InstantiatingRouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterRequestHandlerWrapper
+ * Class InstantiatingStaticRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\StaticRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterRequestHandlerWrapper implements RequestHandlerInterface
+class InstantiatingStaticRouter extends StaticRouter implements InstantiatingRouterInterface
 {
     /**
-     * @var RouterInterface
+     * @var ControllerInstantiatorInterface
      */
-    private $router;
+    private $controllerInstantiator;
 
     /**
-     * RouterRequestHandlerWrapper constructor.
+     * InstantiatingStaticRouter constructor.
      *
-     * @param RouterInterface $router
+     * @param ControllerInstantiatorInterface $controllerInstantiator
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(ControllerInstantiatorInterface $controllerInstantiator)
     {
-        $this->router = $router;
+        $this->controllerInstantiator = $controllerInstantiator;
     }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     * @throws RouterException
+     * @return null|ControllerInterface
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function getController(ServerRequestInterface $request):?ControllerInterface
     {
-        if ($handler = $this->router->getHandler($request)) {
-            return $handler->handle($request);
+        if ($controllerClass = $this->getControllerClass($request)) {
+            return $this->controllerInstantiator->instantiate($controllerClass, $request);
         }
-        throw RouterException::noRequestHandlerFound($request);
+        return null;
     }
 }

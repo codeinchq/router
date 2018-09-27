@@ -19,33 +19,33 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\InstantiatingRouterInterface;
+use CodeInc\Router\RouterException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterMiddlewareWrapper
+ * Class RouterRequestHandlerWrapper. Allows an instantiating router to behave as a PSR-15 request handler.
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterMiddlewareWrapper implements MiddlewareInterface
+class RouterRequestHandlerWrapper implements RequestHandlerInterface
 {
     /**
-     * @var RouterInterface
+     * @var InstantiatingRouterInterface
      */
     private $router;
-
 
     /**
      * RouterRequestHandlerWrapper constructor.
      *
-     * @param RouterInterface $router
+     * @param InstantiatingRouterInterface $router
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(InstantiatingRouterInterface $router)
     {
         $this->router = $router;
     }
@@ -53,14 +53,14 @@ class RouterMiddlewareWrapper implements MiddlewareInterface
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
+     * @throws RouterException
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        if ($routerHandler = $this->router->getHandler($request)) {
-            $handler = $routerHandler;
+        if ($controller = $this->router->getController($request)) {
+            return $controller->getResponse();
         }
-        return $handler->handle($request);
+        throw RouterException::noRequestHandlerFound($request);
     }
 }

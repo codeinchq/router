@@ -15,37 +15,54 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     05/03/2018
+// Time:     11:53
 // Project:  Router
 //
-declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Server\RequestHandlerInterface;
+declare(strict_types = 1);
+namespace CodeInc\Router\StaticRouter;
+use CodeInc\Router\Controllers\ControllerInterface;
+use CodeInc\Router\RouterException;
 
 
 /**
- * Class RequestHandlerFactory
+ * Class StaticRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\StaticRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class RequestHandlerFactory implements RequestHandlerFactoryInterface
+class StaticRouter extends AbstractStaticRouter
 {
     /**
-     * @inheritdoc
-     * @param string $requestHandlerClass
-     * @return RequestHandlerInterface
+     * @var string[]
+     */
+    private $controllers = [];
+
+    /**
+     * Adds a controller.
+     *
+     * @param string $route URI path (supports shell patterns)
+     * @param string $controllerClass
      * @throws RouterException
      */
-    public function factory(string $requestHandlerClass):RequestHandlerInterface
+    public function addController(string $route, string $controllerClass):void
     {
-        if (!class_exists($requestHandlerClass)) {
-            throw RouterException::handlerClassNotFound($requestHandlerClass);
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw RouterException::notAController($controllerClass);
         }
-        $requestHandler = new $requestHandlerClass;
-        if (!$requestHandler instanceof RequestHandlerInterface) {
-            throw RouterException::notARequestHandler($requestHandler);
+        $realRoute = strtolower($route);
+        if (isset($this->controllers[$realRoute])) {
+            throw RouterException::duplicateRoute($route);
         }
-        return $requestHandler;
+        $this->controllers[$realRoute] = $controllerClass;
+    }
+
+    /**
+     * @inheritdoc
+     * @return iterable|string[]
+     */
+    public function getControllers():iterable
+    {
+        return $this->controllers;
     }
 }

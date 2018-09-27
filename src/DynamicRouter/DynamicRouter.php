@@ -19,14 +19,14 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\Router\DynamicRouter;
+use CodeInc\Router\RouterException;
 
 
 /**
  * Class DynamicRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\DynamicRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class DynamicRouter extends AbstractDynamicRouter
@@ -34,7 +34,7 @@ class DynamicRouter extends AbstractDynamicRouter
     /**
      * @var string
      */
-    private $requestHandlersNamespace;
+    private $controllersNamespace;
 
     /**
      * @var string
@@ -42,30 +42,22 @@ class DynamicRouter extends AbstractDynamicRouter
     private $uriPrefix;
 
     /**
-     * @var RequestHandlerFactoryInterface
-     */
-    private $requestHandlerFactory;
-
-    /**
      * DynamicRouter constructor.
      *
-     * @param string $requestHandlersNamespace
+     * @param string $controllersNamespace
      * @param string $uriPrefix
-     * @param RequestHandlerFactoryInterface|null $requestHandlerFactory
      * @throws RouterException
      */
-    public function __construct(string $requestHandlersNamespace, string $uriPrefix,
-        ?RequestHandlerFactoryInterface $requestHandlerFactory = null)
+    public function __construct(string $controllersNamespace, string $uriPrefix)
     {
         if (empty($uriPrefix)) {
             throw RouterException::emptyUriPrefix();
         }
-        if (empty($requestHandlersNamespace)) {
-            throw RouterException::emptyRequestHandlersNamespace();
+        if (empty($controllersNamespace)) {
+            throw RouterException::emptyControllersNamespace();
         }
-        $this->requestHandlersNamespace = $requestHandlersNamespace;
+        $this->controllersNamespace = $controllersNamespace;
         $this->uriPrefix = $uriPrefix;
-        $this->requestHandlerFactory = $requestHandlerFactory ?? new RequestHandlerFactory();
     }
 
     /**
@@ -83,19 +75,8 @@ class DynamicRouter extends AbstractDynamicRouter
      *
      * @return string
      */
-    public function getRequestHandlersNamespace():string
+    public function getControllersNamespace():string
     {
-        return $this->requestHandlersNamespace;
-    }
-
-    /**
-     * @inheritdoc
-     * @param string $handlerClass
-     * @return RequestHandlerInterface
-     * @throws RouterException
-     */
-    protected function instantiateHandler(string $handlerClass):RequestHandlerInterface
-    {
-        return $this->requestHandlerFactory->factory($handlerClass);
+        return $this->controllersNamespace;
     }
 }

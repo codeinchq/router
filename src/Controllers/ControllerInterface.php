@@ -15,35 +15,34 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Controllers;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface RouterInterface
+ * Interface ControllerInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface
+interface ControllerInterface
 {
     /**
-     * Returns the controller's class to handle the given HTTP request or NULL if no handler is available.
+     * Returns the parent PSR-7 server request.
      *
-     * @param ServerRequestInterface $request
-     * @return null|string
+     * @return ServerRequestInterface
      */
-    public function getControllerClass(ServerRequestInterface $request):?string;
+    public function getRequest():ServerRequestInterface;
 
     /**
-     * Returns the URI of a controller or NULL if the URI can not be computed.
+     * Returns the generated PSR-7 response.
      *
-     * @param string $controllerClass
-     * @return string|null
+     * @return ResponseInterface
      */
-    public function getUri(string $controllerClass):?string;
+    public function getResponse():ResponseInterface;
 }

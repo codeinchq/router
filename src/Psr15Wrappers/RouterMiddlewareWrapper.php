@@ -19,31 +19,48 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\InstantiatingRouterInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RouterInterface
+ * Class RouterMiddlewareWrapper. Allows an instantiating router to behave as a PSR-15 middleware.
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface
+class RouterMiddlewareWrapper implements MiddlewareInterface
 {
     /**
-     * Returns the controller's class to handle the given HTTP request or NULL if no handler is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return null|string
+     * @var InstantiatingRouterInterface
      */
-    public function getControllerClass(ServerRequestInterface $request):?string;
+    private $router;
 
     /**
-     * Returns the URI of a controller or NULL if the URI can not be computed.
+     * RouterRequestHandlerWrapper constructor.
      *
-     * @param string $controllerClass
-     * @return string|null
+     * @param InstantiatingRouterInterface $router
      */
-    public function getUri(string $controllerClass):?string;
+    public function __construct(InstantiatingRouterInterface $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    {
+        if ($controller = $this->router->getController($request)) {
+            return $controller->getResponse();
+        }
+        return $handler->handle($request);
+    }
 }

@@ -20,7 +20,8 @@
 // Project:  Router
 //
 declare(strict_types = 1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\StaticRouter;
+use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -38,27 +39,19 @@ abstract class AbstractStaticRouter implements RouterInterface
      *
      * @return iterable|string[]
      */
-    abstract public function getHandlers():iterable;
-
-    /**
-     * Instantiates a request handler.
-     *
-     * @param string $handlerClass
-     * @return RequestHandlerInterface
-     */
-    abstract protected function instantiateHandler(string $handlerClass):RequestHandlerInterface;
+    abstract public function getControllers():iterable;
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return null|string
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
+    public function getControllerClass(ServerRequestInterface $request):?string
     {
         $requestRoute = $request->getUri()->getPath();
-        foreach ($this->getHandlers() as $route => $handlerClass) {
+        foreach ($this->getControllers() as $route => $controllerClass) {
             if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                return $this->instantiateHandler($handlerClass);
+                return $controllerClass;
             }
         }
         return null;
@@ -69,13 +62,10 @@ abstract class AbstractStaticRouter implements RouterInterface
      * @param RequestHandlerInterface|string $requestHandler
      * @return null|string
      */
-    public function getUri($requestHandler):?string
+    public function getUri(string $controllerClass):?string
     {
-        if ($requestHandler instanceof RequestHandlerInterface) {
-            $requestHandler = get_class($requestHandler);
-        }
-        foreach ($this->getHandlers() as $uri => $handlerClass) {
-            if ($requestHandler === $handlerClass) {
+        foreach ($this->getControllers() as $uri => $knownControllerClass) {
+            if ($controllerClass == $knownControllerClass) {
                 return $uri;
             }
         }

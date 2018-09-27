@@ -19,15 +19,17 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\DynamicRouter;
+use CodeInc\Router\Controllers\ControllerInterface;
+use CodeInc\Router\RouterException;
+use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
  * Class AbstractDynamicRouter
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\DynamicRouter
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 abstract class AbstractDynamicRouter implements RouterInterface
@@ -40,38 +42,30 @@ abstract class AbstractDynamicRouter implements RouterInterface
     abstract public function getUriPrefix():string;
 
     /**
-     * Returns the requests handler's base namespace.
+     * Returns the controllers' base namespace.
      *
      * @return string
      */
-    abstract public function getRequestHandlersNamespace():string;
-
-    /**
-     * Instantiates a request handler.
-     *
-     * @param string $handlerClass
-     * @return RequestHandlerInterface
-     */
-    abstract protected function instantiateHandler(string $handlerClass):RequestHandlerInterface;
+    abstract public function getControllersNamespace():string;
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|RequestHandlerInterface
+     * @return null|string
      * @throws RouterException
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
+    public function getControllerClass(ServerRequestInterface $request):?string
     {
         $requestRoute = $request->getUri()->getPath();
         $uriPrefix = $this->getUriPrefix();
         if (substr($requestRoute, 0, strlen($uriPrefix)) == $uriPrefix) {
-            $handlerClass = $this->getRequestHandlersNamespace()
+            $controllerClass = $this->getControllersNamespace()
                 .str_replace('/', '\\', substr($requestRoute, strlen($uriPrefix)));
-            if (class_exists($handlerClass)) {
-                if (is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
-                    throw RouterException::notARequestHandler($handlerClass);
+            if (class_exists($controllerClass)) {
+                if (is_subclass_of($controllerClass, ControllerInterface::class)) {
+                    throw RouterException::notAController($controllerClass);
                 }
-                return $this->instantiateHandler($handlerClass);
+                return $controllerClass;
             }
         }
         return null;
@@ -79,23 +73,20 @@ abstract class AbstractDynamicRouter implements RouterInterface
 
     /**
      * @inheritdoc
-     * @param RequestHandlerInterface|string $requestHandler
+     * @param string $controllerClass
      * @return string
      * @throws RouterException
      */
-    public function getUri($requestHandler):string
+    public function getUri(string $controllerClass):string
     {
-        $requestHandlersNamespace = $this->getRequestHandlersNamespace();
-        if ($requestHandler instanceof RequestHandlerInterface) {
-            $requestHandler = get_class($requestHandler);
+        $controllersNamespace = $this->getControllersNamespace();
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw RouterException::notAController($controllerClass);
         }
-        else if (!is_subclass_of($requestHandler, RequestHandlerInterface::class)) {
-            throw RouterException::notARequestHandler($requestHandler);
-        }
-        if (!substr($requestHandler, 0, strlen($requestHandlersNamespace)) == $requestHandler) {
-            throw RouterException::notWithinNamespace($requestHandler, $requestHandlersNamespace);
+        if (!substr($controllerClass, 0, strlen($controllersNamespace)) == $controllerClass) {
+            throw RouterException::notWithinNamespace($controllerClass, $controllersNamespace);
         }
         return $this->getUriPrefix()
-            .str_replace('\\', '/', substr($requestHandler, strlen($requestHandlersNamespace)));
+            .str_replace('\\', '/', substr($controllerClass, strlen($controllersNamespace)));
     }
 }
