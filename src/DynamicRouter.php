@@ -29,7 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class DynamicRouter extends Router
+class DynamicRouter extends Router
 {
     /**
      * @var string
@@ -75,12 +75,12 @@ abstract class DynamicRouter extends Router
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return ControllerInterface|null
+     * @return string|null
      */
-    public function getController(ServerRequestInterface $request):?ControllerInterface
+    public function getControllerClass(ServerRequestInterface $request):?string
     {
         // if there is a route mach for a manually defined route
-        if ($controller = parent::getController($request)) {
+        if ($controller = parent::getControllerClass($request)) {
             return $controller;
         }
 
@@ -90,7 +90,7 @@ abstract class DynamicRouter extends Router
             $controllerClass = $this->controllersNamespace
                 .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
             if (class_exists($controllerClass) && is_subclass_of($controllerClass, ControllerInterface::class)) {
-                return $this->instantiate($request, $controllerClass);
+                return $controllerClass;
             }
         }
 

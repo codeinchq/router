@@ -15,7 +15,7 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
@@ -24,26 +24,18 @@ use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Interface RouterInterface
+ * Interface InstantiatingRouterInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface
+interface InstantiatingRouterInterface extends RouterInterface
 {
     /**
-     * Returns the controller class to handle the given HTTP request or NULL if none is available.
+     * Returns an instance of the controller to handle the given HTTP request or NULL if none is available.
      *
      * @param ServerRequestInterface $request
-     * @return string|null
+     * @return ControllerInterface|null
      */
-    public function getControllerClass(ServerRequestInterface $request):?string;
-
-    /**
-     * Returns the URI of a controller or NULL if the URI can not be computed.
-     *
-     * @param string $controllerClass
-     * @return string|null
-     */
-    public function getControllerUri(string $controllerClass):?string;
+    public function getController(ServerRequestInterface $request):?ControllerInterface;
 }

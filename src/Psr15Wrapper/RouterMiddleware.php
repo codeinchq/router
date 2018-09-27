@@ -20,9 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\InstantiatingRouterInterface;
 use CodeInc\Router\RouterException;
-use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -38,29 +37,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 abstract class RouterMiddleware implements MiddlewareInterface
 {
     /**
-     * @var RouterInterface
+     * @var InstantiatingRouterInterface
      */
     private $router;
 
     /**
      * RouterMiddleware constructor.
      *
-     * @param RouterInterface $router
+     * @param InstantiatingRouterInterface $router
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(InstantiatingRouterInterface $router)
     {
         $this->router = $router;
     }
-
-    /**
-     * Instantiates a controller.
-     *
-     * @param ServerRequestInterface $request
-     * @param string $controllerClass
-     * @return ControllerInterface
-     */
-    abstract protected function instantiate(ServerRequestInterface $request,
-        string $controllerClass):ControllerInterface;
 
     /**
      * @inheritdoc

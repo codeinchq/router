@@ -20,10 +20,9 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\InstantiatingRouterInterface;
 use CodeInc\Router\Psr15Wrapper\NotFoundRequestHandler;
 use CodeInc\Router\RouterException;
-use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -38,7 +37,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 abstract class RouterRequestHandler implements RequestHandlerInterface
 {
     /**
-     * @var RouterInterface
+     * @var InstantiatingRouterInterface
      */
     private $router;
 
@@ -51,24 +50,14 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
     /**
      * RouterRequestHandler constructor.
      *
-     * @param RouterInterface $router
+     * @param InstantiatingRouterInterface $router
      * @param null|RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(RouterInterface $router, ?RequestHandlerInterface $notFoundRequestHandler = null)
+    public function __construct(InstantiatingRouterInterface $router, ?RequestHandlerInterface $notFoundRequestHandler = null)
     {
         $this->router = $router;
         $this->notFoundRequestHandler = $notFoundRequestHandler;
     }
-
-    /**
-     * Instantiates a controller.
-     *
-     * @param ServerRequestInterface $request
-     * @param string $controllerClass
-     * @return ControllerInterface
-     */
-    abstract protected function instantiate(ServerRequestInterface $request,
-        string $controllerClass):ControllerInterface;
 
     /**
      * Returns the not found request handler.
