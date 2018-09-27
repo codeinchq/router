@@ -53,6 +53,9 @@ $myRouter = new DynamicRouter(
 // controller lookup (assuming the URI of the request is "/MyAppPages/User/Account") 
 $myRouter->getControllerClass($aPsr7ServerRequest); // <-- returns 'MyApp\Controllers\User\Account'
 
+// failed controller lookup (assuming the URI of the request is "/MyAppPages/ANonExistingController") 
+$myRouter->getControllerClass($aPsr7ServerRequest); // <-- returns NULL
+
 // URI lookup 
 $myRouter->getControllerUri(MyApp\Controllers\Shop\Basket); // <-- returns "/MyAppPages/Shop/Basket"
 ```
