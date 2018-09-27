@@ -20,27 +20,23 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Psr7Responses\NotFoundResponse;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class NotFoundRequestHandler
+ * Interface ControllerInstantiatorInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotFoundRequestHandler implements RequestHandlerInterface
+interface ControllerInstantiatorInterface
 {
     /**
-     * @inheritdoc
+     * Instantiates and returns a controller.
+     *
      * @param ServerRequestInterface $request
-     * @return ResponseInterface
+     * @param string $controllerClass
+     * @return ControllerInterface
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
-    {
-        return new NotFoundResponse();
-    }
+    public function instantiateController(ServerRequestInterface $request, string $controllerClass):ControllerInterface;
 }

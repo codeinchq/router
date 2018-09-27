@@ -27,37 +27,48 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class Router
+ * Class RouterMiddleware
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class Router extends RouterMiddleware implements RequestHandlerInterface
+class Router implements RouterInterface
 {
     /**
-     * @var RequestHandlerInterface
+     * @var ResolverInterface
      */
-    private $notFoundRequestHandler;
+    private $resolver;
 
     /**
-     * Router constructor.
+     * @var ControllerInstantiatorInterface
+     */
+    private $controllerInstantiator;
+
+    /**
+     * RouterMiddleware constructor.
      *
      * @param ResolverInterface $resolver
-     * @param null|RequestHandlerInterface $notFoundRequestHandler
+     * @param ControllerInstantiatorInterface $controllerInstantiator
      */
-    public function __construct(ResolverInterface $resolver, ?RequestHandlerInterface $notFoundRequestHandler = null)
+    public function __construct(ResolverInterface $resolver, ControllerInstantiatorInterface $controllerInstantiator)
     {
-        parent::__construct($resolver);
-        $this->notFoundRequestHandler = $notFoundRequestHandler ?? new NotFoundRequestHandler();
+        $this->resolver = $resolver;
+        $this->controllerInstantiator = $controllerInstantiator;
     }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        $this->process($request, $this->notFoundRequestHandler);
+        if ($controllerClass = $this->resolver->getControllerClass($request)) {
+            return $this->controllerInstantiator->instantiateController($request, $controllerClass)->getResponse();
+        }
+        else {
+            return $handler->handle($request);
+        }
     }
 }
