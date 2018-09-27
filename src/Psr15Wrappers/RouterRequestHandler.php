@@ -19,40 +19,53 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractRouter
+ * Class RouterRequestHandler
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractRouter implements RouterInterface
+class RouterRequestHandler implements RequestHandlerInterface
 {
     /**
-     * Returns the controller to handle the given HTTP request or NULL if none is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return ControllerInterface|null
+     * @var RouterInterface
      */
-    abstract protected function getController(ServerRequestInterface $request):?ControllerInterface;
+    private $router;
+
+    /**
+     * @var RequestHandlerInterface
+     */
+    private $notFoundRequestHandler;
+
+    /**
+     * RouterRequestHandler constructor.
+     *
+     * @param RouterInterface $router
+     * @param RequestHandlerInterface $notFoundRequestHandler
+     */
+    public function __construct(RouterInterface $router, RequestHandlerInterface $notFoundRequestHandler)
+    {
+        $this->router = $router;
+        $this->notFoundRequestHandler = $notFoundRequestHandler;
+    }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        if ($controller = $this->getController($request)) {
+        if ($controller = $this->router->getController($request)) {
             return $controller->getResponse();
         }
-        return $handler->handle($request);
+        return $this->notFoundRequestHandler->handle($request);
     }
-
 }

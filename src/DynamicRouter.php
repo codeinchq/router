@@ -29,7 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicRouter extends AbstractRouter
+abstract class DynamicRouter implements RouterInterface
 {
     /**
      * @var string
@@ -41,21 +41,15 @@ class DynamicRouter extends AbstractRouter
      */
     private $uriPrefix;
 
-    /**
-     * @var ControllerInstantiatorInterface
-     */
-    private $controllerInstantiator;
 
     /**
      * DynamicRouter constructor.
      *
      * @param string $controllersNamespace
      * @param string $uriPrefix
-     * @param ControllerInstantiatorInterface $controllerInstantiator
      * @throws RouterException
      */
-    public function __construct(string $controllersNamespace, string $uriPrefix,
-        ControllerInstantiatorInterface $controllerInstantiator)
+    public function __construct(string $controllersNamespace, string $uriPrefix)
     {
         if (empty($uriPrefix)) {
             throw RouterException::emptyUriPrefix();
@@ -65,26 +59,31 @@ class DynamicRouter extends AbstractRouter
         }
         $this->controllersNamespace = $controllersNamespace;
         $this->uriPrefix = $uriPrefix;
-        $this->controllerInstantiator = $controllerInstantiator;
     }
+
+    /**
+     * Instantiates a controller.
+     *
+     * @param ServerRequestInterface $request
+     * @param string $controllerClass
+     * @return ControllerInterface
+     */
+    abstract protected function instantiate(ServerRequestInterface $request,
+        string $controllerClass):ControllerInterface;
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return ControllerInterface|null
-     * @throws RouterException
      */
-    protected function getController(ServerRequestInterface $request):?ControllerInterface
+    public function getController(ServerRequestInterface $request):?ControllerInterface
     {
-        $requestRoute = $request->getUri()->getPath();
-        if (substr($requestRoute, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
+        $requestUri = $request->getUri()->getPath();
+        if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
             $controllerClass = $this->controllersNamespace
-                .str_replace('/', '\\', substr($requestRoute, strlen($this->uriPrefix)));
-            if (class_exists($controllerClass)) {
-                if (is_subclass_of($controllerClass, ControllerInterface::class)) {
-                    throw RouterException::notAController($controllerClass);
-                }
-                return $this->controllerInstantiator->instantiate($request, $controllerClass);
+                .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
+            if (class_exists($controllerClass) && is_subclass_of($controllerClass, ControllerInterface::class)) {
+                return $this->instantiate($request, $controllerClass);
             }
         }
         return null;

@@ -21,8 +21,6 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\ControllerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
@@ -90,16 +88,5 @@ class RouterException extends \Exception
         return new self(sprintf("The controller '%s' is not within the namespace '%s'.",
             $controllerClass, $controllersNamespace),
             self::CODE_NOT_WITHIN_NAMESPACE);
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return RouterException
-     */
-    public static function noRequestHandlerFound(ServerRequestInterface $request):self
-    {
-        return new self(sprintf("No controllers has been found to handle the request '%s'",
-            $request->getUri()->getPath()),
-            self::CODE_NO_REQUEST_HANDLER_FOUND);
     }
 }

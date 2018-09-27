@@ -20,7 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
@@ -29,8 +29,16 @@ use Psr\Http\Server\MiddlewareInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface extends MiddlewareInterface
+interface RouterInterface
 {
+    /**
+     * Returns the controller to handle the given HTTP request or NULL if none is available.
+     *
+     * @param ServerRequestInterface $request
+     * @return ControllerInterface|null
+     */
+    public function getController(ServerRequestInterface $request):?ControllerInterface;
+
     /**
      * Returns the URI of a controller or NULL if the URI can not be computed.
      *

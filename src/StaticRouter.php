@@ -30,7 +30,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class StaticRouter extends AbstractRouter
+abstract class StaticRouter implements RouterInterface
 {
     /**
      * @var string[]
@@ -38,19 +38,14 @@ class StaticRouter extends AbstractRouter
     private $controllers = [];
 
     /**
-     * @var ControllerInstantiatorInterface
-     */
-    private $controllerInstantiator;
-
-    /**
-     * ListRouter constructor.
+     * Instantiates a controller.
      *
-     * @param ControllerInstantiatorInterface $controllerInstantiator
+     * @param ServerRequestInterface $request
+     * @param string $controllerClass
+     * @return ControllerInterface
      */
-    public function __construct(ControllerInstantiatorInterface $controllerInstantiator)
-    {
-        $this->controllerInstantiator = $controllerInstantiator;
-    }
+    abstract protected function instantiate(ServerRequestInterface $request,
+        string $controllerClass):ControllerInterface;
 
     /**
      * Adds a controller.
@@ -76,12 +71,12 @@ class StaticRouter extends AbstractRouter
      * @param ServerRequestInterface $request
      * @return ControllerInterface|null
      */
-    protected function getController(ServerRequestInterface $request):?ControllerInterface
+    public function getController(ServerRequestInterface $request):?ControllerInterface
     {
         $requestRoute = $request->getUri()->getPath();
         foreach ($this->controllers as $route => $controllerClass) {
             if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                return $this->controllerInstantiator->instantiate($request, $controllerClass);
+                return $this->instantiate($request, $controllerClass);
             }
         }
         return null;

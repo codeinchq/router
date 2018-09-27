@@ -63,7 +63,7 @@ $response = $myRouter->process($aPsr7ServerRequest, $notFoundRequestHandler);
 
 ### As a PSR-15 request handler
 
-The router can behave as a PSR-15 request handler (implementing `RequestHandlerInterface`) using [`RouterRequestHandlerWrapper`](src/RouterRequestHandlerWrapper.php):
+The router can behave as a PSR-15 request handler (implementing `RequestHandlerInterface`) using [`RouterRequestHandlerWrapper`](src/RouterRequestHandler.php):
  ```php
  <?php
  use CodeInc\Router\DynamicRouter\DynamicRouter;
