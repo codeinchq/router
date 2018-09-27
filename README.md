@@ -1,81 +1,38 @@
 # PSR-7 & PSR-15 router library
 
-`codeinc/router` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) router library written in PHP 7, processing [PSR-7](https://www.php-fig.org/psr/psr-7/) requests and responses. A router is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware implementing [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface) in charge of determining which request handler to call to answer a request, to call the selected controller and then to returns the PSR-7 response. All routers must implement the [`RouterInterface`](src/ResolverInterface.php) interface. 
+This PHP 7.1 library provides two [PSR-7](https://www.php-fig.org/psr/psr-7/) and [PSR-15](https://www.php-fig.org/psr/psr-15/) compatible routers.  
 
-Two types of routers are supplied in the current package: a static router which takes a list of predefined routes and request handlers classes and a dynamic router which computes the routes of the request handlers base on the request handler's namespace (compatible with [PSR-0](https://www.php-fig.org/psr/psr-0/) or [PSR-4](https://www.php-fig.org/psr/psr-4/) naming conventions). Both are available as `final` ([`StaticRouter`](src/StaticRouter.php) and [`DynamicRouter`](src/DynamicRouter/DynamicRouter.php)) and `abstract` classes ([`AbstractStaticRouter`](src/StaticRouter/AbstractStaticRouter.php) and [`AbstractDynamicRouter`](src/DynamicRouter/DynamicRouter.php)).
+A router is a simple piece of software in charge of matching a controller to a request. All routers must implement [`RouterInterface`](src/RouterInterface.php). A controller is a `class` implementing [`ControllerInterface`](src/ControllerInterface.php) which takes a PSR-7 server request object ([`ServerRequestInterface`](https://github.com/php-fig/http-message/blob/master/src/ServerRequestInterface.php)) as a constructor parameter and returns a PSR-7 response through the `getResponse()` method.  
+ 
+ Two routers are supplied: 
+ * a static router ([`Router`](src/Router.php)) which works with a list of predefined routes (unix patterns) and their corresponding controllers a
+ * a dynamic router ([`DynamicRouter`](src/DynamicRouter.php)) which computes the controller's class name base on the request URI. 
+
+The routers can be used either as PSR-15 request handlers (using [`RouterRequestHandler`](src/Psr15Wrapper/RouterRequestHandler.php) implementing [`RequestHandlerInterface`](https://github.com/http-interop/http-middleware/blob/master/src/RequestHandlerInterface.php)) or as PSR-15 middleware (using [`RouterMiddleware`](src/Psr15Wrapper/RouterMiddleware.php) implementing [`MiddlewareInterface`](https://github.com/http-interop/http-middleware/blob/master/src/MiddlewareInterface.php)).
 
 ## Usage
 
-### Static router
 ```php
 <?php
-use CodeInc\Router\StaticRouter\StaticRouter;
-use CodeInc\PSR7ResponseSender\ResponseSender; 
-use Psr\Http\Server\RequestHandlerInterface;
+use CodeInc\Router\Router;
+use CodeInc\Router\ControllerInterface;
 
 // some request handlers...
-final class HomeController implements RequestHandlerInterface { } 
-final class LicenseController implements RequestHandlerInterface { } 
-final class ArticleController implements RequestHandlerInterface { } 
+final class HomeController implements ControllerInterface { } 
+final class LicenseController implements ControllerInterface { } 
+final class ArticleController implements ControllerInterface { } 
 
 // adding routes
-$myRouter = new StaticRouter();
-$myRouter->addRequestHandler("/", HomeController::class); 
-$myRouter->addRequestHandler("/license.txt", LicenseController::class); 
-$myRouter->addRequestHandler("/article-[0-9]/*", ArticleController::class); 
+$myRouter = new Router();
+$myRouter->addRoute("/", HomeController::class); 
+$myRouter->addRoute("/license.txt", LicenseController::class); 
+$myRouter->addRoute("/article-[0-9]/*", ArticleController::class); 
 
-// processing and the response
-// --> $aPsr7ServerRequest must implement ServerRequestInterface 
-// --> $notFoundRequestHandler must implement RequestHandlerInterface 
-$response = $myRouter->process($aPsr7ServerRequest, $notFoundRequestHandler);
+// controller lookup (assuming the URI of the request is "/article-2456/a-great-article.html") 
+$myRouter->getController($aPsr7ServerRequest); // <-- returns an instance of ArticleController
 
-// sending the response using codeinc/psr7-response-sender
-// --> see https://packagist.org/packages/codeinc/psr7-response-sender
-(new ResponseSender())->send($response);
-```
-
-In order to instantiate the request handlers, you can pass an object implementing [`RequestHandlerInstantiatorInterface`](src/RequestHandlerInstantiator/RequestHandlerFactoryInterface.php) to the `StaticRouter` constructor.
-
-
-### Dynamic router 
-
-```php
-<?php
-use CodeInc\Router\DynamicRouter\DynamicRouter;
-use CodeInc\PSR7ResponseSender\ResponseSender; 
-
-// in the current example a class named MyApp\Controllers\User\MyAccount
-// will be available at /User/MyAccount
-$myRouter = new DynamicRouter(
-    'MyApp\\Controllers', // <-- namespace to the request handler
-    '/' // <-- base URI of the request handlers
-);
-
-// processing and the response
-// --> $aPsr7ServerRequest must implement ServerRequestInterface 
-// --> $notFoundRequestHandler must implement RequestHandlerInterface 
-$response = $myRouter->process($aPsr7ServerRequest, $notFoundRequestHandler);
-
-// sending the response using codeinc/psr7-response-sender
-// --> see https://packagist.org/packages/codeinc/psr7-response-sender
-(new ResponseSender())->send($response);
-```
-
-### As a PSR-15 request handler
-
-The router can behave as a PSR-15 request handler (implementing `RequestHandlerInterface`) using [`RouterRequestHandlerWrapper`](src/RouterRequestHandler.php):
- ```php
- <?php
- use CodeInc\Router\DynamicRouter\DynamicRouter;
- use CodeInc\Router\RouterRequestHandlerWrapper;
- 
- // in the current example a class named MyApp\Controllers\User\MyAccount
- // will be available at /User/MyAccount
- $myRouter = new DynamicRouter('MyApp\\Controllers', '/');
- 
- // the router is now a PSR-15 request handler implementing RequestHandlerInterface
- // --> $notFoundRequestHandler must implement RequestHandlerInterface 
- $myRouterAsARequestHandler = new RouterRequestHandlerWrapper($myRouter, $notFoundRequestHandler);
+// URI lookup
+$myRouter->getControllerUri(LicenseController::class); // <-- returns "/license.txt"
 ```
 
 ## Installation
