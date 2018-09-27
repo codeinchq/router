@@ -7,7 +7,7 @@ A router is a `class` implementing [`RouterInterface`](src/RouterInterface.php) 
 A controller is a `class` implementing [`ControllerInterface`](src/ControllerInterface.php) which takes a PSR-7 server request object ([`ServerRequestInterface`](https://github.com/php-fig/http-message/blob/master/src/ServerRequestInterface.php)) as a constructor parameter and returns a PSR-7 response through the `getResponse()` method.  
 
  Two routers are supplied: 
- * a static router ([`Router`](src/Router.php)) which works with a list of predefined routes (unix patterns) and their corresponding controllers a
+ * a static router ([`Router`](src/Router.php)) which works with a list of predefined routes (unix patterns) and their corresponding controllers;
  * a dynamic router ([`DynamicRouter`](src/DynamicRouter.php)) which computes the controller's class name base on the request URI. 
  
  Simple routers are not capable of instantiating controllers. In order to be able to instantiate controllers at router's level, you must implement [`InstantiatingRouterInterface`](src/InstantiatingRouterInterface.php).
