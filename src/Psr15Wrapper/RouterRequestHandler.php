@@ -19,7 +19,10 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\RouterException;
+use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -28,15 +31,15 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Class RouterRequestHandler
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 abstract class RouterRequestHandler implements RequestHandlerInterface
 {
     /**
-     * @var ResolverInterface
+     * @var RouterInterface
      */
-    private $resolver;
+    private $router;
 
     /**
      * @var RequestHandlerInterface
@@ -46,12 +49,12 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
     /**
      * RouterRequestHandler constructor.
      *
-     * @param ResolverInterface $resolver
+     * @param RouterInterface $router
      * @param RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(ResolverInterface $resolver, RequestHandlerInterface $notFoundRequestHandler)
+    public function __construct(RouterInterface $router, RequestHandlerInterface $notFoundRequestHandler)
     {
-        $this->resolver = $resolver;
+        $this->router = $router;
         $this->notFoundRequestHandler = $notFoundRequestHandler;
     }
 
@@ -73,18 +76,12 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        if ($controllerClass = $this->resolver->getControllerClass($request)) {
-            try {
-                $controller = $this->instantiate($request, $controllerClass);
-            }
-            catch (\Throwable $exception) {
-                throw RouterException::controllerInstantiatingError($controllerClass, $exception);
-            }
+        if ($controller = $this->router->getController($request)) {
             try {
                 return $controller->getResponse();
             }
             catch (\Throwable $exception) {
-                throw RouterException::controllerProcessingError($controllerClass, $exception);
+                throw RouterException::controllerProcessingError($controller, $exception);
             }
         }
         return $this->notFoundRequestHandler->handle($request);

@@ -104,13 +104,13 @@ class RouterException extends \Exception
     }
 
     /**
-     * @param string $controllerClass
+     * @param ControllerInterface $controller
      * @param \Throwable $previous
      * @return RouterException
      */
-    public static function controllerProcessingError(string $controllerClass, \Throwable $previous):self
+    public static function controllerProcessingError(ControllerInterface $controller, \Throwable $previous):self
     {
-        return new self(sprintf("Error while processing the controller '%s'", $controllerClass),
+        return new self(sprintf("Error while processing the controller '%s'", get_class($controller)),
             self::CODE_CONTROLLER_PROCESSING_ERROR, $previous);
     }
 }

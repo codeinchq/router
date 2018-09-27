@@ -19,7 +19,10 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
+namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\RouterException;
+use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -35,18 +38,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 abstract class RouterMiddleware implements MiddlewareInterface
 {
     /**
-     * @var ResolverInterface
+     * @var RouterInterface
      */
-    private $resolver;
+    private $router;
 
     /**
      * RouterMiddleware constructor.
      *
-     * @param ResolverInterface $resolver
+     * @param RouterInterface $router
      */
-    public function __construct(ResolverInterface $resolver)
+    public function __construct(RouterInterface $router)
     {
-        $this->resolver = $resolver;
+        $this->router = $router;
     }
 
     /**
@@ -68,18 +71,12 @@ abstract class RouterMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controllerClass = $this->resolver->getControllerClass($request)) {
-            try {
-                $controller = $this->instantiate($request, $controllerClass);
-            }
-            catch (\Throwable $exception) {
-                throw RouterException::controllerInstantiatingError($controllerClass, $exception);
-            }
+        if ($controller = $this->router->getController($request)) {
             try {
                 return $controller->getResponse();
             }
             catch (\Throwable $exception) {
-                throw RouterException::controllerProcessingError($controllerClass, $exception);
+                throw RouterException::controllerProcessingError($controller, $exception);
             }
         }
         return $handler->handle($request);
