@@ -21,6 +21,7 @@
 declare(strict_types=1);
 namespace CodeInc\Router\Psr15Wrappers;
 use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Psr15Wrapper\NotFoundRequestHandler;
 use CodeInc\Router\RouterException;
 use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -42,7 +43,8 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
     private $router;
 
     /**
-     * @var RequestHandlerInterface
+     * @var null|RequestHandlerInterface
+     * @see RouterRequestHandler::getNotFoundRequestHandler()
      */
     private $notFoundRequestHandler;
 
@@ -50,9 +52,9 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
      * RouterRequestHandler constructor.
      *
      * @param RouterInterface $router
-     * @param RequestHandlerInterface $notFoundRequestHandler
+     * @param null|RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(RouterInterface $router, RequestHandlerInterface $notFoundRequestHandler)
+    public function __construct(RouterInterface $router, ?RequestHandlerInterface $notFoundRequestHandler = null)
     {
         $this->router = $router;
         $this->notFoundRequestHandler = $notFoundRequestHandler;
@@ -67,6 +69,16 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
      */
     abstract protected function instantiate(ServerRequestInterface $request,
         string $controllerClass):ControllerInterface;
+
+    /**
+     * Returns the not found request handler.
+     *
+     * @return RequestHandlerInterface
+     */
+    public function getNotFoundRequestHandler():RequestHandlerInterface
+    {
+        return $this->notFoundRequestHandler ?? new NotFoundRequestHandler();
+    }
 
     /**
      * @inheritdoc
@@ -84,6 +96,6 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
                 throw RouterException::controllerProcessingError($controller, $exception);
             }
         }
-        return $this->notFoundRequestHandler->handle($request);
+        return $this->getNotFoundRequestHandler()->handle($request);
     }
 }

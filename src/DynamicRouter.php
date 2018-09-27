@@ -29,7 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class DynamicRouter implements RouterInterface
+abstract class DynamicRouter extends Router
 {
     /**
      * @var string
@@ -40,11 +40,6 @@ abstract class DynamicRouter implements RouterInterface
      * @var string
      */
     protected $uriPrefix;
-
-    /**
-     * @var string|null
-     */
-    protected $homeController;
 
     /**
      * DynamicRouter constructor.
@@ -68,22 +63,14 @@ abstract class DynamicRouter implements RouterInterface
     /**
      * Sets the controller returned for the URI prefix.
      *
+     * @uses DynamicRouter::addRoute()
      * @param string $controllerClass
+     * @throws RouterException
      */
     public function setHomeController(string $controllerClass):void
     {
-        $this->homeController = $controllerClass;
+        $this->addRoute($this->uriPrefix, $controllerClass);
     }
-
-    /**
-     * Instantiates a controller.
-     *
-     * @param ServerRequestInterface $request
-     * @param string $controllerClass
-     * @return ControllerInterface
-     */
-    abstract protected function instantiate(ServerRequestInterface $request,
-        string $controllerClass):ControllerInterface;
 
     /**
      * @inheritdoc
@@ -92,10 +79,13 @@ abstract class DynamicRouter implements RouterInterface
      */
     public function getController(ServerRequestInterface $request):?ControllerInterface
     {
-        $requestUri = $request->getUri()->getPath();
-        if ($requestUri == $this->uriPrefix) {
-            return $this->instantiate($request, $this->homeController);
+        // if there is a route mach for a manually defined route
+        if ($controller = parent::getController($request)) {
+            return $controller;
         }
+
+        // else if the request URI points toward a controller
+        $requestUri = $request->getUri()->getPath();
         if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
             $controllerClass = $this->controllersNamespace
                 .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
@@ -103,6 +93,7 @@ abstract class DynamicRouter implements RouterInterface
                 return $this->instantiate($request, $controllerClass);
             }
         }
+
         return null;
     }
 

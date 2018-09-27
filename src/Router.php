@@ -25,12 +25,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class StaticRouter
+ * Class Router
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class StaticRouter implements RouterInterface
+abstract class Router implements RouterInterface
 {
     /**
      * @var string[]
@@ -44,7 +44,7 @@ abstract class StaticRouter implements RouterInterface
      * @param string $controllerClass
      * @throws RouterException
      */
-    public function addController(string $route, string $controllerClass):void
+    public function addRoute(string $route, string $controllerClass):void
     {
         if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
             throw RouterException::notAController($controllerClass);
