@@ -20,6 +20,10 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\Router\Exceptions\NotWithinNamespaceException;
+use CodeInc\Router\Exceptions\RouterEmptyControllersNamespaceException;
+use CodeInc\Router\Exceptions\RouterEmptyUriPrefixException;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -46,15 +50,14 @@ class DynamicRouter extends Router
      *
      * @param string $controllersNamespace
      * @param string $uriPrefix
-     * @throws RouterException
      */
     public function __construct(string $controllersNamespace, string $uriPrefix)
     {
         if (empty($uriPrefix)) {
-            throw RouterException::emptyUriPrefix();
+            throw new RouterEmptyUriPrefixException($this);
         }
         if (empty($controllersNamespace)) {
-            throw RouterException::emptyControllersNamespace();
+            throw new RouterEmptyControllersNamespaceException($this);
         }
         $this->controllersNamespace = $controllersNamespace;
         $this->uriPrefix = $uriPrefix;
@@ -65,7 +68,6 @@ class DynamicRouter extends Router
      *
      * @uses DynamicRouter::addRoute()
      * @param string $controllerClass
-     * @throws RouterException
      */
     public function setHomeController(string $controllerClass):void
     {
@@ -101,15 +103,14 @@ class DynamicRouter extends Router
      * @inheritdoc
      * @param string $controllerClass
      * @return string
-     * @throws RouterException
      */
     public function getControllerUri(string $controllerClass):string
     {
         if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-            throw RouterException::notAController($controllerClass);
+            throw new NotAControllerException($controllerClass);
         }
         if (!substr($controllerClass, 0, strlen($this->controllersNamespace)) == $controllerClass) {
-            throw RouterException::notWithinNamespace($controllerClass, $this->controllersNamespace);
+            throw new NotWithinNamespaceException($controllerClass, $this->controllersNamespace);
         }
         return $this->uriPrefix
             .str_replace('\\', '/', substr($controllerClass, strlen($this->controllersNamespace)));

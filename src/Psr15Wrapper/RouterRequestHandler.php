@@ -20,9 +20,9 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\Exceptions\ControllerProcessingException;
 use CodeInc\Router\InstantiatingRouterInterface;
 use CodeInc\Router\Psr15Wrapper\NotFoundRequestHandler;
-use CodeInc\Router\RouterException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -53,7 +53,8 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
      * @param InstantiatingRouterInterface $router
      * @param null|RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(InstantiatingRouterInterface $router, ?RequestHandlerInterface $notFoundRequestHandler = null)
+    public function __construct(InstantiatingRouterInterface $router,
+        ?RequestHandlerInterface $notFoundRequestHandler = null)
     {
         $this->router = $router;
         $this->notFoundRequestHandler = $notFoundRequestHandler;
@@ -73,7 +74,6 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return ResponseInterface
-     * @throws RouterException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
@@ -82,7 +82,7 @@ abstract class RouterRequestHandler implements RequestHandlerInterface
                 return $controller->getResponse();
             }
             catch (\Throwable $exception) {
-                throw RouterException::controllerProcessingError($controller, $exception);
+                throw new ControllerProcessingException($controller, 0, $exception);
             }
         }
         return $this->getNotFoundRequestHandler()->handle($request);

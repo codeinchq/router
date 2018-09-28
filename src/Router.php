@@ -21,6 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
+use CodeInc\Router\Exceptions\ControllerDuplicateRouteException;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -42,16 +44,15 @@ class Router implements RouterInterface
      *
      * @param string $route URI path (supports shell patterns)
      * @param string $controllerClass
-     * @throws RouterException
      */
     public function addRoute(string $route, string $controllerClass):void
     {
         if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-            throw RouterException::notAController($controllerClass);
+            throw new NotAControllerException($controllerClass);
         }
         $realRoute = strtolower($route);
         if (isset($this->controllers[$realRoute])) {
-            throw RouterException::duplicateRoute($route);
+            throw new ControllerDuplicateRouteException($route, $controllerClass, $this);
         }
         $this->controllers[$realRoute] = $controllerClass;
     }

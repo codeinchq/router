@@ -15,57 +15,50 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     28/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\Exceptions\ControllerProcessingException;
-use CodeInc\Router\InstantiatingRouterInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\RouterInterface;
+use Throwable;
 
 
 /**
- * Class RouterMiddleware
+ * Class RouterEmptyUriPrefixException
  *
- * @package CodeInc\Router\Psr15Wrappers
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class RouterMiddleware implements MiddlewareInterface
+class RouterEmptyUriPrefixException extends \LogicException implements RouterException
 {
     /**
-     * @var InstantiatingRouterInterface
+     * @var RouterInterface
      */
     private $router;
 
     /**
-     * RouterMiddleware constructor.
+     * RouterEmptyUriPrefixException constructor.
      *
-     * @param InstantiatingRouterInterface $router
+     * @param RouterInterface $router
+     * @param int $code
+     * @param Throwable|null $previous
      */
-    public function __construct(InstantiatingRouterInterface $router)
+    public function __construct(RouterInterface $router, int $code = 0, Throwable $previous = null)
     {
         $this->router = $router;
+        parent::__construct(
+            "The dynamic router's URI prefix can not be empty.",
+            $code,
+            $previous
+        );
     }
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * @return RouterInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function getRouter():RouterInterface
     {
-        if ($controller = $this->router->getController($request)) {
-            try {
-                return $controller->getResponse();
-            } catch (\Throwable $exception) {
-                throw new ControllerProcessingException($controller,0, $exception);
-            }
-        }
-        return $handler->handle($request);
+        return $this->router;
     }
 }
