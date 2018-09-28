@@ -113,6 +113,7 @@ class DynamicRouter extends Router
             throw new NotWithinNamespaceException($controllerClass, $this->controllersNamespace);
         }
         return $this->uriPrefix
-            .str_replace('\\', '/', substr($controllerClass, strlen($this->controllersNamespace)));
+            .str_replace('\\', '/',
+                substr($controllerClass, strlen($this->controllersNamespace) + 1));
     }
 }
