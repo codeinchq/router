@@ -48,7 +48,7 @@ use CodeInc\Router\DynamicRouter;
 $myRouter = new DynamicRouter(
     'MyApp\\Controllers', // <-- the controllers base namespace
     '/MyAppPages/' // <-- the base URI
-    );
+);
 
 // controller lookup (assuming the URI of the request is "/MyAppPages/User/Account") 
 $myRouter->getControllerClass($aPsr7ServerRequest); // <-- returns 'MyApp\Controllers\User\Account'
