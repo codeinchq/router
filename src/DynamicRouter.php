@@ -87,7 +87,7 @@ class DynamicRouter extends Router
         // else if the request URI points toward a controller
         $requestUri = $request->getUri()->getPath();
         if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
-            $controllerClass = $this->controllersNamespace
+            $controllerClass = $this->controllersNamespace.'\\'
                 .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
             if (class_exists($controllerClass) && is_subclass_of($controllerClass, ControllerInterface::class)) {
                 return $controllerClass;
