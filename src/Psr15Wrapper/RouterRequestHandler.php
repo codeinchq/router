@@ -34,7 +34,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class RouterRequestHandler implements RequestHandlerInterface
+class RouterRequestHandler implements RequestHandlerInterface
 {
     /**
      * @var InstantiatingRouterInterface
