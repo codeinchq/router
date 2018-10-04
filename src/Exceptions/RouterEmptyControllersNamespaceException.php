@@ -3,62 +3,54 @@
 // +---------------------------------------------------------------------+
 // | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
-// | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
+// | Copyright (c) 2018 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
 // +---------------------------------------------------------------------+
 // | NOTICE:  All information contained herein is, and remains the       |
 // | property of Code Inc. SAS. The intellectual and technical concepts  |
 // | contained herein are proprietary to Code Inc. SAS are protected by  |
 // | trade secret or copyright law. Dissemination of this information or |
-// | reproduction of this material  is strictly forbidden unless prior   |
+// | reproduction of this material is strictly forbidden unless prior    |
 // | written permission is obtained from Code Inc. SAS.                  |
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     12:06
+// Date:     28/09/2018
 // Project:  Router
 //
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class DuplicateRouteException
+ * Class RouterEmptyControllersNamespaceException
  *
- * @package CodeInc\Router\Exception
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DuplicateRouteException extends RouterException
+class RouterEmptyControllersNamespaceException extends \LogicException implements RouterException
 {
-	/**
-	 * @var string
-	 */
-	private $route;
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
-	/**
-	 * DuplicateRouteException constructor.
-	 *
-	 * @param string $route
-	 * @param RouterInterface $router
-	 * @param int|null $code
-	 * @param null|Throwable $previous
-	 */
-	public function __construct(string $route, RouterInterface $router, ?int $code = null,
-		?Throwable $previous = null)
-	{
-		$this->route = $route;
-		parent::__construct(sprintf("A controller already exists for the route \"%s\"", $route),
-			$router, $code, $previous);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getRoute():string
-	{
-		return $this->route;
-	}
+    /**
+     * RouterEmptyControllersNamespaceException constructor.
+     *
+     * @param RouterInterface $router
+     * @param int $code
+     * @param Throwable|null $previous
+     */
+    public function __construct(RouterInterface $router, int $code = 0, Throwable $previous = null)
+    {
+        $this->router = $router;
+        parent::__construct(
+            "The controllers namespace can not be empty.",
+            $code,
+            $previous
+        );
+    }
 }

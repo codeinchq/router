@@ -20,36 +20,42 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
 use Throwable;
 
 
 /**
- * Class NotAControllerException
+ * Class NotWithinNamespaceException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotAControllerException extends \LogicException implements RouterException
+class NotWithinNamespaceException extends \LogicException implements RouterException
 {
     /**
      * @var string
      */
-    private $class;
+    private $controllerClass;
 
     /**
-     * NotAControllerException constructor.
+     * @var string
+     */
+    private $controllersNamespace;
+
+    /**
+     * NotWithinNamespaceException constructor.
      *
-     * @param string $class
+     * @param string $controllerClass
+     * @param string $controllersNamespace
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $class, int $code = 0, Throwable $previous = null)
+    public function __construct(string $controllerClass, string $controllersNamespace, int $code = 0, Throwable $previous = null)
     {
-        $this->class = $class;
+        $this->controllerClass = $controllerClass;
+        $this->controllersNamespace = $controllersNamespace;
         parent::__construct(
-            sprintf("The class %s is not a controller. "
-                ."All controllers must implement %s.", $class, ControllerInterface::class),
+            sprintf("The controller '%s' is not within the namespace '%s'.",
+                $controllerClass, $controllersNamespace),
             $code,
             $previous
         );
@@ -58,8 +64,16 @@ class NotAControllerException extends \LogicException implements RouterException
     /**
      * @return string
      */
-    public function getClass():string
+    public function getControllerClass():string
     {
-        return $this->class;
+        return $this->controllerClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllersNamespace():string
+    {
+        return $this->controllersNamespace;
     }
 }

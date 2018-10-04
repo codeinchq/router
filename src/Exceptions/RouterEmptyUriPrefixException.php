@@ -20,14 +20,45 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\RouterInterface;
+use Throwable;
+
 
 /**
- * Interface RouterException
+ * Class RouterEmptyUriPrefixException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterException
+class RouterEmptyUriPrefixException extends \LogicException implements RouterException
 {
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
+    /**
+     * RouterEmptyUriPrefixException constructor.
+     *
+     * @param RouterInterface $router
+     * @param int $code
+     * @param Throwable|null $previous
+     */
+    public function __construct(RouterInterface $router, int $code = 0, Throwable $previous = null)
+    {
+        $this->router = $router;
+        parent::__construct(
+            "The dynamic router's URI prefix can not be empty.",
+            $code,
+            $previous
+        );
+    }
+
+    /**
+     * @return RouterInterface
+     */
+    public function getRouter():RouterInterface
+    {
+        return $this->router;
+    }
 }

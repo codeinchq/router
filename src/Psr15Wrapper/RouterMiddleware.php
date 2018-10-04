@@ -3,67 +3,69 @@
 // +---------------------------------------------------------------------+
 // | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
-// | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
+// | Copyright (c) 2018 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
 // +---------------------------------------------------------------------+
 // | NOTICE:  All information contained herein is, and remains the       |
 // | property of Code Inc. SAS. The intellectual and technical concepts  |
 // | contained herein are proprietary to Code Inc. SAS are protected by  |
 // | trade secret or copyright law. Dissemination of this information or |
-// | reproduction of this material  is strictly forbidden unless prior   |
+// | reproduction of this material is strictly forbidden unless prior    |
 // | written permission is obtained from Code Inc. SAS.                  |
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     11/04/2018
-// Time:     19:21
+// Date:     27/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Controllers;
-use CodeInc\Router\Instantiators\ControllerInstantiator;
-use CodeInc\Router\Instantiators\ControllerInstantiatorInterface;
+namespace CodeInc\Router\Psr15Wrappers;
+use CodeInc\Router\Exceptions\ControllerProcessingException;
+use CodeInc\Router\InstantiatingRouterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class ControllerRequestHandler to transform a controller into a PSR-15 RequestHandler
+ * Class RouterMiddleware
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerRequestHandler implements RequestHandlerInterface
+class RouterMiddleware implements MiddlewareInterface
 {
     /**
-     * @var string
+     * @var InstantiatingRouterInterface
      */
-    private $controllerClass;
+    private $router;
 
     /**
-     * @var ControllerInstantiator|ControllerInstantiatorInterface
-     */
-    private $instantiator;
-
-    /**
-     * ControllerRequestHandler constructor.
+     * RouterMiddleware constructor.
      *
-     * @param string $controllerClass
-     * @param ControllerInstantiatorInterface|null $instantiator
+     * @param InstantiatingRouterInterface $router
      */
-    public function __construct(string $controllerClass, ControllerInstantiatorInterface $instantiator = null)
+    public function __construct(InstantiatingRouterInterface $router)
     {
-        $this->controllerClass = $controllerClass;
-        $this->instantiator = $instantiator ?? new ControllerInstantiator();
+        $this->router = $router;
     }
 
     /**
+     * @inheritdoc
      * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        return $this->instantiator->instantiate($this->controllerClass, $request)->process();
+        if ($controller = $this->router->getController($request)) {
+            try {
+                return $controller->getResponse();
+            } catch (\Throwable $exception) {
+                throw new ControllerProcessingException($controller,0, $exception);
+            }
+        }
+        return $handler->handle($request);
     }
 }

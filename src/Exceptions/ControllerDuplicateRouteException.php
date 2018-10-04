@@ -20,36 +20,50 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\RouterInterface;
 use Throwable;
 
 
 /**
- * Class NotAControllerException
+ * Class ControllerDuplicateRouteException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotAControllerException extends \LogicException implements RouterException
+class ControllerDuplicateRouteException extends \LogicException implements RouterException
 {
     /**
      * @var string
      */
-    private $class;
+    private $route;
 
     /**
-     * NotAControllerException constructor.
+     * @var string
+     */
+    private $controllerClass;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * ControllerDuplicateRouteException constructor.
      *
-     * @param string $class
+     * @param string $route
+     * @param string $controllerClass
+     * @param RouterInterface $router
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $class, int $code = 0, Throwable $previous = null)
+    public function __construct(string $route, string $controllerClass, RouterInterface $router,
+        int $code = 0, Throwable $previous = null)
     {
-        $this->class = $class;
+        $this->route = $route;
+        $this->controllerClass = $controllerClass;
+        $this->router = $router;
         parent::__construct(
-            sprintf("The class %s is not a controller. "
-                ."All controllers must implement %s.", $class, ControllerInterface::class),
+            sprintf("A controller already exists for the route '%s'.", $route),
             $code,
             $previous
         );
@@ -58,8 +72,24 @@ class NotAControllerException extends \LogicException implements RouterException
     /**
      * @return string
      */
-    public function getClass():string
+    public function getRoute():string
     {
-        return $this->class;
+        return $this->route;
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerClass():string
+    {
+        return $this->controllerClass;
+    }
+
+    /**
+     * @return RouterInterface
+     */
+    public function getRouter():RouterInterface
+    {
+        return $this->router;
     }
 }

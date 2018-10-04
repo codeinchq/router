@@ -3,14 +3,14 @@
 // +---------------------------------------------------------------------+
 // | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
-// | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
+// | Copyright (c) 2018 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
 // +---------------------------------------------------------------------+
 // | NOTICE:  All information contained herein is, and remains the       |
 // | property of Code Inc. SAS. The intellectual and technical concepts  |
 // | contained herein are proprietary to Code Inc. SAS are protected by  |
 // | trade secret or copyright law. Dissemination of this information or |
-// | reproduction of this material  is strictly forbidden unless prior   |
+// | reproduction of this material is strictly forbidden unless prior    |
 // | written permission is obtained from Code Inc. SAS.                  |
 // +---------------------------------------------------------------------+
 //
@@ -21,7 +21,8 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\DuplicateRouteException;
+use CodeInc\Router\Exceptions\ControllerDuplicateRouteException;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -31,62 +32,59 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Router extends AbstractInstantiatorRouter
+class Router implements RouterInterface
 {
     /**
      * @var string[]
      */
-    private $routes = [];
+    private $controllers = [];
 
     /**
-     * Adds a route to a controller.
+     * Adds a controller.
      *
-     * @param string $route
+     * @param string $route URI path (supports shell patterns)
      * @param string $controllerClass
-     * @throws DuplicateRouteException
      */
     public function addRoute(string $route, string $controllerClass):void
     {
-        if (isset($this->routes[$route])) {
-            throw new DuplicateRouteException($route, $this);
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw new NotAControllerException($controllerClass);
         }
-        $this->routes[strtolower($route)] = $controllerClass;
-    }
-
-    /**
-     * Adds multiple routes using an iterable.
-     *
-     * @param iterable $routes
-     * @throws DuplicateRouteException
-     */
-    public function addRoutes(iterable $routes):void
-    {
-        foreach ($routes as $route => $controller) {
-            $this->addRoute($route, $controller);
+        $realRoute = strtolower($route);
+        if (isset($this->controllers[$realRoute])) {
+            throw new ControllerDuplicateRouteException($route, $controllerClass, $this);
         }
+        $this->controllers[$realRoute] = $controllerClass;
     }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return null|string
+     * @return ControllerInterface|null
      */
-    protected function getControllerClass(ServerRequestInterface $request):?string
+    public function getControllerClass(ServerRequestInterface $request):?string
     {
-        $requestRoute = strtolower($request->getUri()->getPath());
-
-        // if there is a direct route matching the request
-        if (isset($this->routes[$requestRoute])) {
-            return $this->routes[$requestRoute];
-        }
-
-        // if there is a pattern route matching the request
-        foreach ($this->routes as $route => $controllerClass) {
-            if (fnmatch($route, $requestRoute)) {
+        $requestRoute = $request->getUri()->getPath();
+        foreach ($this->controllers as $route => $controllerClass) {
+            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
                 return $controllerClass;
             }
         }
+        return null;
+    }
 
+    /**
+     * @inheritdoc
+     * @param string $controllerClass
+     * @return null|string
+     */
+    public function getControllerUri(string $controllerClass):?string
+    {
+        foreach ($this->controllers as $route => $knownControllerClass) {
+            if ($controllerClass == $knownControllerClass) {
+                return $route;
+            }
+        }
         return null;
     }
 }
