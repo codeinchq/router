@@ -71,7 +71,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
     public function addResolvers(iterable $resolvers):void
     {
         foreach ($resolvers as $resolver) {
-            if ($resolvers instanceof ResolverInterface) {
+            if ($resolver instanceof ResolverInterface) {
                 $this->addResolver($resolver);
             }
         }
