@@ -10,7 +10,7 @@
     "psr/http-message": "^1.0",
     "psr/http-server-handler": "^1.0",
     "psr/http-server-middleware": "^1.0",
-    "codeinc/psr7-responses": "^1.4",
+    "codeinc/psr7-responses": "^2",
     "psr/http-factory": "^1.0"
   },
   "require-dev": {
