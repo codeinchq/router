@@ -76,7 +76,7 @@ class Router implements MiddlewareInterface
                 $controller->handle($request);
             }
             catch (\Throwable $exception) {
-                throw new ControllerHandlingException($controller);
+                throw new ControllerHandlingException($controller, 0, $exception);
             }
         }
         return ($this->getController($request) ?? $handler)->handle($request);
