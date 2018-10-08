@@ -42,18 +42,18 @@ class Router implements MiddlewareInterface
     private $resolvers = [];
 
     /**
-     * @var ControllerInstantiatorInterface
+     * @var RequestHandlerInstantiatorInterface
      */
-    private $controllerInstantiator;
+    private $handlerInstantiator;
 
     /**
      * Router constructor.
      *
-     * @param ControllerInstantiatorInterface $controllerInstantiator
+     * @param RequestHandlerInstantiatorInterface $handlerInstantiator
      */
-    public function __construct(ControllerInstantiatorInterface $controllerInstantiator)
+    public function __construct(RequestHandlerInstantiatorInterface $handlerInstantiator)
     {
-        $this->controllerInstantiator = $controllerInstantiator;
+        $this->handlerInstantiator = $handlerInstantiator;
     }
 
     /**
@@ -93,7 +93,7 @@ class Router implements MiddlewareInterface
         $requestRoute = $request->getUri()->getPath();
         foreach ($this->resolvers as $resolver) {
             if (($controllerClass = $resolver->getHandlerClass($requestRoute)) !== null) {
-                return $this->controllerInstantiator->instantiate($controllerClass);
+                return $this->handlerInstantiator->instantiate($controllerClass);
             }
         }
         return null;

@@ -24,18 +24,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface ControllerInstantiatorInterface
+ * Interface RequestHandlerInstantiatorInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInstantiatorInterface
+interface RequestHandlerInstantiatorInterface
 {
     /**
-     * Instantiates a controller.
+     * Instantiates a request handler.
      *
-     * @param string $controllerClass
+     * @param string $handlerClass
      * @return RequestHandlerInterface
      */
-    public function instantiate(string $controllerClass):RequestHandlerInterface;
+    public function instantiate(string $handlerClass):RequestHandlerInterface;
 }
