@@ -15,57 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     28/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\Exceptions\ControllerProcessingException;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
+namespace CodeInc\Router\Exceptions;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 
 
 /**
- * Class RouterMiddleware
+ * Class NotARequestHandlerException
  *
- * @package CodeInc\Router\Psr15Wrappers
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterMiddleware implements MiddlewareInterface
+class NotARequestHandlerException extends \LogicException implements RouterException
 {
     /**
-     * @var InstantiatingRouterInterface
+     * @var string
      */
-    private $router;
+    private $class;
 
     /**
-     * RouterMiddleware constructor.
+     * NotARequestHandlerException constructor.
      *
-     * @param InstantiatingRouterInterface $router
+     * @param string $class
+     * @param int $code
+     * @param Throwable|null $previous
      */
-    public function __construct(InstantiatingRouterInterface $router)
+    public function __construct(string $class, int $code = 0, Throwable $previous = null)
     {
-        $this->router = $router;
+        $this->class = $class;
+        parent::__construct(
+            sprintf("The class %s is not a PSR-7 request handler. "
+                ."All request handlers must implement %s.", $class, RequestHandlerInterface::class),
+            $code,
+            $previous
+        );
     }
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * @return string
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function getClass():string
     {
-        if ($controller = $this->router->getController($request)) {
-            try {
-                return $controller->createResponse();
-            }
-            catch (\Throwable $exception) {
-                throw new ControllerProcessingException($controller,0, $exception);
-            }
-        }
-        return $handler->handle($request);
+        return $this->class;
     }
 }

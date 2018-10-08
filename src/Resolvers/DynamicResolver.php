@@ -19,21 +19,21 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\NotAControllerException;
+namespace CodeInc\Router\Resolvers;
+use CodeInc\Router\Exceptions\NotARequestHandlerException;
 use CodeInc\Router\Exceptions\NotWithinNamespaceException;
 use CodeInc\Router\Exceptions\RouterEmptyControllersNamespaceException;
 use CodeInc\Router\Exceptions\RouterEmptyUriPrefixException;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class DynamicRouter
+ * Class DynamicResolver
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicRouter extends Router
+class DynamicResolver implements ResolverInterface
 {
     /**
      * @var string
@@ -46,7 +46,7 @@ class DynamicRouter extends Router
     protected $uriPrefix;
 
     /**
-     * DynamicRouter constructor.
+     * DynamicResolver constructor.
      *
      * @param string $controllersNamespace
      * @param string $uriPrefix
@@ -64,56 +64,38 @@ class DynamicRouter extends Router
     }
 
     /**
-     * Sets the controller returned for the URI prefix.
-     *
-     * @uses DynamicRouter::addRoute()
-     * @param string $controllerClass
-     */
-    public function setHomeController(string $controllerClass):void
-    {
-        $this->addRoute($this->uriPrefix, $controllerClass);
-    }
-
-    /**
      * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @return string|null
+     * @param string $route
+     * @return null|string
      */
-    public function getControllerClass(ServerRequestInterface $request):?string
+    public function getHandlerClass(string $route):?string
     {
-        // if there is a route mach for a manually defined route
-        if ($controller = parent::getControllerClass($request)) {
-            return $controller;
-        }
-
-        // else if the request URI points toward a controller
-        $requestUri = $request->getUri()->getPath();
-        if (substr($requestUri, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
+        if (substr($route, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
             $controllerClass = $this->controllersNamespace.'\\'
-                .str_replace('/', '\\', substr($requestUri, strlen($this->uriPrefix)));
-            if (class_exists($controllerClass) && is_subclass_of($controllerClass, ControllerInterface::class)) {
+                .str_replace('/', '\\', substr($route, strlen($this->uriPrefix)));
+            if (class_exists($controllerClass)
+                && is_subclass_of($controllerClass, RequestHandlerInterface::class)) {
                 return $controllerClass;
             }
         }
-
         return null;
     }
 
     /**
      * @inheritdoc
-     * @param string $controllerClass
+     * @param string $handlerClass
      * @return string
      */
-    public function getControllerUri(string $controllerClass):string
+    public function getHandlerRoute(string $handlerClass):string
     {
-        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-            throw new NotAControllerException($controllerClass);
+        if (!is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
+            throw new NotARequestHandlerException($handlerClass);
         }
-        if (!substr($controllerClass, 0, strlen($this->controllersNamespace)) == $controllerClass) {
-            throw new NotWithinNamespaceException($controllerClass, $this->controllersNamespace);
+        if (!substr($handlerClass, 0, strlen($this->controllersNamespace)) == $handlerClass) {
+            throw new NotWithinNamespaceException($handlerClass, $this->controllersNamespace);
         }
         return $this->uriPrefix
             .str_replace('\\', '/',
-                substr($controllerClass, strlen($this->controllersNamespace) + 1));
+                substr($handlerClass, strlen($this->controllersNamespace) + 1));
     }
 }

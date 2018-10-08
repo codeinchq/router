@@ -15,29 +15,27 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     08/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\RouterInterface;
-use Psr\Http\Message\ServerRequestInterface;
+namespace CodeInc\Router;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface InstantiatingRouterInterface
+ * Interface ControllerInstantiatorInterface
  *
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface InstantiatingRouterInterface extends RouterInterface
+interface ControllerInstantiatorInterface
 {
     /**
-     * Returns an instance of the controller to handle the given HTTP request or NULL if none is available.
+     * Instantiates a controller.
      *
-     * @param ServerRequestInterface $request
-     * @return ControllerInterface|null
+     * @param string $controllerClass
+     * @return RequestHandlerInterface
      */
-    public function getController(ServerRequestInterface $request):?ControllerInterface;
+    public function instantiate(string $controllerClass):RequestHandlerInterface;
 }

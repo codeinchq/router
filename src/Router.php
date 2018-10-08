@@ -15,15 +15,17 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     05/03/2018
-// Time:     11:53
+// Date:     08/10/2018
 // Project:  Router
 //
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\ControllerDuplicateRouteException;
-use CodeInc\Router\Exceptions\NotAControllerException;
+use CodeInc\Router\Exceptions\ControllerHandlingException;
+use CodeInc\Router\Resolvers\ResolverInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -32,57 +34,66 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class Router implements RouterInterface
+class Router implements MiddlewareInterface
 {
     /**
-     * @var string[]
+     * @var ResolverInterface[]
      */
-    private $controllers = [];
+    private $resolvers = [];
 
     /**
-     * Adds a controller.
-     *
-     * @param string $route URI path (supports shell patterns)
-     * @param string $controllerClass
+     * @var ControllerInstantiatorInterface
      */
-    public function addRoute(string $route, string $controllerClass):void
+    private $controllerInstantiator;
+
+    /**
+     * Router constructor.
+     *
+     * @param ControllerInstantiatorInterface $controllerInstantiator
+     */
+    public function __construct(ControllerInstantiatorInterface $controllerInstantiator)
     {
-        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
-            throw new NotAControllerException($controllerClass);
-        }
-        $realRoute = strtolower($route);
-        if (isset($this->controllers[$realRoute])) {
-            throw new ControllerDuplicateRouteException($route, $controllerClass, $this);
-        }
-        $this->controllers[$realRoute] = $controllerClass;
+        $this->controllerInstantiator = $controllerInstantiator;
     }
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @return ControllerInterface|null
+     * @param ResolverInterface $resolver
      */
-    public function getControllerClass(ServerRequestInterface $request):?string
+    public function addResolver(ResolverInterface $resolver):void
     {
-        $requestRoute = $request->getUri()->getPath();
-        foreach ($this->controllers as $route => $controllerClass) {
-            if (fnmatch($route, $requestRoute, FNM_CASEFOLD)) {
-                return $controllerClass;
+        $this->resolvers[] = $resolver;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    {
+        if ($controller = $this->getController($request)) {
+            try {
+                $controller->handle($request);
+            }
+            catch (\Throwable $exception) {
+                throw new ControllerHandlingException($controller);
             }
         }
-        return null;
+        return ($this->getController($request) ?? $handler)->handle($request);
     }
 
     /**
-     * @inheritdoc
-     * @param string $controllerClass
-     * @return null|string
+     * Returns the controller in charge of handling a given request.
+     *
+     * @param ServerRequestInterface $request
+     * @return null|RequestHandlerInterface
      */
-    public function getControllerUri(string $controllerClass):?string
+    public function getController(ServerRequestInterface $request):?RequestHandlerInterface
     {
-        foreach ($this->controllers as $route => $knownControllerClass) {
-            if ($controllerClass == $knownControllerClass) {
-                return $route;
+        $requestRoute = $request->getUri()->getPath();
+        foreach ($this->resolvers as $resolver) {
+            if (($controllerClass = $resolver->getHandlerClass($requestRoute)) !== null) {
+                return $this->controllerInstantiator->instantiate($controllerClass);
             }
         }
         return null;
