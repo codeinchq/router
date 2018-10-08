@@ -20,53 +20,24 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Psr15Wrappers;
-use CodeInc\Router\Exceptions\ControllerProcessingException;
-use CodeInc\Router\InstantiatingRouterInterface;
-use Psr\Http\Message\ResponseInterface;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\RouterInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterMiddleware
+ * Interface InstantiatingRouterInterface
  *
- * @package CodeInc\Router\Psr15Wrappers
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterMiddleware implements MiddlewareInterface
+interface InstantiatingRouterInterface extends RouterInterface
 {
     /**
-     * @var InstantiatingRouterInterface
-     */
-    private $router;
-
-    /**
-     * RouterMiddleware constructor.
+     * Returns an instance of the controller to handle the given HTTP request or NULL if none is available.
      *
-     * @param InstantiatingRouterInterface $router
-     */
-    public function __construct(InstantiatingRouterInterface $router)
-    {
-        $this->router = $router;
-    }
-
-    /**
-     * @inheritdoc
      * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
+     * @return ControllerInterface|null
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
-    {
-        if ($controller = $this->router->getController($request)) {
-            try {
-                return $controller->createResponse();
-            }
-            catch (\Throwable $exception) {
-                throw new ControllerProcessingException($controller,0, $exception);
-            }
-        }
-        return $handler->handle($request);
-    }
+    public function getController(ServerRequestInterface $request):?ControllerInterface;
 }

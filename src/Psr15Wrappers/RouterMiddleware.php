@@ -21,20 +21,19 @@
 declare(strict_types=1);
 namespace CodeInc\Router\Psr15Wrappers;
 use CodeInc\Router\Exceptions\ControllerProcessingException;
-use CodeInc\Router\InstantiatingRouterInterface;
-use CodeInc\Router\Psr15Wrapper\NotFoundRequestHandler;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RouterRequestHandler
+ * Class RouterMiddleware
  *
  * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterRequestHandler implements RequestHandlerInterface
+class RouterMiddleware implements MiddlewareInterface
 {
     /**
      * @var InstantiatingRouterInterface
@@ -42,49 +41,31 @@ class RouterRequestHandler implements RequestHandlerInterface
     private $router;
 
     /**
-     * @var null|RequestHandlerInterface
-     * @see RouterRequestHandler::getNotFoundRequestHandler()
-     */
-    private $notFoundRequestHandler;
-
-    /**
-     * RouterRequestHandler constructor.
+     * RouterMiddleware constructor.
      *
      * @param InstantiatingRouterInterface $router
-     * @param null|RequestHandlerInterface $notFoundRequestHandler
      */
-    public function __construct(InstantiatingRouterInterface $router,
-        ?RequestHandlerInterface $notFoundRequestHandler = null)
+    public function __construct(InstantiatingRouterInterface $router)
     {
         $this->router = $router;
-        $this->notFoundRequestHandler = $notFoundRequestHandler;
-    }
-
-    /**
-     * Returns the not found request handler.
-     *
-     * @return RequestHandlerInterface
-     */
-    public function getNotFoundRequestHandler():RequestHandlerInterface
-    {
-        return $this->notFoundRequestHandler ?? new NotFoundRequestHandler();
     }
 
     /**
      * @inheritdoc
      * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
         if ($controller = $this->router->getController($request)) {
             try {
                 return $controller->createResponse();
             }
             catch (\Throwable $exception) {
-                throw new ControllerProcessingException($controller, 0, $exception);
+                throw new ControllerProcessingException($controller,0, $exception);
             }
         }
-        return $this->getNotFoundRequestHandler()->handle($request);
+        return $handler->handle($request);
     }
 }

@@ -19,28 +19,28 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrapper;
+namespace CodeInc\Router\Psr15Wrappers;
 use CodeInc\Psr7Responses\NotFoundResponse;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class NotFoundRequestHandler
+ * Class NotFoundResponseFactory
  *
- * @package CodeInc\Router\Psr15Wrapper
+ * @package CodeInc\Router\Psr15Wrappers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class NotFoundRequestHandler implements RequestHandlerInterface
+final class NotFoundResponseFactory implements ResponseFactoryInterface
 {
     /**
      * @inheritdoc
-     * @param ServerRequestInterface $request
+     * @param int $code
+     * @param string $reasonPhrase
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function createResponse(int $code = 404, string $reasonPhrase = ''):ResponseInterface
     {
-        return new NotFoundResponse();
+        return new NotFoundResponse('', $code, $reasonPhrase);
     }
 }
