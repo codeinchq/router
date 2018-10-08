@@ -39,8 +39,27 @@ class StaticResolver implements ResolverInterface
      */
     private $routes = [];
 
+    public function __construct(?iterable $routes = null)
+    {
+        if ($routes !== null) {
+            $this->addRoutes($routes);
+        }
+    }
+
     /**
-     * Adds a controller.
+     * Adds multiple routes to request handlers.
+     *
+     * @param iterable $routes
+     */
+    public function addRoutes(iterable $routes):void
+    {
+        foreach ($routes as $route => $controllerClass) {
+            $this->addRoute($route);
+        }
+    }
+
+    /**
+     * Adds a route to a request handler.
      *
      * @param string $route URI path (supports shell patterns)
      * @param string $controllerClass
@@ -58,8 +77,7 @@ class StaticResolver implements ResolverInterface
     }
 
     /**
-     * Returns the controller in charge of handling a given request.
-     *
+     * @inheritdoc
      * @param string $route
      * @return null|string
      */

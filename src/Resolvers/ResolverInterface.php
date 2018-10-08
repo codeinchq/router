@@ -30,7 +30,7 @@ namespace CodeInc\Router\Resolvers;
 interface ResolverInterface
 {
     /**
-     * Returns the request handler's class for a given route or NULL if none is available.
+     * Returns the request handler's in charge or handling a given route or NULL if none is available.
      *
      * @param string $route
      * @return string|null
