@@ -39,6 +39,11 @@ class StaticResolver implements ResolverInterface
      */
     private $routes = [];
 
+    /**
+     * StaticResolver constructor.
+     *
+     * @param iterable|null $routes
+     */
     public function __construct(?iterable $routes = null)
     {
         if ($routes !== null) {
@@ -54,7 +59,7 @@ class StaticResolver implements ResolverInterface
     public function addRoutes(iterable $routes):void
     {
         foreach ($routes as $route => $controllerClass) {
-            $this->addRoute($route);
+            $this->addRoute($route, $controllerClass);
         }
     }
 
