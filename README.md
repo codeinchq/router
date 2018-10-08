@@ -1,10 +1,10 @@
 # PSR-7 & PSR-15 router library
 
-This PHP 7.1 library provides two [PSR-7](https://www.php-fig.org/psr/psr-7/) and [PSR-15](https://www.php-fig.org/psr/psr-15/) compatible routers.  
+This PHP 7.1 library provides two [PSR-7](https://www.php-fig.org/psr/psr-7/), [PSR-15](https://www.php-fig.org/psr/psr-15/) and [PSR-17](https://www.php-fig.org/psr/psr-17/) compatible routers.  
 
 A router is a `class` implementing [`RouterInterface`](src/RouterInterface.php) in charge of matching a controller to a request. It has two methods: `getControllerClass()` which returns the class corresponding to PSR-7 server request and `getControllerUri()` which returns the URI of a controller. 
 
-A controller is a `class` implementing [`ControllerInterface`](src/ControllerInterface.php) which takes a PSR-7 server request object ([`ServerRequestInterface`](https://github.com/php-fig/http-message/blob/master/src/ServerRequestInterface.php)) as a constructor parameter and returns a PSR-7 response through the `getResponse()` method.  
+A controller is a `class` implementing [`ControllerInterface`](src/ControllerInterface.php) which creates a PSR-7 response through the `createResponse()` method.  Controllers are compatible with PSR-17 and the [`ResponseFactoryInterface`](https://www.php-fig.org/psr/psr-17/#22-responsefactoryinterface) interface
 
  Two routers are supplied: 
  * a static router ([`Router`](src/Router.php)) which works with a list of predefined routes (unix patterns) and their corresponding controllers;

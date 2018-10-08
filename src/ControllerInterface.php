@@ -20,7 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -30,7 +30,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInterface
+interface ControllerInterface extends ResponseFactoryInterface
 {
     /**
      * Returns the parent PSR-7 server request.
@@ -38,11 +38,4 @@ interface ControllerInterface
      * @return ServerRequestInterface
      */
     public function getRequest():ServerRequestInterface;
-
-    /**
-     * Returns the generated PSR-7 response.
-     *
-     * @return ResponseInterface
-     */
-    public function getResponse():ResponseInterface;
 }

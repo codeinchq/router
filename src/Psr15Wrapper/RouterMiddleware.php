@@ -61,8 +61,9 @@ class RouterMiddleware implements MiddlewareInterface
     {
         if ($controller = $this->router->getController($request)) {
             try {
-                return $controller->getResponse();
-            } catch (\Throwable $exception) {
+                return $controller->createResponse();
+            }
+            catch (\Throwable $exception) {
                 throw new ControllerProcessingException($controller,0, $exception);
             }
         }

@@ -79,7 +79,7 @@ class RouterRequestHandler implements RequestHandlerInterface
     {
         if ($controller = $this->router->getController($request)) {
             try {
-                return $controller->getResponse();
+                return $controller->createResponse();
             }
             catch (\Throwable $exception) {
                 throw new ControllerProcessingException($controller, 0, $exception);
