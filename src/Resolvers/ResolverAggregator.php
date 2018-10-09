@@ -21,6 +21,7 @@
 declare(strict_types=1);
 namespace CodeInc\Router\Resolvers;
 use CodeInc\CollectionInterface\CountableCollectionInterface;
+use CodeInc\Router\Exceptions\NotAResolverException;
 
 
 /**
@@ -29,7 +30,7 @@ use CodeInc\CollectionInterface\CountableCollectionInterface;
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ResolverAggregator implements ResolverInterface, CountableCollectionInterface
+final class ResolverAggregator implements ResolverInterface, CountableCollectionInterface
 {
     /**
      * @var ResolverInterface[]
@@ -39,7 +40,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
     /**
      * @var int|null
      */
-    private $iteratorKey;
+    private $iteratorPosition;
 
     /**
      * ResolverAggregator constructor.
@@ -71,9 +72,10 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
     public function addResolvers(iterable $resolvers):void
     {
         foreach ($resolvers as $resolver) {
-            if ($resolver instanceof ResolverInterface) {
-                $this->addResolver($resolver);
+            if (!$resolver instanceof ResolverInterface) {
+                throw new NotAResolverException($resolver);
             }
+            $this->addResolver($resolver);
         }
     }
 
@@ -82,7 +84,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
      */
     public function rewind():void
     {
-        $this->iteratorKey = 0;
+        $this->iteratorPosition = 0;
     }
 
     /**
@@ -90,7 +92,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
      */
     public function next():void
     {
-        $this->iteratorKey++;
+        $this->iteratorPosition++;
     }
 
     /**
@@ -99,7 +101,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
      */
     public function valid():bool
     {
-        return array_key_exists($this->iteratorKey, $this->resolvers);
+        return array_key_exists($this->iteratorPosition, $this->resolvers);
     }
 
     /**
@@ -108,7 +110,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
      */
     public function current():ResolverInterface
     {
-        return $this->resolvers[$this->iteratorKey];
+        return $this->resolvers[$this->iteratorPosition];
     }
 
     /**
@@ -117,7 +119,7 @@ class ResolverAggregator implements ResolverInterface, CountableCollectionInterf
      */
     public function key():int
     {
-        return $this->iteratorKey;
+        return $this->iteratorPosition;
     }
 
     /**

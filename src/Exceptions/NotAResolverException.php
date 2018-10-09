@@ -15,27 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     08/10/2018
+// Date:     09/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Resolvers\ResolverInterface;
+use Throwable;
 
 
 /**
- * Interface RequestHandlerInstantiatorInterface
+ * Class NotAResolverException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RequestHandlerInstantiatorInterface
+class NotAResolverException extends \LogicException
 {
     /**
-     * Instantiates a request handler.
-     *
-     * @param string $handlerClass
-     * @return RequestHandlerInterface
+     * @var mixed
      */
-    public function instantiate(string $handlerClass):RequestHandlerInterface;
+    private $item;
+
+    /**
+     * NotAResolverException constructor.
+     *
+     * @param mixed $item
+     * @param int $code
+     * @param Throwable|null $previous
+     */
+    public function __construct($item, int $code = 0, Throwable $previous = null)
+    {
+        parent::__construct(
+            sprintf("The item '%s' is not a resolver. All resolvers must implement '%s'.",
+                is_object($item) ? get_class($item) : (string)$item, ResolverInterface::class),
+            $code,
+            $previous
+        );
+        $this->item = $item;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getItem()
+    {
+        return $this->item;
+    }
 }

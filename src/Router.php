@@ -21,6 +21,8 @@
 declare(strict_types=1);
 namespace CodeInc\Router;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
+use CodeInc\Router\Exceptions\ControllerInstantiatingException;
+use CodeInc\Router\Instantiator\InstantiatorInterface;
 use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,37 +39,33 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Router implements MiddlewareInterface
 {
     /**
-     * @var ResolverInterface[]
+     * @var ResolverInterface
      */
-    private $resolvers = [];
+    private $resolver;
 
     /**
-     * @var RequestHandlerInstantiatorInterface
+     * @var InstantiatorInterface
      */
-    private $handlerInstantiator;
+    private $instantiator;
 
     /**
      * Router constructor.
      *
-     * @param RequestHandlerInstantiatorInterface $handlerInstantiator
+     * @param ResolverInterface|null $resolver
+     * @param InstantiatorInterface $instantiator
      */
-    public function __construct(RequestHandlerInstantiatorInterface $handlerInstantiator)
+    public function __construct(ResolverInterface $resolver, InstantiatorInterface $instantiator)
     {
-        $this->handlerInstantiator = $handlerInstantiator;
+        $this->resolver = $resolver;
+        $this->instantiator = $instantiator;
     }
 
     /**
-     * @param ResolverInterface $resolver
-     */
-    public function addResolver(ResolverInterface $resolver):void
-    {
-        $this->resolvers[] = $resolver;
-    }
-
-    /**
+     * @inheritdoc
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
+     * @throws ControllerHandlingException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
@@ -87,13 +85,17 @@ class Router implements MiddlewareInterface
      *
      * @param ServerRequestInterface $request
      * @return null|RequestHandlerInterface
+     * @throws ControllerInstantiatingException
      */
     public function getController(ServerRequestInterface $request):?RequestHandlerInterface
     {
         $requestRoute = $request->getUri()->getPath();
-        foreach ($this->resolvers as $resolver) {
-            if (($controllerClass = $resolver->getHandlerClass($requestRoute)) !== null) {
-                return $this->handlerInstantiator->instantiate($controllerClass);
+        if (($controllerClass = $this->resolver->getHandlerClass($requestRoute)) !== null) {
+            try {
+                return $this->instantiator->instantiate($controllerClass);
+            }
+            catch (\Throwable $exception) {
+                throw new ControllerInstantiatingException($controllerClass, 0, $exception);
             }
         }
         return null;
