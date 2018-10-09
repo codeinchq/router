@@ -40,7 +40,7 @@ $myRouter->handle($aPsr7ServerRequest); // <-- returns 'ArticleController'
 ```
 
 
-### With multiple resolvers using `HandlerResolverAggregator` and multiple instantiators using `HandlerInstantiatorAggregator`
+### Working with multiple resolvers and multiple instantiators 
 ```php
 <?php
 use CodeInc\Router\Router;
