@@ -30,7 +30,7 @@ use Throwable;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotARequestHandlerException extends \LogicException implements RouterException
+final class NotARequestHandlerException extends \LogicException implements RouterException
 {
     /**
      * @var string

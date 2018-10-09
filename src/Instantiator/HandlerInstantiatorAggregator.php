@@ -31,7 +31,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Instantiator
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class HandlerInstantiatorAggregator implements HandlerInstantiatorInterface, CountableCollectionInterface
+class HandlerInstantiatorAggregator implements HandlerInstantiatorInterface, CountableCollectionInterface
 {
     /**
      * @var HandlerInstantiatorInterface[]

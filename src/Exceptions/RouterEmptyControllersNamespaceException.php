@@ -30,7 +30,7 @@ use Throwable;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class RouterEmptyControllersNamespaceException extends \LogicException implements RouterException
+final class RouterEmptyControllersNamespaceException extends \LogicException implements RouterException
 {
     /**
      * @var HandlerResolverInterface

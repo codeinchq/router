@@ -29,7 +29,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerHandlingException extends \RuntimeException implements RouterException
+final class ControllerHandlingException extends \RuntimeException implements RouterException
 {
     /**
      * @var RequestHandlerInterface
