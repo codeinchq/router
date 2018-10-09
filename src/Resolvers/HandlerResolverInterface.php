@@ -15,32 +15,33 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     25/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Psr15Wrapper;
-use CodeInc\Psr7Responses\NotFoundResponse;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-
+namespace CodeInc\Router\Resolvers;
 
 /**
- * Class NotFoundRequestHandler
+ * Interface HandlerResolverInterface
  *
- * @package CodeInc\Router\Psr15Wrapper
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class NotFoundRequestHandler implements RequestHandlerInterface
+interface HandlerResolverInterface
 {
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
+     * Returns the request handler's in charge or handling a given route or NULL if none is available.
+     *
+     * @param string $route
+     * @return string|null
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
-    {
-        return new NotFoundResponse();
-    }
+    public function getHandlerClass(string $route):?string;
+
+    /**
+     * Returns the route to a request handler or NULL if the route can not be computed.
+     *
+     * @param string $handlerClass
+     * @return string|null
+     */
+    public function getHandlerRoute(string $handlerClass):?string;
 }

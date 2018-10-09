@@ -15,50 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     28/09/2018
+// Date:     09/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
 use Throwable;
 
 
 /**
- * Class ControllerProcessingException
+ * Class NotAnInstantiatorException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerProcessingException extends \RuntimeException implements RouterException
+class NotAnInstantiatorException extends \LogicException
 {
     /**
-     * @var ControllerInterface
+     * @var mixed
      */
-    private $controller;
+    private $item;
 
     /**
-     * ControllerProcessingException constructor.
+     * NotAnInstantiatorException constructor.
      *
-     * @param ControllerInterface $controller
+     * @param $item
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(ControllerInterface $controller, int $code = 0, Throwable $previous = null)
+    public function __construct($item, int $code = 0, Throwable $previous = null)
     {
-        $this->controller = $controller;
         parent::__construct(
-            sprintf("Error while processing the controller '%s'", get_class($controller)),
+            sprintf("The item '%s' is not an instantiator. All instantiators must implement '%s'.",
+                is_object($item) ? get_class($item) : (string)$item, HandlerInstantiatorInterface::class),
             $code,
             $previous
         );
+        $this->item = $item;
     }
 
     /**
-     * @return ControllerInterface
+     * @return mixed
      */
-    public function getController():ControllerInterface
+    public function getItem()
     {
-        return $this->controller;
+        return $this->item;
     }
 }

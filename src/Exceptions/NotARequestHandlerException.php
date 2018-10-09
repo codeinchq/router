@@ -15,27 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     28/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ServerRequestInterface;
+namespace CodeInc\Router\Exceptions;
+use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 
 
 /**
- * Interface ControllerInterface
+ * Class NotARequestHandlerException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ControllerInterface extends ResponseFactoryInterface
+class NotARequestHandlerException extends \LogicException implements RouterException
 {
     /**
-     * Returns the parent PSR-7 server request.
-     *
-     * @return ServerRequestInterface
+     * @var string
      */
-    public function getRequest():ServerRequestInterface;
+    private $class;
+
+    /**
+     * NotARequestHandlerException constructor.
+     *
+     * @param string $class
+     * @param int $code
+     * @param Throwable|null $previous
+     */
+    public function __construct(string $class, int $code = 0, Throwable $previous = null)
+    {
+        $this->class = $class;
+        parent::__construct(
+            sprintf("The class %s is not a PSR-7 request handler. "
+                ."All request handlers must implement %s.", $class, RequestHandlerInterface::class),
+            $code,
+            $previous
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass():string
+    {
+        return $this->class;
+    }
 }

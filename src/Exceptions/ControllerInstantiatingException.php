@@ -20,36 +20,33 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\ControllerInterface;
-use Throwable;
 
 
 /**
- * Class NotAControllerException
+ * Class ControllerInstantiatingException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotAControllerException extends \LogicException implements RouterException
+class ControllerInstantiatingException extends \RuntimeException implements RouterException
 {
     /**
      * @var string
      */
-    private $class;
+    private $controllerClass;
 
     /**
-     * NotAControllerException constructor.
+     * ControllerInstantiatingException constructor.
      *
-     * @param string $class
+     * @param string $controllerClass
      * @param int $code
-     * @param Throwable|null $previous
+     * @param null|\Throwable $previous
      */
-    public function __construct(string $class, int $code = 0, Throwable $previous = null)
+    public function __construct(string $controllerClass, int $code = 0, ?\Throwable $previous = null)
     {
-        $this->class = $class;
+        $this->controllerClass = $controllerClass;
         parent::__construct(
-            sprintf("The class %s is not a controller. "
-                ."All controllers must implement %s.", $class, ControllerInterface::class),
+            sprintf("Error while instantiating the controller '%s'", $controllerClass),
             $code,
             $previous
         );
@@ -58,8 +55,8 @@ class NotAControllerException extends \LogicException implements RouterException
     /**
      * @return string
      */
-    public function getClass():string
+    public function getControllerClass():string
     {
-        return $this->class;
+        return $this->controllerClass;
     }
 }

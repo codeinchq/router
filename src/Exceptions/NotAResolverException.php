@@ -15,27 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     27/09/2018
+// Date:     09/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\ServerRequestInterface;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\Resolvers\HandlerResolverInterface;
+use Throwable;
 
 
 /**
- * Interface InstantiatingRouterInterface
+ * Class NotAResolverException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface InstantiatingRouterInterface extends RouterInterface
+class NotAResolverException extends \LogicException
 {
     /**
-     * Returns an instance of the controller to handle the given HTTP request or NULL if none is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return ControllerInterface|null
+     * @var mixed
      */
-    public function getController(ServerRequestInterface $request):?ControllerInterface;
+    private $item;
+
+    /**
+     * NotAResolverException constructor.
+     *
+     * @param mixed $item
+     * @param int $code
+     * @param Throwable|null $previous
+     */
+    public function __construct($item, int $code = 0, Throwable $previous = null)
+    {
+        parent::__construct(
+            sprintf("The item '%s' is not a resolver. All resolvers must implement '%s'.",
+                is_object($item) ? get_class($item) : (string)$item, HandlerResolverInterface::class),
+            $code,
+            $previous
+        );
+        $this->item = $item;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getItem()
+    {
+        return $this->item;
+    }
 }

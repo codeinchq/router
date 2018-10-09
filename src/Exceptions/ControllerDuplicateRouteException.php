@@ -20,9 +20,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\RouterInterface;
-use Throwable;
-
 
 /**
  * Class ControllerDuplicateRouteException
@@ -43,25 +40,17 @@ class ControllerDuplicateRouteException extends \LogicException implements Route
     private $controllerClass;
 
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * ControllerDuplicateRouteException constructor.
      *
      * @param string $route
      * @param string $controllerClass
-     * @param RouterInterface $router
      * @param int $code
-     * @param Throwable|null $previous
+     * @param \Throwable|null $previous
      */
-    public function __construct(string $route, string $controllerClass, RouterInterface $router,
-        int $code = 0, Throwable $previous = null)
+    public function __construct(string $route, string $controllerClass, int $code = 0, \Throwable $previous = null)
     {
         $this->route = $route;
         $this->controllerClass = $controllerClass;
-        $this->router = $router;
         parent::__construct(
             sprintf("A controller already exists for the route '%s'.", $route),
             $code,
@@ -83,13 +72,5 @@ class ControllerDuplicateRouteException extends \LogicException implements Route
     public function getControllerClass():string
     {
         return $this->controllerClass;
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    public function getRouter():RouterInterface
-    {
-        return $this->router;
     }
 }

@@ -15,35 +15,49 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     28/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router;
-use Psr\Http\Message\ServerRequestInterface;
+namespace CodeInc\Router\Exceptions;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Interface RouterInterface
+ * Class ControllerHandlingException
  *
- * @package CodeInc\Router
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface RouterInterface
+class ControllerHandlingException extends \RuntimeException implements RouterException
 {
     /**
-     * Returns the controller class to handle the given HTTP request or NULL if none is available.
-     *
-     * @param ServerRequestInterface $request
-     * @return string|null
+     * @var RequestHandlerInterface
      */
-    public function getControllerClass(ServerRequestInterface $request):?string;
+    private $controller;
 
     /**
-     * Returns the URI of a controller or NULL if the URI can not be computed.
+     * ControllerHandlingException constructor.
      *
-     * @param string $controllerClass
-     * @return string|null
+     * @param RequestHandlerInterface $controller
+     * @param int $code
+     * @param null|\Throwable $previous
      */
-    public function getControllerUri(string $controllerClass):?string;
+    public function __construct(RequestHandlerInterface $controller, int $code = 0, ?\Throwable $previous = null)
+    {
+        $this->controller = $controller;
+        parent::__construct(
+            sprintf("Error while processing the controller '%s'", get_class($controller)),
+            $code,
+            $previous
+        );
+    }
+
+    /**
+     * @return RequestHandlerInterface
+     */
+    public function getController():RequestHandlerInterface
+    {
+        return $this->controller;
+    }
 }
