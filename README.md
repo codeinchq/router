@@ -1,18 +1,13 @@
 # PSR-7 & PSR-15 router library
 
-This PHP 7.1 library provides two [PSR-7](https://www.php-fig.org/psr/psr-7/), [PSR-15](https://www.php-fig.org/psr/psr-15/) and [PSR-17](https://www.php-fig.org/psr/psr-17/) compatible routers.  
+This library provides a PSR-7 and PSR-15 compatible router. The router is a component in charge or selecting the appropriate request handler for a given PSR-7 request. It behaves as a PSR-15 middleware. 
 
-A router is a `class` implementing [`RouterInterface`](src/RouterInterface.php) in charge of matching a controller to a request. It has two methods: `getControllerClass()` which returns the class corresponding to PSR-7 server request and `getControllerUri()` which returns the URI of a controller. 
+## Resolvers
+In order to select a request handler, the router relies a handler resolver (implementing `HandlerResolverInterface`). Resolvers are in charge of matching a URI path (called a route) to a request handler's class and vice versa, mapping a request handler's class to a route. Two resolvers are provided, `StaticResolver` which uses a list of preset patterns (shell patterns resolved by `fnmatch()`) matching handler's classes and `DynamicResolver` which dynamically calculates the routes of namespaces base on a PHP namespace and a base URI. You can pair multiple resolvers using `HandlerResolverAggregator`.
 
-A controller is a `class` implementing [`ControllerInterface`](src/ControllerInterface.php) which creates a PSR-7 response through the `createResponse()` method.  Controllers are compatible with PSR-17 and the [`ResponseFactoryInterface`](https://www.php-fig.org/psr/psr-17/#22-responsefactoryinterface) interface
+## Instantiator
+In order to instantiate a request handler, the router uses an instantiator (implementing `HandlerInstantiatorInterface`). The instantiator component is app specific in order to pass the required services and managers to the request handler's constructor method. You can pair multiple instantiators using `HandlerInstantiatorAggregator`. 
 
- Two routers are supplied: 
- * a static router ([`Router`](src/Router.php)) which works with a list of predefined routes (unix patterns) and their corresponding controllers;
- * a dynamic router ([`DynamicRouter`](src/DynamicRouter.php)) which computes the controller's class name base on the request URI. 
- 
- Simple routers are not capable of instantiating controllers. In order to be able to instantiate controllers at router's level, you must implement [`InstantiatingRouterInterface`](src/InstantiatingRouterInterface.php).
-
-The routers can be used either as PSR-15 request handlers (using [`RouterRequestHandler`](src/Psr15Wrapper/RouterRequestHandler.php) implementing [`RequestHandlerInterface`](https://github.com/http-interop/http-middleware/blob/master/src/RequestHandlerInterface.php)) or as PSR-15 middleware (using [`RouterMiddleware`](src/Psr15Wrapper/RouterMiddleware.php) implementing [`MiddlewareInterface`](https://github.com/http-interop/http-middleware/blob/master/src/MiddlewareInterface.php)).
 
 ## Usage
 
@@ -20,93 +15,70 @@ The routers can be used either as PSR-15 request handlers (using [`RouterRequest
 ```php
 <?php
 use CodeInc\Router\Router;
-use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
+use CodeInc\Router\Resolvers\StaticHandlerResolver;
+use Psr\Http\Server\RequestHandlerInterface;
 
-// some request handlers...
-final class HomeController implements ControllerInterface { } 
-final class LicenseController implements ControllerInterface { } 
-final class ArticleController implements ControllerInterface { } 
+// dummy classes 
+final class MyInstantiator implements HandlerInstantiatorInterface {}
+final class HomePage implements RequestHandlerInterface {}
+final class License implements RequestHandlerInterface {}
+final class Article implements RequestHandlerInterface {}
 
-// adding routes
-$myRouter = new Router();
-$myRouter->addRoute("/", HomeController::class); 
-$myRouter->addRoute("/license.txt", LicenseController::class); 
-$myRouter->addRoute("/article-[0-9]/*", ArticleController::class); 
-
-// controller lookup (assuming the URI of the request is "/article-2456/a-great-article.html") 
-$myRouter->getControllerClass($aPsr7ServerRequest); // <-- returns 'ArticleController'
-
-// URI lookup
-$myRouter->getControllerUri(LicenseController::class); // <-- returns "/license.txt"
-```
-
-### Dynamic router
-```php
-<?php
-use CodeInc\Router\DynamicRouter;
-
-$myRouter = new DynamicRouter(
-    'MyApp\\Controllers', // <-- the controllers base namespace
-    '/MyAppPages/' // <-- the base URI
+// instantiating the router
+$myRouter = new Router(
+    new StaticHandlerResolver([
+        '/' => HomePage::class,
+        '/license.txt' => License::class,
+        '/article-[0-9]/*' => Article::class
+    ]),
+    new MyInstantiator()
 );
 
-// controller lookup (assuming the URI of the request is "/MyAppPages/User/Account") 
-$myRouter->getControllerClass($aPsr7ServerRequest); // <-- returns 'MyApp\Controllers\User\Account'
-
-// failed controller lookup (assuming the URI of the request is "/MyAppPages/ANonExistingController") 
-$myRouter->getControllerClass($aPsr7ServerRequest); // <-- returns NULL
-
-// URI lookup 
-$myRouter->getControllerUri(MyApp\Controllers\Shop\Basket); // <-- returns "/MyAppPages/Shop/Basket"
+// controller lookup (assuming the URI of the request is "/article-2456/a-great-article.html") 
+$myRouter->handle($aPsr7ServerRequest); // <-- returns 'ArticleController'
 ```
 
-### Instantiating routers
+
+### With multiple resolvers using `HandlerResolverAggregator` and multiple instantiators using `HandlerInstantiatorAggregator`
 ```php
 <?php
 use CodeInc\Router\Router;
-use CodeInc\Router\ControllerInterface;
-use CodeInc\Router\InstantiatingRouterInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
+use CodeInc\Router\Instantiator\HandlerInstantiatorAggregator;
+use CodeInc\Router\Resolvers\StaticHandlerResolver;
+use Psr\Http\Server\RequestHandlerInterface;
+use CodeInc\Router\Resolvers\HandlerResolverAggregator;
+use CodeInc\Router\Resolvers\DynamicHandlerResolver
 
-// as an instantiating router
-class MyInstantiatingRouter extends Router implements InstantiatingRouterInterface
-{
-    public function getController(ServerRequestInterface $request):?ControllerInterface
-    {
-        // instantiating the controller
-        if ($controllerClass = $this->getControllerClass($request)) {
-            return new $controllerClass($request);
-        }
-        return null;
-    }
-}
+// dummy classes 
+final class MyFirstInstantiator implements HandlerInstantiatorInterface {}
+final class MySecondInstantiator implements HandlerInstantiatorInterface {}
+final class HomePage implements RequestHandlerInterface {}
+final class License implements RequestHandlerInterface {}
+final class Article implements RequestHandlerInterface {}
 
-$myInstantiatingRouter = new MyInstantiatingRouter();
-$myInstantiatingRouter->addRoute("/", HomeController::class); 
-$myInstantiatingRouter->addRoute("/license.txt", LicenseController::class); 
-$myInstantiatingRouter->addRoute("/article-[0-9]/*", ArticleController::class); 
+// instantiating the router
+$myRouter = new Router(
+    new HandlerResolverAggregator([
+        new StaticHandlerResolver([
+            '/' => HomePage::class,
+            '/license.txt' => License::class,
+            '/article-[0-9]/*' => Article::class
+        ]),
+        new DynamicHandlerResolver(
+            'MyApp\\MyHandlers', // <-- handlers base namespace
+            '/my-app/' // <-- handlers base URI
+        )
+    ]),
+    new HandlerInstantiatorAggregator([
+        new MyFirstInstantiator(),
+        new MySecondInstantiator(),
+    ])
+);
 
 // controller lookup (assuming the URI of the request is "/article-2456/a-great-article.html") 
-$myInstantiatingRouter->getControllerClass($aPsr7ServerRequest); // <-- returns 'ArticleController'
-$myInstantiatingRouter->getController($aPsr7ServerRequest); // <-- returns an instance of 'ArticleController'
-```
-
-### As a PSR-15 request handler and middleware
-
-You can use instantiating routers as PSR-15 request handler or middleware.
-
-```php
-<?php
-use CodeInc\Router\Psr15Wrappers\RouterRequestHandler;
-use CodeInc\Router\Psr15Wrappers\RouterMiddleware;
-
-// as a PSR-15 request handler
-$requestHandler = new RouterRequestHandler($myInstantiatingRouter);
-$requestHandler->handle($aPsr7ServerRequest);
-
-// as a PSR-15 middleware
-$middleware = new RouterMiddleware($myInstantiatingRouter);
-$middleware->process($aPsr7ServerRequest, $aPsr7RequestHandler);
+$myRouter->handle($aPsr7ServerRequest); // <-- returns 'ArticleController'
 ```
 
 ## Installation
