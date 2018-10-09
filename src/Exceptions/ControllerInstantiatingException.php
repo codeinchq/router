@@ -28,7 +28,7 @@ namespace CodeInc\Router\Exceptions;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerInstantiatingException extends \RuntimeException implements RouterException
+final class ControllerInstantiatingException extends \RuntimeException implements RouterException
 {
     /**
      * @var string

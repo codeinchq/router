@@ -30,7 +30,7 @@ use Throwable;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotAResolverException extends \LogicException
+final class NotAResolverException extends \LogicException
 {
     /**
      * @var mixed

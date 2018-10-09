@@ -30,7 +30,7 @@ use Throwable;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class NotAnInstantiatorException extends \LogicException
+final class NotAnInstantiatorException extends \LogicException
 {
     /**
      * @var mixed

@@ -27,7 +27,7 @@ namespace CodeInc\Router\Exceptions;
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ControllerDuplicateRouteException extends \LogicException implements RouterException
+final class ControllerDuplicateRouteException extends \LogicException implements RouterException
 {
     /**
      * @var string
