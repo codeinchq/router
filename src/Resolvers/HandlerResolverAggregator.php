@@ -25,25 +25,25 @@ use CodeInc\Router\Exceptions\NotAResolverException;
 
 
 /**
- * Class ResolverAggregator
+ * Class HandlerResolverAggregator
  *
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class ResolverAggregator implements ResolverInterface, CountableCollectionInterface
+final class HandlerResolverAggregator implements HandlerResolverInterface, CountableCollectionInterface
 {
     /**
-     * @var ResolverInterface[]
+     * @var HandlerResolverInterface[]
      */
     private $resolvers = [];
 
     /**
-     * @var int|null
+     * @var int
      */
-    private $iteratorPosition;
+    private $iteratorPosition = 0;
 
     /**
-     * ResolverAggregator constructor.
+     * HandlerResolverAggregator constructor.
      *
      * @param iterable|null $resolvers
      */
@@ -57,9 +57,9 @@ final class ResolverAggregator implements ResolverInterface, CountableCollection
     /**
      * Adds a resolver.
      *
-     * @param ResolverInterface $resolver
+     * @param HandlerResolverInterface $resolver
      */
-    public function addResolver(ResolverInterface $resolver):void
+    public function addResolver(HandlerResolverInterface $resolver):void
     {
         $this->resolvers[] = $resolver;
     }
@@ -67,12 +67,12 @@ final class ResolverAggregator implements ResolverInterface, CountableCollection
     /**
      * Adds multiple resolvers. Only object implementing ResolverInterface will be added.
      *
-     * @param iterable|ResolverInterface[] $resolvers
+     * @param iterable|HandlerResolverInterface[] $resolvers
      */
     public function addResolvers(iterable $resolvers):void
     {
         foreach ($resolvers as $resolver) {
-            if (!$resolver instanceof ResolverInterface) {
+            if (!$resolver instanceof HandlerResolverInterface) {
                 throw new NotAResolverException($resolver);
             }
             $this->addResolver($resolver);
@@ -106,9 +106,9 @@ final class ResolverAggregator implements ResolverInterface, CountableCollection
 
     /**
      * @inheritdoc
-     * @return ResolverInterface
+     * @return HandlerResolverInterface
      */
-    public function current():ResolverInterface
+    public function current():HandlerResolverInterface
     {
         return $this->resolvers[$this->iteratorPosition];
     }

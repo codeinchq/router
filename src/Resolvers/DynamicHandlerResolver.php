@@ -28,12 +28,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class DynamicResolver
+ * Class DynamicHandlerResolver
  *
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicResolver implements ResolverInterface
+class DynamicHandlerResolver implements HandlerResolverInterface
 {
     /**
      * @var string

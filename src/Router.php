@@ -22,8 +22,8 @@ declare(strict_types=1);
 namespace CodeInc\Router;
 use CodeInc\Router\Exceptions\ControllerHandlingException;
 use CodeInc\Router\Exceptions\ControllerInstantiatingException;
-use CodeInc\Router\Instantiator\InstantiatorInterface;
-use CodeInc\Router\Resolvers\ResolverInterface;
+use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
+use CodeInc\Router\Resolvers\HandlerResolverInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -39,22 +39,22 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Router implements MiddlewareInterface
 {
     /**
-     * @var ResolverInterface
+     * @var HandlerResolverInterface
      */
     private $resolver;
 
     /**
-     * @var InstantiatorInterface
+     * @var HandlerInstantiatorInterface
      */
     private $instantiator;
 
     /**
      * Router constructor.
      *
-     * @param ResolverInterface|null $resolver
-     * @param InstantiatorInterface $instantiator
+     * @param HandlerResolverInterface|null $resolver
+     * @param HandlerInstantiatorInterface $instantiator
      */
-    public function __construct(ResolverInterface $resolver, InstantiatorInterface $instantiator)
+    public function __construct(HandlerResolverInterface $resolver, HandlerInstantiatorInterface $instantiator)
     {
         $this->resolver = $resolver;
         $this->instantiator = $instantiator;

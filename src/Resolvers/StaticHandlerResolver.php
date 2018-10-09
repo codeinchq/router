@@ -27,12 +27,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class StaticResolver
+ * Class StaticHandlerResolver
  *
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class StaticResolver implements ResolverInterface
+class StaticHandlerResolver implements HandlerResolverInterface
 {
     /**
      * @var string[]
@@ -40,7 +40,7 @@ class StaticResolver implements ResolverInterface
     private $routes = [];
 
     /**
-     * StaticResolver constructor.
+     * StaticHandlerResolver constructor.
      *
      * @param iterable|null $routes
      */

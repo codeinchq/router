@@ -22,12 +22,12 @@ declare(strict_types=1);
 namespace CodeInc\Router\Resolvers;
 
 /**
- * Interface ResolverInterface
+ * Interface HandlerResolverInterface
  *
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface ResolverInterface
+interface HandlerResolverInterface
 {
     /**
      * Returns the request handler's in charge or handling a given route or NULL if none is available.

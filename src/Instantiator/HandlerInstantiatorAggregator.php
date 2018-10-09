@@ -26,25 +26,25 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class InstantiatorAggregator
+ * Class HandlerInstantiatorAggregator
  *
  * @package CodeInc\Router\Instantiator
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class InstantiatorAggregator implements InstantiatorInterface, CountableCollectionInterface
+final class HandlerInstantiatorAggregator implements HandlerInstantiatorInterface, CountableCollectionInterface
 {
     /**
-     * @var InstantiatorInterface[]
+     * @var HandlerInstantiatorInterface[]
      */
     private $instantiators = [];
 
     /**
-     * @var int|null
+     * @var int
      */
-    private $iteratorPosition;
+    private $iteratorPosition = 0;
 
     /**
-     * InstantiatorAggregator constructor.
+     * HandlerInstantiatorAggregator constructor.
      *
      * @param iterable|null $instantiators
      */
@@ -58,9 +58,9 @@ final class InstantiatorAggregator implements InstantiatorInterface, CountableCo
     /**
      * Adds an instantiator.
      *
-     * @param InstantiatorInterface $instantiator
+     * @param HandlerInstantiatorInterface $instantiator
      */
-    public function addInstantiator(InstantiatorInterface $instantiator):void
+    public function addInstantiator(HandlerInstantiatorInterface $instantiator):void
     {
         $this->instantiators[] = $instantiator;
     }
@@ -73,7 +73,7 @@ final class InstantiatorAggregator implements InstantiatorInterface, CountableCo
     public function addInstantiators(iterable $instantiators):void
     {
         foreach ($instantiators as $instantiator) {
-            if (!$instantiator instanceof InstantiatorInterface) {
+            if (!$instantiator instanceof HandlerInstantiatorInterface) {
                 throw new NotAnInstantiatorException($instantiator);
             }
             $this->addInstantiator($instantiator);
@@ -123,9 +123,9 @@ final class InstantiatorAggregator implements InstantiatorInterface, CountableCo
 
     /**
      * @inheritdoc
-     * @return InstantiatorInterface
+     * @return HandlerInstantiatorInterface
      */
-    public function current():InstantiatorInterface
+    public function current():HandlerInstantiatorInterface
     {
         return $this->instantiators[$this->iteratorPosition];
     }

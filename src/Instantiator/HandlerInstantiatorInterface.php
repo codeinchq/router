@@ -15,7 +15,7 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     09/10/2018
+// Date:     08/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
@@ -24,23 +24,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class SimpleInstantiator
+ * Interface HandlerInstantiatorInterface
  *
  * @package CodeInc\Router\Instantiator
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class SimpleInstantiator implements InstantiatorInterface
+interface HandlerInstantiatorInterface
 {
     /**
-     * @inheritdoc
+     * Instantiates a request handler or returns NULL if the request handler can not be instantiated.
+     *
      * @param string $handlerClass
-     * @return null|RequestHandlerInterface
+     * @return RequestHandlerInterface|null
      */
-    public function instantiate(string $handlerClass):?RequestHandlerInterface
-    {
-        if (is_subclass_of($handlerClass, SimpleRequestHandlerInterface::class)) {
-            return new $handlerClass;
-        }
-        return null;
-    }
+    public function instantiate(string $handlerClass):?RequestHandlerInterface;
 }
