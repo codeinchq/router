@@ -74,11 +74,10 @@ class StaticHandlerResolver implements HandlerResolverInterface
         if (!is_subclass_of($controllerClass, RequestHandlerInterface::class)) {
             throw new NotARequestHandlerException($controllerClass);
         }
-        $realRoute = strtolower($route);
-        if (isset($this->routes[$realRoute])) {
+        if (isset($this->routes[$route])) {
             throw new ControllerDuplicateRouteException($route, $controllerClass);
         }
-        $this->routes[$realRoute] = $controllerClass;
+        $this->routes[$route] = $controllerClass;
     }
 
     /**
