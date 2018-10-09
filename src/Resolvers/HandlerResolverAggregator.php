@@ -30,7 +30,7 @@ use CodeInc\Router\Exceptions\NotAResolverException;
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class HandlerResolverAggregator implements HandlerResolverInterface, CountableCollectionInterface
+class HandlerResolverAggregator implements HandlerResolverInterface, CountableCollectionInterface
 {
     /**
      * @var HandlerResolverInterface[]
