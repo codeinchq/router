@@ -61,6 +61,22 @@ class Router implements MiddlewareInterface
     }
 
     /**
+     * @return HandlerResolverInterface
+     */
+    public function getResolver():HandlerResolverInterface
+    {
+        return $this->resolver;
+    }
+
+    /**
+     * @return HandlerInstantiatorInterface
+     */
+    public function getInstantiator():HandlerInstantiatorInterface
+    {
+        return $this->instantiator;
+    }
+
+    /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
@@ -112,12 +128,15 @@ class Router implements MiddlewareInterface
     }
 
     /**
-     * Returns the parent handler's resolver.
+     * Returns the route to a request handler or NULL if the route can not be computed.
+     * Alias of HandlerResolverInterface::getHandlerRoute().
      *
-     * @return HandlerResolverInterface
+     * @uses HandlerResolverInterface::getHandlerRoute()
+     * @param string $handlerClass
+     * @return null|string
      */
-    public function getResolver():HandlerResolverInterface
+    public function getHandlerRoute(string $handlerClass):?string
     {
-        return $this->resolver;
+        return $this->resolver->getHandlerRoute($handlerClass);
     }
 }
