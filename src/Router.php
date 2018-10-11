@@ -69,7 +69,7 @@ class Router implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controller = $this->getController($request)) {
+        if ($controller = $this->getHandler($request)) {
             try {
                 $controller->handle($request);
             }
@@ -77,17 +77,17 @@ class Router implements MiddlewareInterface
                 throw new ControllerHandlingException($controller, 0, $exception);
             }
         }
-        return ($this->getController($request) ?? $handler)->handle($request);
+        return ($this->getHandler($request) ?? $handler)->handle($request);
     }
 
     /**
-     * Returns the controller in charge of handling a given request.
+     * Returns the handler in charge of handling a request.
      *
      * @param ServerRequestInterface $request
      * @return null|RequestHandlerInterface
      * @throws ControllerInstantiatingException
      */
-    public function getController(ServerRequestInterface $request):?RequestHandlerInterface
+    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
     {
         $requestRoute = $request->getUri()->getPath();
         if (($controllerClass = $this->resolver->getHandlerClass($requestRoute)) !== null) {
@@ -99,5 +99,15 @@ class Router implements MiddlewareInterface
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the parent handler's resolver.
+     *
+     * @return HandlerResolverInterface
+     */
+    public function getResolver():HandlerResolverInterface
+    {
+        return $this->resolver;
     }
 }
