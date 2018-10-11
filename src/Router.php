@@ -85,12 +85,12 @@ class Router implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($handler = $this->getHandler($request)) {
+        if ($routeHandler = $this->getHandler($request)) {
             try {
-                return $handler->handle($request);
+                return $routeHandler->handle($request);
             }
             catch (\Throwable $exception) {
-                throw new RequestHandlingException($handler, 0, $exception);
+                throw new RequestHandlingException($routeHandler, $request, 0, $exception);
             }
         }
         return $handler->handle($request);
