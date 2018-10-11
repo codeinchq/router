@@ -69,7 +69,7 @@ class Router implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controller = $this->getHandler($request)) {
+        if ($controller = $this->getRequestHandler($request)) {
             try {
                 $controller->handle($request);
             }
@@ -77,20 +77,30 @@ class Router implements MiddlewareInterface
                 throw new ControllerHandlingException($controller, 0, $exception);
             }
         }
-        return ($this->getHandler($request) ?? $handler)->handle($request);
+        return ($this->getRequestHandler($request) ?? $handler)->handle($request);
     }
 
     /**
-     * Returns the handler in charge of handling a request.
+     * Returns the handler in charge of handling a given PSR-7 request.
      *
      * @param ServerRequestInterface $request
      * @return null|RequestHandlerInterface
      * @throws ControllerInstantiatingException
      */
-    public function getHandler(ServerRequestInterface $request):?RequestHandlerInterface
+    public function getRequestHandler(ServerRequestInterface $request):?RequestHandlerInterface
     {
-        $requestRoute = $request->getUri()->getPath();
-        if (($controllerClass = $this->resolver->getHandlerClass($requestRoute)) !== null) {
+        return $this->getRouteHandler($request->getUri()->getPath());
+    }
+
+    /**
+     * Returns the handler in charge of handling a given route.
+     *
+     * @param string $route
+     * @return null|RequestHandlerInterface
+     */
+    public function getRouteHandler(string $route):?RequestHandlerInterface
+    {
+        if (($controllerClass = $this->resolver->getHandlerClass($route)) !== null) {
             try {
                 return $this->instantiator->instantiate($controllerClass);
             }
