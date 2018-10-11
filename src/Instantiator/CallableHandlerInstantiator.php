@@ -15,49 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     28/09/2018
+// Date:     11/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
+namespace CodeInc\Router\Instantiator;
+use CodeInc\Router\Exceptions\NotAHandlerException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class ControllerHandlingException
+ * Class CallableHandlerInstantiator
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router\Instantiator
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class ControllerHandlingException extends \RuntimeException implements RouterException
+class CallableHandlerInstantiator implements HandlerInstantiatorInterface
 {
     /**
-     * @var RequestHandlerInterface
+     * @var callable
      */
-    private $controller;
+    private $instantiator;
 
     /**
-     * ControllerHandlingException constructor.
+     * CallableHandlerInstantiator constructor.
      *
-     * @param RequestHandlerInterface $controller
-     * @param int $code
-     * @param null|\Throwable $previous
+     * @param callable $instantiator
      */
-    public function __construct(RequestHandlerInterface $controller, int $code = 0, ?\Throwable $previous = null)
+    public function __construct(callable $instantiator)
     {
-        $this->controller = $controller;
-        parent::__construct(
-            sprintf("Error while processing the controller '%s'", get_class($controller)),
-            $code,
-            $previous
-        );
+        $this->instantiator = $instantiator;
     }
 
     /**
-     * @return RequestHandlerInterface
+     * Instantiates a request handler or returns NULL if the request handler can not be instantiated.
+     *
+     * @param string $handlerClass
+     * @return RequestHandlerInterface|null
+     * @throws NotAHandlerException
      */
-    public function getController():RequestHandlerInterface
+    public function instantiate(string $handlerClass):?RequestHandlerInterface
     {
-        return $this->controller;
+        $handler = call_user_func($this->instantiator, $handlerClass);
+        if ($handler !== null && !$handler instanceof RequestHandlerInterface) {
+            throw new NotAHandlerException($handler);
+        }
+        return $handler;
     }
 }

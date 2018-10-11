@@ -20,57 +20,61 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
 
 /**
- * Class ControllerDuplicateRouteException
+ * Class RequestHandlingException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class ControllerDuplicateRouteException extends \LogicException implements RouterException
+final class RequestHandlingException extends \RuntimeException implements RouterException
 {
     /**
-     * @var string
+     * @var RequestHandlerInterface
      */
-    private $route;
+    private $handler;
 
     /**
-     * @var string
+     * @var ServerRequestInterface
      */
-    private $controllerClass;
+    private $request;
 
     /**
-     * ControllerDuplicateRouteException constructor.
+     * RequestHandlingException constructor.
      *
-     * @param string $route
-     * @param string $controllerClass
+     * @param RequestHandlerInterface $handler
+     * @param ServerRequestInterface $request
      * @param int $code
-     * @param \Throwable|null $previous
+     * @param null|\Throwable $previous
      */
-    public function __construct(string $route, string $controllerClass, int $code = 0, \Throwable $previous = null)
+    public function __construct(RequestHandlerInterface $handler, ServerRequestInterface $request,
+        int $code = 0, ?\Throwable $previous = null)
     {
-        $this->route = $route;
-        $this->controllerClass = $controllerClass;
+        $this->handler = $handler;
+        $this->request = $request;
         parent::__construct(
-            sprintf("A controller already exists for the route '%s'.", $route),
+            sprintf("Error while processing a request with the handler '%s'", get_class($handler)),
             $code,
             $previous
         );
     }
 
     /**
-     * @return string
+     * @return ServerRequestInterface
      */
-    public function getRoute():string
+    public function getRequest():ServerRequestInterface
     {
-        return $this->route;
+        return $this->request;
     }
 
     /**
-     * @return string
+     * @return RequestHandlerInterface
      */
-    public function getControllerClass():string
+    public function getHandler():RequestHandlerInterface
     {
-        return $this->controllerClass;
+        return $this->handler;
     }
 }

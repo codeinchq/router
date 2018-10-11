@@ -20,42 +20,39 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use Throwable;
-
 
 /**
- * Class NotWithinNamespaceException
+ * Class DuplicateRouteException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class NotWithinNamespaceException extends \LogicException implements RouterException
+final class DuplicateRouteException extends \LogicException implements RouterException
 {
+    /**
+     * @var string
+     */
+    private $route;
+
     /**
      * @var string
      */
     private $handlerClass;
 
     /**
-     * @var string
-     */
-    private $handlersNamespace;
-
-    /**
-     * NotWithinNamespaceException constructor.
+     * DuplicateRouteException constructor.
      *
+     * @param string $route
      * @param string $handlerClass
-     * @param string $handlersNamespace
      * @param int $code
-     * @param Throwable|null $previous
+     * @param \Throwable|null $previous
      */
-    public function __construct(string $handlerClass, string $handlersNamespace, int $code = 0, Throwable $previous = null)
+    public function __construct(string $route, string $handlerClass, int $code = 0, \Throwable $previous = null)
     {
+        $this->route = $route;
         $this->handlerClass = $handlerClass;
-        $this->handlersNamespace = $handlersNamespace;
         parent::__construct(
-            sprintf("The handler '%s' is not within the namespace '%s'.",
-                $handlerClass, $handlersNamespace),
+            sprintf("A handler is already registered for the route '%s'.", $route),
             $code,
             $previous
         );
@@ -64,16 +61,16 @@ final class NotWithinNamespaceException extends \LogicException implements Route
     /**
      * @return string
      */
-    public function getHandlerClass():string
+    public function getRoute():string
     {
-        return $this->handlerClass;
+        return $this->route;
     }
 
     /**
      * @return string
      */
-    public function getHandlersNamespace():string
+    public function getHandlerClass():string
     {
-        return $this->handlersNamespace;
+        return $this->handlerClass;
     }
 }

@@ -20,37 +20,42 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Resolvers\HandlerResolverInterface;
-use Throwable;
-
 
 /**
- * Class RouterEmptyControllersNamespaceException
+ * Class HandlerInstantiatingException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class RouterEmptyControllersNamespaceException extends \LogicException implements RouterException
+final class HandlerInstantiatingException extends \RuntimeException implements RouterException
 {
     /**
-     * @var HandlerResolverInterface
+     * @var string
      */
-    private $router;
+    private $handlerClass;
 
     /**
-     * RouterEmptyControllersNamespaceException constructor.
+     * HandlerInstantiatingException constructor.
      *
-     * @param HandlerResolverInterface $router
+     * @param string $handlerClass
      * @param int $code
-     * @param Throwable|null $previous
+     * @param null|\Throwable $previous
      */
-    public function __construct(HandlerResolverInterface $router, int $code = 0, Throwable $previous = null)
+    public function __construct(string $handlerClass, int $code = 0, ?\Throwable $previous = null)
     {
-        $this->router = $router;
+        $this->handlerClass = $handlerClass;
         parent::__construct(
-            "The controllers namespace can not be empty.",
+            sprintf("Error while instantiating the handler '%s'", $handlerClass),
             $code,
             $previous
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getHandlerClass():string
+    {
+        return $this->handlerClass;
     }
 }

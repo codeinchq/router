@@ -20,8 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\ControllerHandlingException;
-use CodeInc\Router\Exceptions\ControllerInstantiatingException;
+use CodeInc\Router\Exceptions\RequestHandlingException;
+use CodeInc\Router\Exceptions\HandlerInstantiatingException;
 use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
 use CodeInc\Router\Resolvers\HandlerResolverInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -81,49 +81,42 @@ class Router implements MiddlewareInterface
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
-     * @throws ControllerHandlingException
+     * @throws RequestHandlingException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controller = $this->getRequestHandler($request)) {
+        if ($handler = $this->getHandler($request)) {
             try {
-                $controller->handle($request);
+                return $handler->handle($request);
             }
             catch (\Throwable $exception) {
-                throw new ControllerHandlingException($controller, 0, $exception);
+                throw new RequestHandlingException($handler, 0, $exception);
             }
         }
-        return ($this->getRequestHandler($request) ?? $handler)->handle($request);
-    }
-
-    /**
-     * Returns the handler in charge of handling a given PSR-7 request.
-     *
-     * @param ServerRequestInterface $request
-     * @return null|RequestHandlerInterface
-     * @throws ControllerInstantiatingException
-     */
-    public function getRequestHandler(ServerRequestInterface $request):?RequestHandlerInterface
-    {
-        return $this->getRouteHandler($request->getUri()->getPath());
+        return $handler->handle($request);
     }
 
     /**
      * Returns the handler in charge of handling a given route.
      *
-     * @param string $route
+     * @param string|ServerRequestInterface $route
      * @return null|RequestHandlerInterface
      */
-    public function getRouteHandler(string $route):?RequestHandlerInterface
+    public function getHandler($route):?RequestHandlerInterface
     {
-        if (($controllerClass = $this->resolver->getHandlerClass($route)) !== null) {
+        if ($route instanceof ServerRequestInterface) {
+            $route = $route->getUri()->getPath();
+        }
+
+        if (($handlerClass = $this->resolver->getHandlerClass((string)$route)) !== null) {
             try {
-                return $this->instantiator->instantiate($controllerClass);
+                return $this->instantiator->instantiate($handlerClass);
             }
             catch (\Throwable $exception) {
-                throw new ControllerInstantiatingException($controllerClass, 0, $exception);
+                throw new HandlerInstantiatingException($handlerClass, 0, $exception);
             }
         }
+
         return null;
     }
 
@@ -135,7 +128,7 @@ class Router implements MiddlewareInterface
      * @param string $handlerClass
      * @return null|string
      */
-    public function getHandlerRoute(string $handlerClass):?string
+    public function getRoute(string $handlerClass):?string
     {
         return $this->resolver->getHandlerRoute($handlerClass);
     }

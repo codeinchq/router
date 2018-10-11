@@ -15,65 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     28/09/2018
+// Date:     11/10/2018
 // Project:  Router
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
+use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
 
 /**
- * Class NotWithinNamespaceException
+ * Class NotAHandlerException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class NotWithinNamespaceException extends \LogicException implements RouterException
+class NotAHandlerException extends \RuntimeException implements RouterException
 {
     /**
-     * @var string
+     * @var mixed
      */
-    private $handlerClass;
+    private $item;
 
     /**
-     * @var string
-     */
-    private $handlersNamespace;
-
-    /**
-     * NotWithinNamespaceException constructor.
+     * NotAHandlerException constructor.
      *
-     * @param string $handlerClass
-     * @param string $handlersNamespace
+     * @param mixed $item
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $handlerClass, string $handlersNamespace, int $code = 0, Throwable $previous = null)
+    public function __construct($item, int $code = 0, Throwable $previous = null)
     {
-        $this->handlerClass = $handlerClass;
-        $this->handlersNamespace = $handlersNamespace;
+        $this->item = $item;
         parent::__construct(
-            sprintf("The handler '%s' is not within the namespace '%s'.",
-                $handlerClass, $handlersNamespace),
+            sprintf("The result '%s' or the callable instantiator is not a PSR-15 request handler implementing '%s'.",
+                is_object($item) ? get_class($item) : (string)$item, RequestHandlerInterface::class),
             $code,
             $previous
         );
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getHandlerClass():string
+    public function getItem()
     {
-        return $this->handlerClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHandlersNamespace():string
-    {
-        return $this->handlersNamespace;
+        return $this->item;
     }
 }
