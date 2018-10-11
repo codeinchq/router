@@ -20,44 +20,37 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use Psr\Http\Server\RequestHandlerInterface;
+use CodeInc\Router\Resolvers\HandlerResolverInterface;
+use Throwable;
 
 
 /**
- * Class ControllerHandlingException
+ * Class RouterEmptyHandlersNamespaceException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class ControllerHandlingException extends \RuntimeException implements RouterException
+final class RouterEmptyHandlersNamespaceException extends \LogicException implements RouterException
 {
     /**
-     * @var RequestHandlerInterface
+     * @var HandlerResolverInterface
      */
-    private $controller;
+    private $router;
 
     /**
-     * ControllerHandlingException constructor.
+     * RouterEmptyHandlersNamespaceException constructor.
      *
-     * @param RequestHandlerInterface $controller
+     * @param HandlerResolverInterface $router
      * @param int $code
-     * @param null|\Throwable $previous
+     * @param Throwable|null $previous
      */
-    public function __construct(RequestHandlerInterface $controller, int $code = 0, ?\Throwable $previous = null)
+    public function __construct(HandlerResolverInterface $router, int $code = 0, Throwable $previous = null)
     {
-        $this->controller = $controller;
+        $this->router = $router;
         parent::__construct(
-            sprintf("Error while processing the controller '%s'", get_class($controller)),
+            "The request handlers namespace can not be empty.",
             $code,
             $previous
         );
-    }
-
-    /**
-     * @return RequestHandlerInterface
-     */
-    public function getController():RequestHandlerInterface
-    {
-        return $this->controller;
     }
 }

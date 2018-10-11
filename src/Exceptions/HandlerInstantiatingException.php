@@ -21,32 +21,31 @@
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 
-
 /**
- * Class ControllerInstantiatingException
+ * Class HandlerInstantiatingException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class ControllerInstantiatingException extends \RuntimeException implements RouterException
+final class HandlerInstantiatingException extends \RuntimeException implements RouterException
 {
     /**
      * @var string
      */
-    private $controllerClass;
+    private $handlerClass;
 
     /**
-     * ControllerInstantiatingException constructor.
+     * HandlerInstantiatingException constructor.
      *
-     * @param string $controllerClass
+     * @param string $handlerClass
      * @param int $code
      * @param null|\Throwable $previous
      */
-    public function __construct(string $controllerClass, int $code = 0, ?\Throwable $previous = null)
+    public function __construct(string $handlerClass, int $code = 0, ?\Throwable $previous = null)
     {
-        $this->controllerClass = $controllerClass;
+        $this->handlerClass = $handlerClass;
         parent::__construct(
-            sprintf("Error while instantiating the controller '%s'", $controllerClass),
+            sprintf("Error while instantiating the handler '%s'", $handlerClass),
             $code,
             $previous
         );
@@ -55,8 +54,8 @@ final class ControllerInstantiatingException extends \RuntimeException implement
     /**
      * @return string
      */
-    public function getControllerClass():string
+    public function getHandlerClass():string
     {
-        return $this->controllerClass;
+        return $this->handlerClass;
     }
 }

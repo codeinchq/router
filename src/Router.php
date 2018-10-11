@@ -20,8 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
-use CodeInc\Router\Exceptions\ControllerHandlingException;
-use CodeInc\Router\Exceptions\ControllerInstantiatingException;
+use CodeInc\Router\Exceptions\RequestHandlingException;
+use CodeInc\Router\Exceptions\HandlerInstantiatingException;
 use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
 use CodeInc\Router\Resolvers\HandlerResolverInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -81,16 +81,16 @@ class Router implements MiddlewareInterface
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
-     * @throws ControllerHandlingException
+     * @throws RequestHandlingException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($controller = $this->getHandler($request)) {
+        if ($handler = $this->getHandler($request)) {
             try {
-                return $controller->handle($request);
+                return $handler->handle($request);
             }
             catch (\Throwable $exception) {
-                throw new ControllerHandlingException($controller, 0, $exception);
+                throw new RequestHandlingException($handler, 0, $exception);
             }
         }
         return $handler->handle($request);
@@ -107,18 +107,16 @@ class Router implements MiddlewareInterface
         if ($route instanceof ServerRequestInterface) {
             $route = $route->getUri()->getPath();
         }
-        else {
-            $route = (string)$route;
-        }
 
-        if (($controllerClass = $this->resolver->getHandlerClass($route)) !== null) {
+        if (($handlerClass = $this->resolver->getHandlerClass((string)$route)) !== null) {
             try {
-                return $this->instantiator->instantiate($controllerClass);
+                return $this->instantiator->instantiate($handlerClass);
             }
             catch (\Throwable $exception) {
-                throw new ControllerInstantiatingException($controllerClass, 0, $exception);
+                throw new HandlerInstantiatingException($handlerClass, 0, $exception);
             }
         }
+
         return null;
     }
 

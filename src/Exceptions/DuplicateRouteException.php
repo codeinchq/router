@@ -20,37 +20,57 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Resolvers\HandlerResolverInterface;
-use Throwable;
-
 
 /**
- * Class RouterEmptyControllersNamespaceException
+ * Class DuplicateRouteException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class RouterEmptyControllersNamespaceException extends \LogicException implements RouterException
+final class DuplicateRouteException extends \LogicException implements RouterException
 {
     /**
-     * @var HandlerResolverInterface
+     * @var string
      */
-    private $router;
+    private $route;
 
     /**
-     * RouterEmptyControllersNamespaceException constructor.
-     *
-     * @param HandlerResolverInterface $router
-     * @param int $code
-     * @param Throwable|null $previous
+     * @var string
      */
-    public function __construct(HandlerResolverInterface $router, int $code = 0, Throwable $previous = null)
+    private $handlerClass;
+
+    /**
+     * DuplicateRouteException constructor.
+     *
+     * @param string $route
+     * @param string $handlerClass
+     * @param int $code
+     * @param \Throwable|null $previous
+     */
+    public function __construct(string $route, string $handlerClass, int $code = 0, \Throwable $previous = null)
     {
-        $this->router = $router;
+        $this->route = $route;
+        $this->handlerClass = $handlerClass;
         parent::__construct(
-            "The controllers namespace can not be empty.",
+            sprintf("A handler is already registered for the route '%s'.", $route),
             $code,
             $previous
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoute():string
+    {
+        return $this->route;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHandlerClass():string
+    {
+        return $this->handlerClass;
     }
 }
