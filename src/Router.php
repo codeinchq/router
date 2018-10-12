@@ -51,7 +51,7 @@ class Router implements MiddlewareInterface
     /**
      * Router constructor.
      *
-     * @param HandlerResolverInterface|null $resolver
+     * @param HandlerResolverInterface $resolver
      * @param HandlerInstantiatorInterface $instantiator
      */
     public function __construct(HandlerResolverInterface $resolver, HandlerInstantiatorInterface $instantiator)
