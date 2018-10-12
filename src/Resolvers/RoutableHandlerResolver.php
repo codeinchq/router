@@ -32,6 +32,31 @@ use CodeInc\Router\Exceptions\NotARoutableHandlerException;
 class RoutableHandlerResolver extends StaticHandlerResolver
 {
     /**
+     * RoutableHandlerResolver constructor.
+     *
+     * @param iterable|null $handlerClasses
+     */
+    public function __construct(?iterable $handlerClasses = null)
+    {
+        parent::__construct();
+        if ($handlerClasses) {
+            $this->addHandlers($handlerClasses);
+        }
+    }
+
+    /**
+     * Adds multiple routable handlers to the resolver.
+     *
+     * @param iterable $handlerClasses
+     */
+    public function addHandlers(iterable $handlerClasses):void
+    {
+        foreach ($handlerClasses as $handlersClass) {
+            $this->addHandler($handlersClass);
+        }
+    }
+
+    /**
      * Adds a routable handler to the resolver.
      *
      * @param string $handlerClass
