@@ -25,8 +25,7 @@
   "suggest": {
     "codeinc/middleware-dispatcher": "A PSR-15 middleware dispatcher",
     "codeinc/psr7-response-sender": "A PSR-7 response sender",
-    "codeinc/psr7-responses": "Provides a collection of PSR-7 responses",
-    "doctrine/annotations": "Required in order to use AnnotationResolver"
+    "codeinc/psr7-responses": "Provides a collection of PSR-7 responses"
   },
   "autoload": {
     "psr-4": {"CodeInc\\Router\\": "src/"}
