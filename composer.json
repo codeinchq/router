@@ -1,6 +1,6 @@
 {
   "name": "codeinc/router",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/CodeIncHQ/Router",
   "type": "library",
@@ -12,7 +12,9 @@
     "psr/http-server-middleware": "^1.0",
     "psr/http-factory": "^1.0",
     "codeinc/psr7-responses": "^2",
-    "codeinc/collection-interface": "^1.1"
+    "codeinc/collection-interface": "^1.1",
+    "codeinc/directory-classes-iterator": "^1.0",
+    "doctrine/annotations": "^1.6"
   },
   "require-dev": {
     "phpunit/phpunit": "^7",
@@ -23,7 +25,8 @@
   "suggest": {
     "codeinc/middleware-dispatcher": "A PSR-15 middleware dispatcher",
     "codeinc/psr7-response-sender": "A PSR-7 response sender",
-    "codeinc/psr7-responses": "Provides a collection of PSR-7 responses"
+    "codeinc/psr7-responses": "Provides a collection of PSR-7 responses",
+    "doctrine/annotations": "Required in order to use AnnotationResolver"
   },
   "autoload": {
     "psr-4": {"CodeInc\\Router\\": "src/"}
