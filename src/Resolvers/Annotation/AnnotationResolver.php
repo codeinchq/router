@@ -35,6 +35,22 @@ use Doctrine\Common\Annotations\AnnotationReader;
 class AnnotationResolver extends StaticHandlerResolver
 {
     /**
+     * @var string
+     */
+    private $routePrefix;
+
+    /**
+     * AnnotationResolver constructor.
+     *
+     * @param string $routePrefix
+     */
+    public function __construct(string $routePrefix = '')
+    {
+        parent::__construct();
+        $this->routePrefix = $routePrefix;
+    }
+
+    /**
      * Adds all the handler in a directory having the
      *
      * @param string $dirPath
@@ -46,10 +62,10 @@ class AnnotationResolver extends StaticHandlerResolver
         foreach (new RecursiveDirectoryClassesIterator($dirPath) as $class) {
             /** @var Routable $annotation */
             if ($annotation = $reader->getClassAnnotation($class, Routable::class)) {
-                $this->addRoute($annotation->route, $class->getName());
+                $this->addRoute($this->routePrefix.$annotation->route, $class->getName());
                 if ($annotation->altRoutes) {
                     foreach ($annotation->altRoutes as $route) {
-                        $this->addRoute($route, $class->getName());
+                        $this->addRoute($this->routePrefix.$route, $class->getName());
                     }
                 }
             }
