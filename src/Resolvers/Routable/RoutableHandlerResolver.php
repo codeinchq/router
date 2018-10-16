@@ -19,14 +19,17 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Resolvers;
+namespace CodeInc\Router\Resolvers\Routable;
 use CodeInc\Router\Exceptions\NotARoutableHandlerException;
+use CodeInc\Router\Resolvers\Routable\MultiRoutableRequestHandlerInterface;
+use CodeInc\Router\Resolvers\Routable\RoutableRequestHandlerInterface;
+use CodeInc\Router\Resolvers\StaticHandlerResolver;
 
 
 /**
  * Class RoutableHandlerResolver
  *
- * @package CodeInc\Router\Resolvers
+ * @package CodeInc\Router\Resolvers\Routable
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 class RoutableHandlerResolver extends StaticHandlerResolver

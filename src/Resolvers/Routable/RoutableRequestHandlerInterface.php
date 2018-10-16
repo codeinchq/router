@@ -19,14 +19,14 @@
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Resolvers;
+namespace CodeInc\Router\Resolvers\Routable;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class RoutableRequestHandlerInterface
+ * Interface RoutableRequestHandlerInterface
  *
- * @package CodeInc\Router\Resolvers
+ * @package CodeInc\Router\Resolvers\Routable
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
 interface RoutableRequestHandlerInterface extends RequestHandlerInterface
