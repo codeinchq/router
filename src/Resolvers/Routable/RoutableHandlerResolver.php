@@ -20,9 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Resolvers\Routable;
+use CodeInc\DirectoryClassesIterator\RecursiveDirectoryClassesIterator;
 use CodeInc\Router\Exceptions\NotARoutableHandlerException;
-use CodeInc\Router\Resolvers\Routable\MultiRoutableRequestHandlerInterface;
-use CodeInc\Router\Resolvers\Routable\RoutableRequestHandlerInterface;
 use CodeInc\Router\Resolvers\StaticHandlerResolver;
 
 
@@ -63,22 +62,26 @@ class RoutableHandlerResolver extends StaticHandlerResolver
      * Adds a routable handler to the resolver.
      *
      * @param string $handlerClass
+     * @throws NotARoutableHandlerException
      */
     public function addHandler(string $handlerClass):void
     {
+        $isHandlerRoutable = false;
         if (is_subclass_of($handlerClass, RoutableRequestHandlerInterface::class)) {
             /** @var RoutableRequestHandlerInterface $handlerClass */
             /** @noinspection PhpStrictTypeCheckingInspection */
             $this->addRoute($handlerClass::getRoute(), $handlerClass);
+            $isHandlerRoutable = true;
         }
-        elseif (is_subclass_of($handlerClass, MultiRoutableRequestHandlerInterface::class)) {
+        if (is_subclass_of($handlerClass, MultiRoutableRequestHandlerInterface::class)) {
             /** @var MultiRoutableRequestHandlerInterface $handlerClass */
             foreach ($handlerClass::getRoutes() as $route) {
                 /** @noinspection PhpStrictTypeCheckingInspection */
                 $this->addRoute($route, $handlerClass);
             }
+            $isHandlerRoutable = true;
         }
-        else {
+        if (!$isHandlerRoutable) {
             throw new NotARoutableHandlerException($handlerClass);
         }
     }

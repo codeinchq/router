@@ -23,7 +23,9 @@ namespace CodeInc\Router\Resolvers\Annotation;
 use CodeInc\DirectoryClassesIterator\RecursiveDirectoryClassesIterator;
 use CodeInc\Router\Resolvers\StaticHandlerResolver;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\ArrayCache;
 
 
 /**
@@ -55,7 +57,7 @@ class AnnotationResolver extends StaticHandlerResolver
     {
         parent::__construct();
         $this->routePrefix = $routePrefix;
-        $this->annotationReader = $annotationReader ?? new AnnotationReader();
+        $this->annotationReader = $annotationReader ?? new CachedReader(new AnnotationReader(), new ArrayCache());
     }
 
     /**
@@ -65,7 +67,8 @@ class AnnotationResolver extends StaticHandlerResolver
      */
     public function addDirectory(string $dirPath):void
     {
-        foreach (new RecursiveDirectoryClassesIterator($dirPath) as $class) {
+        foreach (new RecursiveDirectoryClassesIterator($dirPath) as $class)
+        {
             /** @var Routable $annotation */
             if ($annotation = $this->annotationReader->getClassAnnotation($class, Routable::class)) {
                 $this->addRoute($this->routePrefix.$annotation->route, $class->getName());
