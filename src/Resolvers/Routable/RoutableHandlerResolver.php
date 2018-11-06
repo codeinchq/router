@@ -85,4 +85,21 @@ class RoutableHandlerResolver extends StaticHandlerResolver
             throw new NotARoutableHandlerException($handlerClass);
         }
     }
+
+    /**
+     * Adds all the handler in a directory implementing RoutableRequestHandlerInterface
+     * or MultiRoutableRequestHandlerInterface
+     *
+     * @param string $dirPath
+     */
+    public function addDirectory(string $dirPath):void
+    {
+        foreach (new RecursiveDirectoryClassesIterator($dirPath) as $class)
+        {
+            if ($class->isSubclassOf(RoutableRequestHandlerInterface::class)
+                || $class->isSubclassOf(MultiRoutableRequestHandlerInterface::class)) {
+                $this->addHandler($class->getName());
+            }
+        }
+    }
 }
