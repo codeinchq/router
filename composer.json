@@ -13,9 +13,7 @@
     "psr/http-factory": "^1.0",
     "codeinc/psr7-responses": "^2",
     "codeinc/collection-interface": "^1.1",
-    "codeinc/directory-classes-iterator": "^1.0",
-    "doctrine/annotations": "^1.6",
-    "doctrine/cache": "^1.8"
+    "codeinc/directory-classes-iterator": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^7",
