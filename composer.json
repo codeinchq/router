@@ -11,9 +11,7 @@
     "psr/http-server-handler": "^1.0",
     "psr/http-server-middleware": "^1.0",
     "psr/http-factory": "^1.0",
-    "codeinc/psr7-responses": "^2",
-    "codeinc/collection-interface": "^1.1",
-    "codeinc/directory-classes-iterator": "^1.0"
+    "codeinc/psr7-responses": "^2"
   },
   "require-dev": {
     "phpunit/phpunit": "^7",
