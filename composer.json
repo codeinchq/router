@@ -1,6 +1,6 @@
 {
   "name": "codeinc/router",
-  "version": "3.4.0-beta.2",
+  "version": "3.4.0",
   "description": "Code Inc. PSR7 & PSR15 router library",
   "homepage": "https://github.com/CodeIncHQ/Router",
   "type": "library",
@@ -20,7 +20,7 @@
     "codeinc/error-renderer": "^1.2"
   },
   "suggest": {
-    "codeinc/router-interface-resolver": "A resolver using interfaces to detect and configure request handlers",
+    "codeinc/router-routable-resolver": "A resolver using interfaces to detect and configure request handlers",
     "codeinc/router-annotation-resolver": "A resolver using Doctrine's annotation system to detect and configure request handlers",
     "codeinc/middleware-dispatcher": "A PSR-15 middleware dispatcher",
     "codeinc/psr7-response-sender": "A PSR-7 response sender",
