@@ -20,8 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Resolvers\MultiRoutableRequestHandlerInterface;
-use CodeInc\Router\Resolvers\RoutableRequestHandlerInterface;
+use CodeInc\Router\Resolvers\Routable\MultiRoutableRequestHandlerInterface;
+use CodeInc\Router\Resolvers\Routable\RoutableRequestHandlerInterface;
 use Throwable;
 
 
