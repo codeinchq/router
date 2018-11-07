@@ -20,11 +20,11 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Resolvers;
-use CodeInc\Router\Exceptions\NotARequestHandlerException;
+use CodeInc\Router\ControllerInterface;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use CodeInc\Router\Exceptions\NotWithinNamespaceException;
-use CodeInc\Router\Exceptions\RouterEmptyHandlersNamespaceException;
+use CodeInc\Router\Exceptions\RouterEmptyControllersNamespaceException;
 use CodeInc\Router\Exceptions\RouterEmptyUriPrefixException;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -33,12 +33,12 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DynamicHandlerResolver implements HandlerResolverInterface
+class DynamicResolver implements ResolverInterface
 {
     /**
      * @var string
      */
-    protected $handlersNamespace;
+    protected $controllersNamespace;
 
     /**
      * @var string
@@ -48,27 +48,27 @@ class DynamicHandlerResolver implements HandlerResolverInterface
     /**
      * DynamicResolver constructor.
      *
-     * @param string $handlersNamespace
+     * @param string $controllersNamespace
      * @param string $uriPrefix
      */
-    public function __construct(string $handlersNamespace, string $uriPrefix)
+    public function __construct(string $controllersNamespace, string $uriPrefix)
     {
         if (empty($uriPrefix)) {
             throw new RouterEmptyUriPrefixException($this);
         }
-        if (empty($handlersNamespace)) {
-            throw new RouterEmptyHandlersNamespaceException($this);
+        if (empty($controllersNamespace)) {
+            throw new RouterEmptyControllersNamespaceException($this);
         }
-        $this->handlersNamespace = $handlersNamespace;
+        $this->controllersNamespace = $controllersNamespace;
         $this->uriPrefix = $uriPrefix;
     }
 
     /**
      * @return string
      */
-    public function getHandlersNamespace():string
+    public function getControllersNamespace():string
     {
-        return $this->handlersNamespace;
+        return $this->controllersNamespace;
     }
 
     /**
@@ -84,13 +84,13 @@ class DynamicHandlerResolver implements HandlerResolverInterface
      * @param string $route
      * @return null|string
      */
-    public function getHandlerClass(string $route):?string
+    public function getControllerClass(string $route):?string
     {
         if (substr($route, 0, strlen($this->uriPrefix)) == $this->uriPrefix) {
-            $controllerClass = $this->handlersNamespace.'\\'
+            $controllerClass = $this->controllersNamespace.'\\'
                 .str_replace('/', '\\', substr($route, strlen($this->uriPrefix)));
             if (class_exists($controllerClass)
-                && is_subclass_of($controllerClass, RequestHandlerInterface::class)) {
+                && is_subclass_of($controllerClass, ControllerInterface::class)) {
                 return $controllerClass;
             }
         }
@@ -99,19 +99,19 @@ class DynamicHandlerResolver implements HandlerResolverInterface
 
     /**
      * @inheritdoc
-     * @param string $handlerClass
+     * @param string $controllerClass
      * @return string
      */
-    public function getHandlerRoute(string $handlerClass):string
+    public function getControllerRoute(string $controllerClass):string
     {
-        if (!is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
-            throw new NotARequestHandlerException($handlerClass);
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw new NotAControllerException($controllerClass);
         }
-        if (!substr($handlerClass, 0, strlen($this->handlersNamespace)) == $handlerClass) {
-            throw new NotWithinNamespaceException($handlerClass, $this->handlersNamespace);
+        if (!substr($controllerClass, 0, strlen($this->controllersNamespace)) == $controllerClass) {
+            throw new NotWithinNamespaceException($controllerClass, $this->controllersNamespace);
         }
         return $this->uriPrefix
             .str_replace('\\', '/',
-                substr($handlerClass, strlen($this->handlersNamespace) + 1));
+                substr($controllerClass, strlen($this->controllersNamespace) + 1));
     }
 }

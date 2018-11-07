@@ -15,33 +15,51 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     25/09/2018
+// Date:     28/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Resolvers;
+namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\ControllerInterface;
+use Throwable;
+
 
 /**
- * Interface HandlerResolverInterface
+ * Class NotAControllerException
  *
- * @package CodeInc\Router\Resolvers
+ * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface HandlerResolverInterface
+final class NotAControllerException extends \LogicException implements RouterException
 {
     /**
-     * Returns the request handler's in charge or handling a given route or NULL if none is available.
-     *
-     * @param string $route
-     * @return string|null
+     * @var string
      */
-    public function getHandlerClass(string $route):?string;
+    private $class;
 
     /**
-     * Returns the route to a request handler or NULL if the route can not be computed.
+     * NotAControllerException constructor.
      *
-     * @param string $handlerClass
-     * @return string|null
+     * @param string $class
+     * @param int $code
+     * @param Throwable|null $previous
      */
-    public function getHandlerRoute(string $handlerClass):?string;
+    public function __construct(string $class, int $code = 0, Throwable $previous = null)
+    {
+        $this->class = $class;
+        parent::__construct(
+            sprintf("The class %s is not a controller. "
+                ."All request handlers must implement %s.", $class, ControllerInterface::class),
+            $code,
+            $previous
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass():string
+    {
+        return $this->class;
+    }
 }

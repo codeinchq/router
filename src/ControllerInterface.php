@@ -15,42 +15,34 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     28/09/2018
+// Date:     07/11/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Resolvers\HandlerResolverInterface;
-use Throwable;
+namespace CodeInc\Router;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
- * Class RouterEmptyHandlersNamespaceException
+ * Interface ControllerInterface
  *
- * @package CodeInc\Router\Exceptions
+ * @package CodeInc\Router
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class RouterEmptyHandlersNamespaceException extends \LogicException implements RouterException
+interface ControllerInterface
 {
     /**
-     * @var HandlerResolverInterface
+     * ControllerInterface constructor.
+     *
+     * @param ServerRequestInterface $request
      */
-    private $router;
+    public function __construct(ServerRequestInterface $request);
 
     /**
-     * RouterEmptyHandlersNamespaceException constructor.
+     * Creates and returns the PSR-7 HTTP response.
      *
-     * @param HandlerResolverInterface $router
-     * @param int $code
-     * @param Throwable|null $previous
+     * @return ResponseInterface
      */
-    public function __construct(HandlerResolverInterface $router, int $code = 0, Throwable $previous = null)
-    {
-        $this->router = $router;
-        parent::__construct(
-            "The request handlers namespace can not be empty.",
-            $code,
-            $previous
-        );
-    }
+    public function createResponse():ResponseInterface;
 }

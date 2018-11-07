@@ -20,10 +20,10 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use CodeInc\Router\Exceptions\RequestHandlingException;
-use CodeInc\Router\Exceptions\HandlerInstantiatingException;
-use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
-use CodeInc\Router\Resolvers\HandlerResolverInterface;
+use CodeInc\Router\Exceptions\ControllerInstantiatingException;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -39,41 +39,26 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Router implements MiddlewareInterface
 {
     /**
-     * @var HandlerResolverInterface
+     * @var ResolverInterface
      */
     private $resolver;
 
     /**
-     * @var HandlerInstantiatorInterface
-     */
-    private $instantiator;
-
-    /**
      * Router constructor.
      *
-     * @param HandlerResolverInterface $resolver
-     * @param HandlerInstantiatorInterface $instantiator
+     * @param ResolverInterface $resolver
      */
-    public function __construct(HandlerResolverInterface $resolver, HandlerInstantiatorInterface $instantiator)
+    public function __construct(ResolverInterface $resolver)
     {
         $this->resolver = $resolver;
-        $this->instantiator = $instantiator;
     }
 
     /**
-     * @return HandlerResolverInterface
+     * @return ResolverInterface
      */
-    public function getResolver():HandlerResolverInterface
+    public function getResolver():ResolverInterface
     {
         return $this->resolver;
-    }
-
-    /**
-     * @return HandlerInstantiatorInterface
-     */
-    public function getInstantiator():HandlerInstantiatorInterface
-    {
-        return $this->instantiator;
     }
 
     /**
@@ -85,12 +70,12 @@ class Router implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        if ($routeHandler = $this->getHandler($request)) {
+        if ($controller = $this->getController($request)) {
             try {
-                return $routeHandler->handle($request);
+                return $controller->createResponse();
             }
             catch (\Throwable $exception) {
-                throw new RequestHandlingException($routeHandler, $request, 0, $exception);
+                throw new RequestHandlingException($controller, $request, 0, $exception);
             }
         }
         return $handler->handle($request);
@@ -99,21 +84,21 @@ class Router implements MiddlewareInterface
     /**
      * Returns the handler in charge of handling a given route.
      *
-     * @param string|ServerRequestInterface $route
-     * @return null|RequestHandlerInterface
+     * @param ServerRequestInterface $request
+     * @return ControllerInterface|null
+     * @throws ControllerInstantiatingException
      */
-    public function getHandler($route):?RequestHandlerInterface
+    public function getController(ServerRequestInterface $request):?ControllerInterface
     {
-        if ($route instanceof ServerRequestInterface) {
-            $route = $route->getUri()->getPath();
-        }
-
-        if (($handlerClass = $this->resolver->getHandlerClass((string)$route)) !== null) {
+        if (($controllerClass = $this->resolver->getControllerClass($request->getUri()->getPath())) !== null) {
+            if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+                throw new NotAControllerException($controllerClass);
+            }
             try {
-                return $this->instantiator->instantiate($handlerClass);
+                return new $controllerClass($request);
             }
             catch (\Throwable $exception) {
-                throw new HandlerInstantiatingException($handlerClass, 0, $exception);
+                throw new ControllerInstantiatingException($controllerClass, $request, 0, $exception);
             }
         }
 
@@ -124,12 +109,12 @@ class Router implements MiddlewareInterface
      * Returns the route to a request handler or NULL if the route can not be computed.
      * Alias of HandlerResolverInterface::getHandlerRoute().
      *
-     * @uses HandlerResolverInterface::getHandlerRoute()
-     * @param string $handlerClass
+     * @uses ResolverInterface::getControllerRoute()
+     * @param string $controllerClass
      * @return null|string
      */
-    public function getRoute(string $handlerClass):?string
+    public function getRoute(string $controllerClass):?string
     {
-        return $this->resolver->getHandlerRoute($handlerClass);
+        return $this->resolver->getControllerRoute($controllerClass);
     }
 }

@@ -44,18 +44,18 @@ final class NotWithinNamespaceException extends \LogicException implements Route
     /**
      * NotWithinNamespaceException constructor.
      *
-     * @param string $handlerClass
+     * @param string $controllerClass
      * @param string $handlersNamespace
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $handlerClass, string $handlersNamespace, int $code = 0, Throwable $previous = null)
+    public function __construct(string $controllerClass, string $handlersNamespace, int $code = 0, Throwable $previous = null)
     {
-        $this->handlerClass = $handlerClass;
+        $this->handlerClass = $controllerClass;
         $this->handlersNamespace = $handlersNamespace;
         parent::__construct(
             sprintf("The handler '%s' is not within the namespace '%s'.",
-                $handlerClass, $handlersNamespace),
+                $controllerClass, $handlersNamespace),
             $code,
             $previous
         );

@@ -20,7 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Instantiator\HandlerInstantiatorInterface;
+use CodeInc\Router\Instantiator\InstantiatorInterface;
 use Throwable;
 
 
@@ -48,7 +48,7 @@ final class NotAnInstantiatorException extends \LogicException
     {
         parent::__construct(
             sprintf("The item '%s' is not an instantiator. All instantiators must implement '%s'.",
-                is_object($item) ? get_class($item) : (string)$item, HandlerInstantiatorInterface::class),
+                is_object($item) ? get_class($item) : (string)$item, InstantiatorInterface::class),
             $code,
             $previous
         );

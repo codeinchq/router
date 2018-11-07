@@ -20,7 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Resolvers\HandlerResolverInterface;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Throwable;
 
 
@@ -33,18 +33,18 @@ use Throwable;
 final class RouterEmptyUriPrefixException extends \LogicException implements RouterException
 {
     /**
-     * @var HandlerResolverInterface
+     * @var ResolverInterface
      */
     private $router;
 
     /**
      * RouterEmptyUriPrefixException constructor.
      *
-     * @param HandlerResolverInterface $router
+     * @param ResolverInterface $router
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(HandlerResolverInterface $router, int $code = 0, Throwable $previous = null)
+    public function __construct(ResolverInterface $router, int $code = 0, Throwable $previous = null)
     {
         $this->router = $router;
         parent::__construct(
@@ -55,9 +55,9 @@ final class RouterEmptyUriPrefixException extends \LogicException implements Rou
     }
 
     /**
-     * @return HandlerResolverInterface
+     * @return ResolverInterface
      */
-    public function getRouter():HandlerResolverInterface
+    public function getRouter():ResolverInterface
     {
         return $this->router;
     }

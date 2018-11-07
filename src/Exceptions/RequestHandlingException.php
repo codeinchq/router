@@ -20,8 +20,8 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
+use CodeInc\Router\ControllerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -33,9 +33,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class RequestHandlingException extends \RuntimeException implements RouterException
 {
     /**
-     * @var RequestHandlerInterface
+     * @var ControllerInterface
      */
-    private $handler;
+    private $controller;
 
     /**
      * @var ServerRequestInterface
@@ -45,18 +45,18 @@ final class RequestHandlingException extends \RuntimeException implements Router
     /**
      * RequestHandlingException constructor.
      *
-     * @param RequestHandlerInterface $handler
+     * @param ControllerInterface $controller
      * @param ServerRequestInterface $request
      * @param int $code
      * @param null|\Throwable $previous
      */
-    public function __construct(RequestHandlerInterface $handler, ServerRequestInterface $request,
+    public function __construct(ControllerInterface $controller, ServerRequestInterface $request,
         int $code = 0, ?\Throwable $previous = null)
     {
-        $this->handler = $handler;
+        $this->controller = $controller;
         $this->request = $request;
         parent::__construct(
-            sprintf("Error while processing a request with the handler '%s'", get_class($handler)),
+            sprintf("Error while processing a request with the handler '%s'", get_class($controller)),
             $code,
             $previous
         );
@@ -71,10 +71,10 @@ final class RequestHandlingException extends \RuntimeException implements Router
     }
 
     /**
-     * @return RequestHandlerInterface
+     * @return ControllerInterface
      */
-    public function getHandler():RequestHandlerInterface
+    public function getController():ControllerInterface
     {
-        return $this->handler;
+        return $this->controller;
     }
 }

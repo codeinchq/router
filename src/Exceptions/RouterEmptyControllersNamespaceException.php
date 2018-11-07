@@ -20,46 +20,37 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use Psr\Http\Server\RequestHandlerInterface;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Throwable;
 
 
 /**
- * Class NotARequestHandlerException
+ * Class RouterEmptyControllersNamespaceException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class NotARequestHandlerException extends \LogicException implements RouterException
+final class RouterEmptyControllersNamespaceException extends \LogicException implements RouterException
 {
     /**
-     * @var string
+     * @var ResolverInterface
      */
-    private $class;
+    private $router;
 
     /**
-     * NotARequestHandlerException constructor.
+     * RouterEmptyControllersNamespaceException constructor.
      *
-     * @param string $class
+     * @param ResolverInterface $router
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $class, int $code = 0, Throwable $previous = null)
+    public function __construct(ResolverInterface $router, int $code = 0, Throwable $previous = null)
     {
-        $this->class = $class;
+        $this->router = $router;
         parent::__construct(
-            sprintf("The class %s is not a PSR-7 request handler. "
-                ."All request handlers must implement %s.", $class, RequestHandlerInterface::class),
+            "The controllers namespace can not be empty.",
             $code,
             $previous
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getClass():string
-    {
-        return $this->class;
     }
 }

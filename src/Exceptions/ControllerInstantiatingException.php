@@ -21,41 +21,60 @@
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
 
+use Psr\Http\Message\ServerRequestInterface;
+
+
 /**
- * Class HandlerInstantiatingException
+ * Class ControllerInstantiatingException
  *
  * @package CodeInc\Router\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-final class HandlerInstantiatingException extends \RuntimeException implements RouterException
+final class ControllerInstantiatingException extends \RuntimeException implements RouterException
 {
     /**
      * @var string
      */
-    private $handlerClass;
+    private $controllerClass;
 
     /**
-     * HandlerInstantiatingException constructor.
+     * @var ServerRequestInterface
+     */
+    private $request;
+
+    /**
+     * ControllerInstantiatingException constructor.
      *
-     * @param string $handlerClass
+     * @param string $controllerClass
+     * @param ServerRequestInterface $request
      * @param int $code
      * @param null|\Throwable $previous
      */
-    public function __construct(string $handlerClass, int $code = 0, ?\Throwable $previous = null)
+    public function __construct(string $controllerClass, ServerRequestInterface $request,
+        int $code = 0, ?\Throwable $previous = null)
     {
-        $this->handlerClass = $handlerClass;
+        $this->controllerClass = $controllerClass;
+        $this->request = $request;
         parent::__construct(
-            sprintf("Error while instantiating the handler '%s'", $handlerClass),
+            sprintf("Error while instantiating the controller '%s'", $controllerClass),
             $code,
             $previous
         );
     }
 
     /**
+     * @return ServerRequestInterface
+     */
+    public function getRequest():ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    /**
      * @return string
      */
-    public function getHandlerClass():string
+    public function getControllerClass():string
     {
-        return $this->handlerClass;
+        return $this->controllerClass;
     }
 }
