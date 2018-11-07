@@ -20,7 +20,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Resolvers;
-use CodeInc\CollectionInterface\CountableCollectionInterface;
 use CodeInc\Router\Exceptions\NotAResolverException;
 
 
@@ -30,10 +29,10 @@ use CodeInc\Router\Exceptions\NotAResolverException;
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class HandlerResolverAggregator implements HandlerResolverInterface, CountableCollectionInterface
+class ResolverAggregator implements ResolverInterface, \Countable, \Iterator
 {
     /**
-     * @var HandlerResolverInterface[]
+     * @var ResolverInterface[]
      */
     private $resolvers = [];
 
@@ -57,9 +56,9 @@ class HandlerResolverAggregator implements HandlerResolverInterface, CountableCo
     /**
      * Adds a resolver.
      *
-     * @param HandlerResolverInterface $resolver
+     * @param ResolverInterface $resolver
      */
-    public function addResolver(HandlerResolverInterface $resolver):void
+    public function addResolver(ResolverInterface $resolver):void
     {
         $this->resolvers[] = $resolver;
     }
@@ -67,16 +66,46 @@ class HandlerResolverAggregator implements HandlerResolverInterface, CountableCo
     /**
      * Adds multiple resolvers. Only object implementing ResolverInterface will be added.
      *
-     * @param iterable|HandlerResolverInterface[] $resolvers
+     * @param iterable|ResolverInterface[] $resolvers
      */
     public function addResolvers(iterable $resolvers):void
     {
         foreach ($resolvers as $resolver) {
-            if (!$resolver instanceof HandlerResolverInterface) {
+            if (!$resolver instanceof ResolverInterface) {
                 throw new NotAResolverException($resolver);
             }
             $this->addResolver($resolver);
         }
+    }
+
+    /**
+     * @inheritdoc
+     * @param string $route
+     * @return string|null
+     */
+    public function getControllerClass(string $route):?string
+    {
+        foreach ($this->resolvers as $resolver) {
+            if (($handlerClass = $resolver->getControllerClass($route)) !== null) {
+                return $handlerClass;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     * @param string $controllerClass
+     * @return string|null
+     */
+    public function getControllerRoute(string $controllerClass):?string
+    {
+        foreach ($this->resolvers as $resolver) {
+            if (($route = $resolver->getControllerRoute($controllerClass)) !== null) {
+                return $route;
+            }
+        }
+        return null;
     }
 
     /**
@@ -106,9 +135,9 @@ class HandlerResolverAggregator implements HandlerResolverInterface, CountableCo
 
     /**
      * @inheritdoc
-     * @return HandlerResolverInterface
+     * @return ResolverInterface
      */
-    public function current():HandlerResolverInterface
+    public function current():ResolverInterface
     {
         return $this->resolvers[$this->iteratorPosition];
     }
@@ -129,37 +158,5 @@ class HandlerResolverAggregator implements HandlerResolverInterface, CountableCo
     public function count():int
     {
         return count($this->resolvers);
-    }
-
-    /**
-     * Returns the request handler's class for a given route or NULL if none is available.
-     *
-     * @param string $route
-     * @return string|null
-     */
-    public function getHandlerClass(string $route):?string
-    {
-        foreach ($this->resolvers as $resolver) {
-            if (($handlerClass = $resolver->getHandlerClass($route)) !== null) {
-                return $handlerClass;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the route to a request handler or NULL if the route can not be computed.
-     *
-     * @param string $handlerClass
-     * @return string|null
-     */
-    public function getHandlerRoute(string $handlerClass):?string
-    {
-        foreach ($this->resolvers as $resolver) {
-            if (($route = $resolver->getHandlerRoute($handlerClass)) !== null) {
-                return $route;
-            }
-        }
-        return null;
     }
 }

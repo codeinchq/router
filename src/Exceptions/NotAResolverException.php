@@ -20,7 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\Router\Exceptions;
-use CodeInc\Router\Resolvers\HandlerResolverInterface;
+use CodeInc\Router\Resolvers\ResolverInterface;
 use Throwable;
 
 
@@ -48,7 +48,7 @@ final class NotAResolverException extends \LogicException
     {
         parent::__construct(
             sprintf("The item '%s' is not a resolver. All resolvers must implement '%s'.",
-                is_object($item) ? get_class($item) : (string)$item, HandlerResolverInterface::class),
+                is_object($item) ? get_class($item) : (string)$item, ResolverInterface::class),
             $code,
             $previous
         );

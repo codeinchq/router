@@ -21,8 +21,9 @@
 //
 declare(strict_types = 1);
 namespace CodeInc\Router\Resolvers;
+use CodeInc\Router\ControllerInterface;
 use CodeInc\Router\Exceptions\DuplicateRouteException;
-use CodeInc\Router\Exceptions\NotARequestHandlerException;
+use CodeInc\Router\Exceptions\NotAControllerException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -32,7 +33,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class StaticHandlerResolver implements HandlerResolverInterface
+class StaticResolver implements ResolverInterface
 {
     /**
      * @var string[]
@@ -67,17 +68,17 @@ class StaticHandlerResolver implements HandlerResolverInterface
      * Adds a route to a request handler.
      *
      * @param string $route URI path (supports shell patterns)
-     * @param string $handlerClass
+     * @param string $controllerClass
      */
-    public function addRoute(string $route, string $handlerClass):void
+    public function addRoute(string $route, string $controllerClass):void
     {
-        if (!is_subclass_of($handlerClass, RequestHandlerInterface::class)) {
-            throw new NotARequestHandlerException($handlerClass);
+        if (!is_subclass_of($controllerClass, ControllerInterface::class)) {
+            throw new NotAControllerException($controllerClass);
         }
         if (isset($this->routes[$route])) {
-            throw new DuplicateRouteException($route, $handlerClass);
+            throw new DuplicateRouteException($route, $controllerClass);
         }
-        $this->routes[$route] = $handlerClass;
+        $this->routes[$route] = $controllerClass;
     }
 
     /**
@@ -93,7 +94,7 @@ class StaticHandlerResolver implements HandlerResolverInterface
      * @param string $route
      * @return null|string
      */
-    public function getHandlerClass(string $route):?string
+    public function getControllerClass(string $route):?string
     {
         foreach ($this->routes as $handlerRoute => $handlerClass) {
             if (fnmatch($handlerRoute, $route, FNM_CASEFOLD)) {
@@ -105,13 +106,13 @@ class StaticHandlerResolver implements HandlerResolverInterface
 
     /**
      * @inheritdoc
-     * @param string $handlerClass
+     * @param string $controllerClass
      * @return null|string
      */
-    public function getHandlerRoute(string $handlerClass):?string
+    public function getControllerRoute(string $controllerClass):?string
     {
         foreach ($this->routes as $route => $class) {
-            if ($handlerClass == $class) {
+            if ($controllerClass == $class) {
                 return $route;
             }
         }

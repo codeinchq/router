@@ -15,51 +15,33 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     11/10/2018
+// Date:     25/09/2018
 // Project:  Router
 //
 declare(strict_types=1);
-namespace CodeInc\Router\Instantiator;
-use CodeInc\Router\Exceptions\NotAHandlerException;
-use Psr\Http\Server\RequestHandlerInterface;
-
+namespace CodeInc\Router\Resolvers;
 
 /**
- * Class CallableHandlerInstantiator
+ * Interface ResolverInterface
  *
- * @package CodeInc\Router\Instantiator
+ * @package CodeInc\Router\Resolvers
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class CallableHandlerInstantiator implements HandlerInstantiatorInterface
+interface ResolverInterface
 {
     /**
-     * @var callable
+     * Returns the controller's in charge or handling a given route or NULL if none is available.
+     *
+     * @param string $route
+     * @return string|null
      */
-    private $instantiator;
+    public function getControllerClass(string $route):?string;
 
     /**
-     * CallableHandlerInstantiator constructor.
+     * Returns the route to a controller or NULL if the route can not be computed.
      *
-     * @param callable $instantiator
+     * @param string $controllerClass
+     * @return string|null
      */
-    public function __construct(callable $instantiator)
-    {
-        $this->instantiator = $instantiator;
-    }
-
-    /**
-     * Instantiates a request handler or returns NULL if the request handler can not be instantiated.
-     *
-     * @param string $handlerClass
-     * @return RequestHandlerInterface|null
-     * @throws NotAHandlerException
-     */
-    public function instantiate(string $handlerClass):?RequestHandlerInterface
-    {
-        $handler = call_user_func($this->instantiator, $handlerClass);
-        if ($handler !== null && !$handler instanceof RequestHandlerInterface) {
-            throw new NotAHandlerException($handler);
-        }
-        return $handler;
-    }
+    public function getControllerRoute(string $controllerClass):?string;
 }
